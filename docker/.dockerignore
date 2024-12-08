@@ -1,0 +1,6 @@
+docker/
+scripts/
+deno.lock
+README.md
+.gitignore
+.env**
