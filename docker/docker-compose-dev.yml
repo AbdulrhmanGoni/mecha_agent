@@ -1,0 +1,62 @@
+services:
+  dev_server:
+    build: 
+      context: ../
+      dockerfile: docker/ServerDockerfile
+    container_name: dev_server_container
+    ports:
+      - 10000:10000
+    command: deno run --allow-net --allow-env --watch src/server.ts
+    image: mecha_agent_server:dev
+    volumes:
+      - ../src:/assistant-server/src:ro
+    env_file:
+      - .env.development
+    networks:
+      - development-network
+
+  dev_database:
+    image: postgres:latest
+    container_name: dev_database_container
+    ports:
+      - 5432:5432
+    volumes:
+      - dev_database_storage:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - development-network
+
+  dev_vector_database: 
+    image: qdrant/qdrant:latest
+    container_name: dev_vector_database_container
+    ports:
+      - 6333:6333
+      - 6334:6334
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    restart: always
+    networks:
+      - development-network
+
+  dev_ollama: 
+    image: ollama/ollama:latest
+    container_name: dev_ollama_container
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: always
+    networks:
+      - development-network
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+networks:
+  development-network:
+    driver: bridge
+
+volumes:
+  dev_database_storage:
+  ollama-data:
+  qdrant_storage:

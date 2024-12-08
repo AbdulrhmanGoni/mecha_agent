@@ -1,4 +1,8 @@
 {
+  "tasks": {
+    "start:dev": "deno run --allow-run --allow-env --allow-read --env-file=docker/.env.development scripts/startDevelopment.ts",
+    "stop:dev": "docker compose -f docker/docker-compose-dev.yml down",
+  },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
     "deno.land/x/postgres": "https://deno.land/x/postgres@v0.19.3/mod.ts",

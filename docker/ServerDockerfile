@@ -1,0 +1,11 @@
+FROM denoland/deno
+
+EXPOSE 10000
+
+WORKDIR /assistant-server
+
+COPY . .
+
+RUN deno install --entrypoint src/server.ts
+
+CMD ["deno", "run", "--allow-net", "--allow-env", "src/server.ts"]
