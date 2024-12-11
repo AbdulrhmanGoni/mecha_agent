@@ -32,8 +32,10 @@ const envSchema = z.object({
     VECTOR_DB_HOST: z.string(),
 
     OWNER_NAME: z.string(),
+    ASSISTANT_NAME: z.string().default("Mecha Agent"),
     OLLAMA_HOST: z.string(),
-    MODEL_NAME: z.string().default("llama3.2:3b"),
+    BASE_MODEL_NAME: z.string().default("llama3.2:3b"),
+    MODEL_NAME: z.string().default("Mecha_Agent"),
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),
     DONT_KNOW_RESPOND: z.string().optional(),
 
