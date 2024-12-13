@@ -19,11 +19,12 @@ export class JwtService {
         )
     }
 
-    async generateJwt(options: CreateApiKeyInput) {
+    async generateJwt(options: CreateJWTOptions) {
         const expirationDate = genDateAfterNDays(options.maxAgeInDays);
         const payload: Payload = {
             exp: getNumericDate(expirationDate),
-            permissions: options.permissions
+            permissions: options.permissions,
+            user: options.user
         };
 
         const header: Header = { alg: "HS512", typ: "JWT", };
@@ -36,9 +37,9 @@ export class JwtService {
         }
     }
 
-    async verifyJwt<T extends object>(token: string): Promise<VerifyJwtResponse<T & Payload>> {
+    async verifyJwt(token: string): Promise<VerifyJwtResponse> {
         try {
-            const payload = await verify<T & Payload>(token, this.JWT_SECRET_CRYPTO_KEY);
+            const payload = await verify<Required<VerifyJwtResponse>["payload"]>(token, this.JWT_SECRET_CRYPTO_KEY);
             return { payload };
         } catch (error) {
             const e = error as Error
