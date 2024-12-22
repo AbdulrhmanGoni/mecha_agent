@@ -6,4 +6,15 @@ export class DatabaseService {
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
     }
+
+    private async checkTableExistance(tableName: string) {
+        const result = await this.dbClient.queryObject<{ exists: boolean }>(`
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = $1 
+            );
+        `, [tableName]
+        );
+        return result.rows[0].exists
+    }
 }
