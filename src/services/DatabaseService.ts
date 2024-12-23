@@ -17,4 +17,12 @@ export class DatabaseService {
         );
         return result.rows[0].exists
     }
+
+    get query() {
+        return this.dbClient.queryObject.bind(this.dbClient)
+    }
+
+    createTransaction(name: string) {
+        return this.dbClient.createTransaction(name)
+    }
 }
