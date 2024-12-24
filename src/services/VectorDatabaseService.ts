@@ -122,6 +122,7 @@ export class VectorDatabaseService {
 
         return searchResult.map(p => p.payload as Instruction)
     }
+
     async removeInstructions(instructionsIds: string[]) {
         return await this.dbClient.delete(
             this.datasetsCollection,
@@ -129,4 +130,17 @@ export class VectorDatabaseService {
         )
     }
 
+    async clearInstructions(datasetId: string) {
+        return await this.dbClient.delete(
+            this.datasetsCollection,
+            {
+                filter: {
+                    must: {
+                        key: "datasetId",
+                        match: { value: datasetId }
+                    }
+                }
+            }
+        )
+    }
 }
