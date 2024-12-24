@@ -1,5 +1,8 @@
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { Schemas } from "npm:@qdrant/js-client-rest";
+import objectIdToUUID from "../helpers/objectIdToUUID.ts";
 import { EmbeddingService } from "./EmbeddingService.ts";
+import embedInstructionFormat from "../helpers/embedInstructionFormat.ts";
 
 export class VectorDatabaseService {
     private readonly datasetsCollection = "datasets";
@@ -38,5 +41,23 @@ export class VectorDatabaseService {
                 },
             })
         }
+    }
+
+    async insertInstructions(instruction: InstructionInput[]) {
+        const points = new Array<Schemas["PointStruct"]>(instruction.length)
+
+        for (let i = 0; i < instruction.length; i++) {
+            const instructionEmbedding = await this.embeddingService.embedText(
+                embedInstructionFormat(instruction[i])
+            )
+
+            points[i] = {
+                id: objectIdToUUID(instruction[i].id),
+                vector: instructionEmbedding.embedding,
+                payload: instruction[i]
+            }
+        }
+
+        return await this.dbClient.upsert(this.datasetsCollection, { points })
     }
 }
