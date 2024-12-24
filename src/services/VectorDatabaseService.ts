@@ -98,4 +98,28 @@ export class VectorDatabaseService {
             { points: updatedInstructionPoints }
         )
     }
+
+    async search(datasetId: string, text: string): Promise<Instruction[]> {
+        const textEmbedding = await this.embeddingService.embedText(text);
+
+        const searchResult = await this.dbClient.search(
+            this.datasetsCollection,
+            {
+                vector: textEmbedding.embedding,
+                filter: {
+                    must: [
+                        {
+                            key: "datasetId",
+                            match: {
+                                value: datasetId,
+                            },
+                        },
+                    ],
+                },
+                limit: 10
+            }
+        )
+
+        return searchResult.map(p => p.payload as Instruction)
+    }
 }
