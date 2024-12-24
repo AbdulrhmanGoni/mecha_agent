@@ -6,6 +6,7 @@ export class DatabaseService {
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
         await this.createAgentsTable();
+        await this.createApiKeysTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -36,6 +37,24 @@ export class DatabaseService {
                     created_at TIMESTAMP NOT NULL DEFAULT now()
                 )
             `;
+        }
+    }
+
+    private async createApiKeysTable() {
+        const tableExists = await this.checkTableExistance("api_keys")
+
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+            CREATE TABLE api_keys (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+                key TEXT NOT NULL,
+                key_name VARCHAR(80) NOT NULL,
+                expiration_date TIMESTAMP NOT NULL,
+                permissions VARCHAR(10)[] NOT NULL,
+                status VARCHAR(10) NOT NULL DEFAULT 'Active',
+                created_at TIMESTAMP NOT NULL DEFAULT now()
+            )
+        `;
         }
     }
 
