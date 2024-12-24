@@ -122,4 +122,11 @@ export class VectorDatabaseService {
 
         return searchResult.map(p => p.payload as Instruction)
     }
+    async removeInstructions(instructionsIds: string[]) {
+        return await this.dbClient.delete(
+            this.datasetsCollection,
+            { points: instructionsIds.map(id => objectIdToUUID(id)) }
+        )
+    }
+
 }
