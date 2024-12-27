@@ -39,4 +39,11 @@ export class ObjectStorageService {
 
         return fileId;
     }
+
+    async getFile(bucketName: string, fileId: string): Promise<Readable & { headers?: Record<string, string> }> {
+        return await this.minioClient.getObject(
+            bucketName,
+            fileId,
+        )
+    }
 }
