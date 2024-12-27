@@ -46,4 +46,11 @@ export class ObjectStorageService {
             fileId,
         )
     }
+
+    async deleteFile(bucketName: string, fileId: string) {
+        return await this.minioClient.removeObject(
+            bucketName,
+            fileId,
+        )
+    }
 }
