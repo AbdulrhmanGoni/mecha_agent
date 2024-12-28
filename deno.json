@@ -12,7 +12,8 @@
   "compilerOptions": {
     "types": [
       "./types/global.d.ts",
-      "./types/instructions.d.ts"
+      "./types/instructions.d.ts",
+      "./types/agents.d.ts"
     ]
   }
 }
