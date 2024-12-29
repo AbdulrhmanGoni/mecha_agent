@@ -34,6 +34,7 @@ export class DatabaseService {
                     dataset_id VARCHAR(50),
                     dont_know_response TEXT,
                     response_syntax VARCHAR(10),
+                    greeting_message VARCHAR(100),
                     created_at TIMESTAMP NOT NULL DEFAULT now()
                 )
             `;
