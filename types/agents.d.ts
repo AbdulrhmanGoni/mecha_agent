@@ -7,6 +7,7 @@ type Agent = {
     systemInstructions?: string;
     dontKnowResponse?: string;
     responseSyntax: import("../src/constant/responseSyntaxes.ts").ResponseSyntax;
+    greetingMessage?: string;
     createdAt: Date;
 }
 
