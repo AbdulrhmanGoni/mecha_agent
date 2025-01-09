@@ -7,6 +7,7 @@ export class DatabaseService {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
         await this.createAgentsTable();
         await this.createApiKeysTable();
+        await this.chatsHistoryTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -18,6 +19,22 @@ export class DatabaseService {
         `, [tableName]
         );
         return result.rows[0].exists
+    }
+
+    private async chatsHistoryTable() {
+        const tableExists = await this.checkTableExistance("chats_history");
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+                CREATE TABLE chats_history (
+                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+                    agent_id UUID REFERENCES agents(id) ON DELETE CASCADE,
+                    username VARCHAR(50) NOT NULL,
+                    title VARCHAR(40) NOT NULL,
+                    messages JSONB NOT NULL,
+                    started_at TIMESTAMP DEFAULT NOW() NOT NULL
+                )
+            `;
+        }
     }
 
     private async createAgentsTable() {
