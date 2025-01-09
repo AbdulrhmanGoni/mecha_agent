@@ -10,6 +10,7 @@ services:
     image: mecha_agent_server:dev
     volumes:
       - ../src:/assistant-server/src:ro
+      - ../scripts/createCustomModel.ts:/assistant-server/scripts/createCustomModel.ts
     env_file:
       - .env.development
     networks:
