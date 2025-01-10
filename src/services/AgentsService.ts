@@ -93,4 +93,39 @@ export class AgentsService {
         return result.rows
     }
 
+    async delete(agentId: string) {
+        const { rows: [agent] } = await this.databaseService.query<Agent | null>({
+            text: "SELECT avatar FROM agents WHERE id = $1;",
+            args: [agentId],
+            camelCase: true,
+        })
+
+        if (!agent) {
+            return false
+        }
+
+        const transaction = this.databaseService.createTransaction("deleting_agent")
+        await transaction.begin();
+
+        const result = await transaction.queryObject<Agent>({
+            text: "DELETE FROM agents WHERE id = $1;",
+            args: [agentId],
+            camelCase: true,
+        })
+
+        if (agent.avatar) {
+            try {
+                await this.objectStorageService.deleteFile(
+                    this.objectStorageService.buckets.agentsAvatars,
+                    agent.avatar
+                )
+            } catch {
+                await transaction.rollback();
+                return false
+            }
+        }
+
+        await transaction.commit();
+        return !!result.rowCount
+    }
 }
