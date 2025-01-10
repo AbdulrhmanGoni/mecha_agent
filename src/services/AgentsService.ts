@@ -75,4 +75,22 @@ export class AgentsService {
         await transaction.rollback();
         return false;
     }
+
+    async getOne(id: string) {
+        const result = await this.databaseService.query<Agent>({
+            text: "SELECT * FROM agents WHERE id = $1;",
+            args: [id],
+            camelCase: true,
+        })
+        return result.rows[0]
+    }
+
+    async getAll() {
+        const result = await this.databaseService.query<Agent>({
+            text: "SELECT * FROM agents",
+            camelCase: true
+        })
+        return result.rows
+    }
+
 }
