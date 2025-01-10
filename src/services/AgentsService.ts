@@ -128,4 +128,75 @@ export class AgentsService {
         await transaction.commit();
         return !!result.rowCount
     }
+
+    async update(agentId: string, updateData: UpdateAgentFormData) {
+        const { rows: [agent] } = await this.databaseService.query<Agent | null>({
+            text: "SELECT avatar FROM agents WHERE id = $1;",
+            args: [agentId],
+            camelCase: true,
+        })
+
+        if (!agent) {
+            return false
+        }
+
+        const { avatar: newAgentAvatart, removeAvatar, ...restUpdateData } = updateData;
+
+        let avatarId = null;
+
+        if (newAgentAvatart) {
+            const fileExtention = mimeTypeToFileExtentionMap[newAgentAvatart.type];
+            avatarId = `${crypto.randomUUID()}.${fileExtention}`;
+        }
+
+        type UpdateDataFormat = [string, string[]]
+
+        const [fields, values] = Object
+            .entries(newAgentAvatart || removeAvatar ? { ...restUpdateData, avatar: avatarId } : restUpdateData)
+            .reduce<UpdateDataFormat>(([fields, values], [field, value], i, arr) => {
+                return [
+                    (
+                        fields +
+                        `${agentRowFieldsNamesMap[field] || field} = $${i + 2}` +
+                        `${i === arr.length - 1 ? "" : ", "}`
+                    ),
+                    [...values, value || ""]
+                ]
+            }, ["", []])
+
+        const transaction = this.databaseService.createTransaction("updating_agent")
+        await transaction.begin();
+
+        const result = await transaction.queryObject<Agent>({
+            text: `UPDATE agents SET ${fields} WHERE id = $1;`,
+            args: [agentId, ...values],
+            camelCase: true,
+        })
+
+        try {
+            if (result.rowCount) {
+                if (newAgentAvatart && avatarId) {
+                    await this.objectStorageService.uploadFile(
+                        this.objectStorageService.buckets.agentsAvatars,
+                        newAgentAvatart,
+                        { id: avatarId }
+                    );
+                }
+
+                if (agent.avatar && (newAgentAvatart || removeAvatar)) {
+                    await this.objectStorageService.deleteFile(
+                        this.objectStorageService.buckets.agentsAvatars,
+                        agent.avatar
+                    )
+                }
+
+                await transaction.commit();
+                return true
+            }
+        } catch {
+            await transaction.rollback()
+        }
+
+        return false
+    }
 }
