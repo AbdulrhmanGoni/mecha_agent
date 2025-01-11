@@ -1,4 +1,4 @@
-import { Ollama } from "npm:ollama";
+import { Message, Ollama } from "npm:ollama";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export class LLMService {
@@ -9,6 +9,15 @@ export class LLMService {
             model: parsedEnvVariables.MODEL_NAME,
             prompt,
             system,
+            keep_alive: "1h",
+            stream: true,
+        })
+    }
+
+    async chat(messages: Message[]) {
+        return await this.ollamaClient.chat({
+            model: parsedEnvVariables.MODEL_NAME,
+            messages,
             keep_alive: "1h",
             stream: true,
         })
