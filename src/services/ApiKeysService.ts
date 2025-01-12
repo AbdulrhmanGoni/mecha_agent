@@ -50,4 +50,21 @@ export class ApiKeysService {
         return !!result.rowCount
     }
 
+    async deactivate(keysIds: string[]) {
+        const result = await this.databaseService.query({
+            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1)",
+            args: [keysIds, "Inactive"],
+        })
+
+        return !!result.rowCount
+    }
+
+    async activate(keysIds: string[]) {
+        const result = await this.databaseService.query({
+            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1)",
+            args: [keysIds, "Active"],
+        })
+
+        return !!result.rowCount
+    }
 }
