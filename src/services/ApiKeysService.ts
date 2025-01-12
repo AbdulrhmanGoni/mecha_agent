@@ -40,4 +40,14 @@ export class ApiKeysService {
 
         return result.rows[0]
     }
+
+    async delete(keysIds: string[]) {
+        const result = await this.databaseService.query<ApiKeyRecord>({
+            text: "DELETE FROM api_keys WHERE id = ANY($1)",
+            args: [keysIds],
+        })
+
+        return !!result.rowCount
+    }
+
 }
