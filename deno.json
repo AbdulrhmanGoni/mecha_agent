@@ -13,6 +13,7 @@
     "types": [
       "./types/global.d.ts",
       "./types/instructions.d.ts",
+      "./types/apiKeys.d.ts",
       "./types/agents.d.ts"
     ]
   }
