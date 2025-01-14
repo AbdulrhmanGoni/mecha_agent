@@ -14,3 +14,5 @@ type VerifyJwtResponse = {
     payload?: JWTPayload & Pick<CreateJWTOptions, "permissions" | "user">
     errorMessage?: string;
 }
+
+type ObjectReadable = import("node:stream").Readable & { headers?: Record<string, string> }
