@@ -8,6 +8,7 @@ export class DatabaseService {
         await this.createAgentsTable();
         await this.createApiKeysTable();
         await this.chatsHistoryTable();
+        await this.datasetsTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -19,6 +20,22 @@ export class DatabaseService {
         `, [tableName]
         );
         return result.rows[0].exists
+    }
+
+    private async datasetsTable() {
+        const tableExists = await this.checkTableExistance("datasets");
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+                CREATE TABLE datasets (
+                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+                    agent_id UUID REFERENCES agents(id) ON DELETE CASCADE NOT NULL,
+                    title VARCHAR(80) NOT NULL,
+                    description VARCHAR(200) NOT NULL,
+                    status VARCHAR(11) NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT now()
+                )
+            `;
+        }
     }
 
     private async chatsHistoryTable() {
