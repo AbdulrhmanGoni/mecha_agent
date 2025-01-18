@@ -65,7 +65,7 @@ export class DatabaseService {
                     description TEXT NOT NULL,
                     avatar VARCHAR(42),
                     system_instructions TEXT,
-                    dataset_id VARCHAR(50),
+                    dataset_id UUID REFERENCES datasets(id) ON DELETE SET NULL,
                     dont_know_response TEXT,
                     response_syntax VARCHAR(10),
                     greeting_message VARCHAR(100),
