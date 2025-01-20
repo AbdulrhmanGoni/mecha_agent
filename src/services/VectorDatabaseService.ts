@@ -43,51 +43,51 @@ export class VectorDatabaseService {
         }
     }
 
-    async insertInstructions(instruction: InstructionInput[]) {
-        const points = new Array<Schemas["PointStruct"]>(instruction.length)
+    async insertInstructions(instructions: InstructionInput[]) {
+        const points = new Array<Schemas["PointStruct"]>(instructions.length)
 
-        for (let i = 0; i < instruction.length; i++) {
+        for (let i = 0; i < instructions.length; i++) {
             const instructionEmbedding = await this.embeddingService.embedText(
-                embedInstructionFormat(instruction[i])
+                embedInstructionFormat(instructions[i])
             )
 
             points[i] = {
-                id: objectIdToUUID(instruction[i].id),
+                id: objectIdToUUID(instructions[i].id),
                 vector: instructionEmbedding.embedding,
-                payload: instruction[i]
+                payload: instructions[i]
             }
         }
 
         return await this.dbClient.upsert(this.datasetsCollection, { points })
     }
 
-    async updateInstructions(instruction: UpdateInstructionInput[]) {
-        const updateData = instruction.reduce<{ ids: Array<string>, updateDataMap: Record<string, UpdateInstructionInput> }>((updateData, instruction, i) => {
+    async updateInstructions(instructions: UpdateInstructionInput[]) {
+        const updateData = instructions.reduce<{ ids: Array<string>, updateDataMap: Record<string, UpdateInstructionInput> }>((updateData, instruction, i) => {
             const id = objectIdToUUID(instruction.id)
             updateData.updateDataMap[id] = instruction;
             updateData.ids[i] = id;
             return updateData;
-        }, { ids: new Array<string>(instruction.length), updateDataMap: {} })
+        }, { ids: new Array<string>(instructions.length), updateDataMap: {} })
 
-        const oldInstructionPoints = await this.dbClient.retrieve(
+        const oldInstructionsPoints = await this.dbClient.retrieve(
             this.datasetsCollection,
             { ids: updateData.ids }
         )
 
-        const updatedInstructionPoints = new Array<Schemas["PointStruct"]>(instruction.length)
+        const updatedInstructionsPoints = new Array<Schemas["PointStruct"]>(instructions.length)
 
-        for (let i = 0; i < oldInstructionPoints.length; i++) {
+        for (let i = 0; i < oldInstructionsPoints.length; i++) {
             const updatedPayload = {
-                ...oldInstructionPoints[i].payload,
-                ...updateData.updateDataMap[oldInstructionPoints[i].id]
+                ...oldInstructionsPoints[i].payload,
+                ...updateData.updateDataMap[oldInstructionsPoints[i].id]
             }
 
             const updatedInstructionEmbedding = await this.embeddingService.embedText(
                 embedInstructionFormat(updatedPayload)
             )
 
-            updatedInstructionPoints[i] = {
-                id: oldInstructionPoints[i].id,
+            updatedInstructionsPoints[i] = {
+                id: oldInstructionsPoints[i].id,
                 vector: updatedInstructionEmbedding.embedding,
                 payload: updatedPayload
             }
@@ -95,7 +95,7 @@ export class VectorDatabaseService {
 
         return await this.dbClient.upsert(
             this.datasetsCollection,
-            { points: updatedInstructionPoints }
+            { points: updatedInstructionsPoints }
         )
     }
 
