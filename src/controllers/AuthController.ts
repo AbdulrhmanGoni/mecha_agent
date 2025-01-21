@@ -10,8 +10,8 @@ export class AuthController {
         return c.json({ result }, 200);
     }
 
-    async getRootData(c: Context) {
-        const result = await this.authService.getRootData();
+    async getRootUserData(c: Context) {
+        const result = await this.authService.getRootUserData();
         return c.json({ result }, 200);
     }
 }
