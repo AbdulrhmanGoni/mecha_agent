@@ -18,7 +18,7 @@ export class AuthService {
         return false
     }
 
-    getRootData() {
+    getRootUserData() {
         return {
             name: "root",
             avatar: null,
