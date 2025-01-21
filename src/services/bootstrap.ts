@@ -9,6 +9,7 @@ import { Client as PostgresClient } from "deno.land/x/postgres";
 import { DatabaseService } from "./DatabaseService.ts";
 import { ApiKeysService } from "./ApiKeysService.ts";
 import { JwtService } from "./JwtService.ts";
+import { AuthService } from "./AuthService.ts";
 import { GuardService } from "./GuardService.ts";
 import { AgentsService } from "./AgentsService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
@@ -43,6 +44,8 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const apiKeysService = new ApiKeysService(databaseService, jwtService);
 
+    const authService = new AuthService(jwtService);
+
     const guardService = new GuardService(jwtService);
 
     return {
@@ -50,6 +53,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         agentsService,
         apiKeysService,
         objectStorageService,
+        authService,
         guardService,
     }
 };
