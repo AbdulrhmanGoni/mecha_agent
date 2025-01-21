@@ -18,7 +18,7 @@ export class VectorDatabaseService {
 
     private async createDatasetsCollection() {
         const collectionExists = await this.dbClient.collectionExists(this.datasetsCollection);
-        if (!collectionExists) {
+        if (!collectionExists.exists) {
             await this.dbClient.createCollection(this.datasetsCollection, {
                 vectors: {
                     size: 384,
