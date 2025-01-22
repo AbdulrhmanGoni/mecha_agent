@@ -8,7 +8,7 @@ type CreateJWTOptions = {
     user: string,
 }
 
-type JWTPayload = import("deno.land/x/djwt").Payload
+type JWTPayload = import("djwt").Payload
 
 type VerifyJwtResponse = {
     payload?: JWTPayload & Pick<CreateJWTOptions, "permissions" | "user">
