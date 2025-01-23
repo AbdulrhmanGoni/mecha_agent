@@ -34,4 +34,13 @@ export class ChatsService {
             agent: agentRow,
         }
     }
+
+    async createChat({ agentId, chatId, chatMessages, user }: Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "user" | "chatId">) {
+        const firstPromptBegenning = chatMessages[0].content.slice(0, 40)
+        await this.databaseService.query<ChatHistory | undefined>({
+            text: `INSERT INTO chats_history (id, agent_id, title, username, messages) VALUES ($1, $2, $3, $4, $5);`,
+            args: [chatId, agentId, firstPromptBegenning, user, JSON.stringify(chatMessages)],
+            camelCase: true,
+        })
+    }
 }
