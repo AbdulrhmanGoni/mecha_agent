@@ -1,6 +1,7 @@
 import { DatabaseService } from "./DatabaseService.ts";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
+import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export class ChatsService {
     constructor(
