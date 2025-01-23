@@ -44,6 +44,16 @@ export class ChatsService {
         })
     }
 
+    async getChatMessages({ agentId, chatId, user }: Pick<ChatRelatedTypes, "agentId" | "user" | "chatId">) {
+        const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
+            text: `SELECT messages FROM chats_history WHERE id = $1 AND agent_id = $2 AND username = $3`,
+            args: [chatId, agentId, user],
+            camelCase: true,
+        })
+
+        return chatHistory?.messages || []
+    }
+
     async getChats({ agentId, user }: Pick<ChatRelatedTypes, "agentId" | "user">) {
         const { rows } = await this.databaseService.query<ChatHistory | undefined>({
             text: `SELECT id, agent_id, title, started_at FROM chats_history WHERE agent_id = $1 AND username = $2`,
