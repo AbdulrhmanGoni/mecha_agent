@@ -73,4 +73,13 @@ export class ChatsService {
         })
         return chatHistory
     }
+
+    async deleteChat({ chatId, agentId, user }: Pick<ChatRelatedTypes, "chatId" | "agentId" | "user">) {
+        const { rowCount } = await this.databaseService.query<ChatHistory | undefined>({
+            text: `DELETE FROM chats_history WHERE id = $1 AND agent_id = $2 AND username = $3`,
+            args: [chatId, agentId, user],
+            camelCase: true,
+        })
+        return !!rowCount
+    }
 }
