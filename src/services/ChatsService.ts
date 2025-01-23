@@ -43,4 +43,14 @@ export class ChatsService {
             camelCase: true,
         })
     }
+
+    async getChats({ agentId, user }: Pick<ChatRelatedTypes, "agentId" | "user">) {
+        const { rows } = await this.databaseService.query<ChatHistory | undefined>({
+            text: `SELECT id, agent_id, title, started_at FROM chats_history WHERE agent_id = $1 AND username = $2`,
+            args: [agentId, user],
+            camelCase: true,
+        })
+
+        return rows
+    }
 }
