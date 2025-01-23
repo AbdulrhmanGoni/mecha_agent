@@ -63,4 +63,13 @@ export class ChatsService {
 
         return rows
     }
+
+    async appendMessageToChat({ chatId, chatMessages }: Pick<ChatRelatedTypes, "chatId" | "chatMessages">) {
+        const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
+            text: `UPDATE chats_history SET messages = messages || $2::JSONB WHERE id = $1`,
+            args: [chatId, JSON.stringify(chatMessages)],
+            camelCase: true,
+        })
+        return chatHistory
+    }
 }
