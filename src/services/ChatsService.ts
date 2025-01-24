@@ -65,6 +65,40 @@ export class ChatsService {
         })
     }
 
+    async startChat({ agentId, prompt, user }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "user">) {
+        const chatId = crypto.randomUUID();
+
+        const newMessage = {
+            role: "user",
+            content: prompt,
+        }
+
+        const chatResponse = await this.chat({
+            prompt,
+            agentId,
+            chatMessages: [newMessage],
+            onResponseComplete: async (fullResponseText) => {
+                const chatHistory = [
+                    newMessage, {
+                        role: "agent",
+                        content: fullResponseText,
+                    }
+                ]
+                await this.createChat({
+                    chatId,
+                    agentId,
+                    chatMessages: chatHistory,
+                    user
+                })
+            }
+        })
+
+        return {
+            chatId,
+            chatResponse
+        }
+    }
+
     async createChat({ agentId, chatId, chatMessages, user }: Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "user" | "chatId">) {
         const firstPromptBegenning = chatMessages[0].content.slice(0, 40)
         await this.databaseService.query<ChatHistory | undefined>({
