@@ -2,6 +2,9 @@ import { DatabaseService } from "./DatabaseService.ts";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import chatResponseHandler from "../helpers/chatResponseHandler.ts";
+import contextTemplete from "../helpers/contextTemplete.ts";
+import systemMessageTemplete from "../helpers/systemMessageTemplete.ts";
 
 export class ChatsService {
     constructor(
@@ -34,6 +37,32 @@ export class ChatsService {
             instructions: searchResult,
             agent: agentRow,
         }
+    }
+
+    async chat({ prompt, agentId, chatMessages, onResponseComplete }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "chatMessages" | "onResponseComplete">) {
+        const result = await this.fetchInstructions({ agentId, prompt });
+
+        if (typeof result === "string") {
+            return result
+        }
+
+        const systemMessage = systemMessageTemplete(result.agent);
+        const context = contextTemplete(result.instructions);
+
+        const llmResponse = await this.llmService.chat(
+            [
+                {
+                    role: "system",
+                    content: systemMessage + "\n\n" + context,
+                },
+                ...chatMessages,
+            ],
+        )
+
+        return chatResponseHandler({
+            llmResponse,
+            onResponseComplete,
+        })
     }
 
     async createChat({ agentId, chatId, chatMessages, user }: Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "user" | "chatId">) {
