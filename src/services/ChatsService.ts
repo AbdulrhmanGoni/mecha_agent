@@ -99,6 +99,31 @@ export class ChatsService {
         }
     }
 
+    async continueChat({ chatId, prompt, agentId, user }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "user" | "chatId">) {
+        const newMessage = {
+            role: "user",
+            content: prompt,
+        }
+
+        const chatHistory = await this.getChatMessages({ agentId, chatId, user });
+
+        return this.chat({
+            prompt,
+            agentId,
+            chatMessages: [...chatHistory, newMessage],
+            onResponseComplete: async (fullResponseText) => {
+                const newMessages = [
+                    newMessage,
+                    {
+                        role: "agent",
+                        content: fullResponseText,
+                    }
+                ]
+                await this.appendMessageToChat({ chatId, chatMessages: newMessages })
+            }
+        })
+    }
+
     async createChat({ agentId, chatId, chatMessages, user }: Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "user" | "chatId">) {
         const firstPromptBegenning = chatMessages[0].content.slice(0, 40)
         await this.databaseService.query<ChatHistory | undefined>({
