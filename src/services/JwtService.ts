@@ -1,4 +1,4 @@
-import { create, verify, getNumericDate, Header, Payload } from "deno.land/x/djwt";
+import { create, verify, getNumericDate, Header, Payload } from "djwt";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 import genDateAfterNDays from "../helpers/genDateAfterNDays.ts";
 
