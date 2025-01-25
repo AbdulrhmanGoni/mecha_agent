@@ -2,7 +2,7 @@ import { encoder } from "djwt/util";
 
 type ChatResponseHandlerParams = {
     llmResponse: any;
-    onResponseComplete: (text: string) => Promise<void>;
+    onResponseComplete: (responseText: string) => Promise<void>;
 }
 
 export default function chatResponseHandler({ onResponseComplete, llmResponse }: ChatResponseHandlerParams): ReadableStream {
