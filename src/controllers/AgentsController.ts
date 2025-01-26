@@ -15,5 +15,22 @@ export class AgentsController {
 
         return c.json({ error: AgentsResponseMessages.failedAgentCreation }, 404);
     }
+
+    async getOne(c: Context) {
+        const agentId = c.req.param("agentId");
+        const result = await this.agentsService.getOne(agentId);
+
+        if (result) {
+            return c.json({ result }, 200);
+        }
+
+        return c.json({ error: AgentsResponseMessages.notFoundAgent }, 404);
+    }
+
+    async getAll(c: Context) {
+        const result = await this.agentsService.getAll();
+        return c.json({ result }, 200);
+    }
+
 }
 
