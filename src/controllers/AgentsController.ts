@@ -43,5 +43,16 @@ export class AgentsController {
         return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 404);
     }
 
+    async update(c: Context<never, never, { out: { form: UpdateAgentFormData } }>) {
+        const agentId = c.req.param("agentId") as string;
+        const updateData = c.req.valid("form");
+        const result = await this.agentsService.update(agentId, updateData);
+
+        if (result) {
+            return c.json({ result: AgentsResponseMessages.successfulAgentUpdate }, 200);
+        }
+
+        return c.json({ error: AgentsResponseMessages.failedAgentUpdate }, 404);
+    }
 }
 
