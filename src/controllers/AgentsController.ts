@@ -32,5 +32,16 @@ export class AgentsController {
         return c.json({ result }, 200);
     }
 
+    async delete(c: Context) {
+        const agentId = c.req.param("agentId");
+        const result = await this.agentsService.delete(agentId);
+
+        if (result) {
+            return c.json({ result: AgentsResponseMessages.successfulAgentDeletion }, 200);
+        }
+
+        return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 404);
+    }
+
 }
 
