@@ -16,7 +16,10 @@ export class DatasetProcessorService {
     ) { }
 
     async processDataset(dataset: Dataset) {
-        const readableDataset = await this.objectStorageService.getFile("datasets", dataset.id);
+        const readableDataset = await this.objectStorageService.getFile(
+            this.objectStorageService.buckets.datasets,
+            dataset.id
+        );
         const fileType = readableDataset.headers?.["content-type"] as string;
 
         const parser = this.parsers[fileType];
@@ -47,7 +50,10 @@ export class DatasetProcessorService {
     }
 
     async deleteDataset(datasetId: string) {
-        await this.objectStorageService.deleteFile("datasets", datasetId);
+        await this.objectStorageService.deleteFile(
+            this.objectStorageService.buckets.datasets,
+            datasetId
+        );;
         await this.vectorDatabaseService.clearInstructions(datasetId);
     }
 }
