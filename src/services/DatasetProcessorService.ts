@@ -45,4 +45,9 @@ export class DatasetProcessorService {
 
         return readingResult
     }
+
+    async deleteDataset(datasetId: string) {
+        await this.objectStorageService.deleteFile("datasets", datasetId);
+        await this.vectorDatabaseService.clearInstructions(datasetId);
+    }
 }
