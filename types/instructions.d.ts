@@ -26,3 +26,6 @@ type InstructionInput = Instruction;
 
 type UpdateInstructionInput = WithOptionalFields<Instruction, "response" | "prompt">;
 
+type DatasetProcessingWorkerTask = "new_dataset" | "delete_dataset" | "successful_process" | "failed_process"
+
+type DatasetProcessingWorkerEvent = MessageEvent<{ process: DatasetProcessingWorkerTask; payload: any }>

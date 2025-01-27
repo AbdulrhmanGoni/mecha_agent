@@ -4,3 +4,5 @@ export const mimeTypeToFileExtentionMap: Record<string, string> = {
     "image/png": "png",
     "image/webp": "webp",
 }
+
+export const supportedDatasetFileTypes = ["text/csv", "application/jsonl"];
