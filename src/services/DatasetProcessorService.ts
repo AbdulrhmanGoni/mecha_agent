@@ -33,7 +33,7 @@ export class DatasetProcessorService {
                     ...baseInstruction,
                 }
 
-                this.vectorDatabaseService.insertInstructions([instruction]);
+                this.vectorDatabaseService.insert([instruction]);
             }
         }
 
@@ -42,7 +42,7 @@ export class DatasetProcessorService {
         })
             .then(() => true)
             .catch(() => {
-                this.vectorDatabaseService.clearInstructions(dataset.id);
+                this.vectorDatabaseService.clear(dataset.id);
                 return false
             })
 
@@ -54,6 +54,6 @@ export class DatasetProcessorService {
             this.objectStorageService.buckets.datasets,
             datasetId
         );;
-        await this.vectorDatabaseService.clearInstructions(datasetId);
+        await this.vectorDatabaseService.clear(datasetId);
     }
 }

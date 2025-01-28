@@ -43,7 +43,7 @@ export class VectorDatabaseService {
         }
     }
 
-    async insertInstructions(instructions: InstructionInput[]) {
+    async insert(instructions: InstructionInput[]) {
         const points = new Array<Schemas["PointStruct"]>(instructions.length)
 
         for (let i = 0; i < instructions.length; i++) {
@@ -61,7 +61,7 @@ export class VectorDatabaseService {
         return await this.dbClient.upsert(this.datasetsCollection, { points })
     }
 
-    async updateInstructions(instructions: UpdateInstructionInput[]) {
+    async update(instructions: UpdateInstructionInput[]) {
         const updateData = instructions.reduce<{ ids: Array<string>, updateDataMap: Record<string, UpdateInstructionInput> }>((updateData, instruction, i) => {
             const id = objectIdToUUID(instruction.id)
             updateData.updateDataMap[id] = instruction;
@@ -123,14 +123,14 @@ export class VectorDatabaseService {
         return searchResult.map(p => p.payload as Instruction)
     }
 
-    async removeInstructions(instructionsIds: string[]) {
+    async remove(instructionsIds: string[]) {
         return await this.dbClient.delete(
             this.datasetsCollection,
             { points: instructionsIds.map(id => objectIdToUUID(id)) }
         )
     }
 
-    async clearInstructions(datasetId: string) {
+    async clear(datasetId: string) {
         return await this.dbClient.delete(
             this.datasetsCollection,
             {
