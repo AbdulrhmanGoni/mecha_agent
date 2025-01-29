@@ -14,6 +14,7 @@ import { GuardService } from "./GuardService.ts";
 import { AgentsService } from "./AgentsService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { ChatsService } from "./ChatsService.ts";
+import { SSEService } from "./SSEService.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -51,6 +52,8 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const guardService = new GuardService(jwtService);
 
+    const sseService = new SSEService();
+
     return {
         instructionsService,
         agentsService,
@@ -59,5 +62,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         objectStorageService,
         authService,
         guardService,
+        sseService,
     }
 };
