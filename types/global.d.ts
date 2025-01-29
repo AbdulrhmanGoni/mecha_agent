@@ -16,3 +16,7 @@ type VerifyJwtResponse = {
 }
 
 type ObjectReadable = import("node:stream").Readable & { headers?: Record<string, string> }
+
+type SSEEvent = "dataset-status";
+
+type SSESubscriber = Record<string, { subscriberChannel: ReadableStreamDefaultController, subscriberId: string }>
