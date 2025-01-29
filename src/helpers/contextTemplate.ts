@@ -1,4 +1,4 @@
-export default function contextTemplete(instructions: Instruction[]) {
+export default function contextTemplate(instructions: Instruction[]) {
     return instructions.reduce((text, currentInstruction) => {
         text += (
             `"${currentInstruction.systemMessage ? currentInstruction.systemMessage + "; " : ""}` +

@@ -3,8 +3,8 @@ import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 import chatResponseHandler from "../helpers/chatResponseHandler.ts";
-import contextTemplete from "../helpers/contextTemplete.ts";
-import systemMessageTemplete from "../helpers/systemMessageTemplete.ts";
+import contextTemplate from "../helpers/contextTemplate.ts";
+import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
 
 export class ChatsService {
     constructor(
@@ -46,8 +46,8 @@ export class ChatsService {
             return result
         }
 
-        const systemMessage = systemMessageTemplete(result.agent);
-        const context = contextTemplete(result.instructions);
+        const systemMessage = systemMessageTemplate(result.agent);
+        const context = contextTemplate(result.instructions);
 
         const llmResponse = await this.llmService.chat(
             [

@@ -1,7 +1,7 @@
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 import { responseSyntaxesPrompt } from "../constant/responseSyntaxes.ts";
 
-export default function systemMessageTemplete({
+export default function systemMessageTemplate({
     agentName,
     description,
     systemInstructions,

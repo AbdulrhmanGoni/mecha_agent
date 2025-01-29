@@ -1,4 +1,4 @@
-export default function promptTemplete(instructions: Instruction[], prompt: string) {
+export default function promptTemplate(instructions: Instruction[], prompt: string) {
     const instructionsText = instructions.reduce((text, currentInstruction) => {
         text += (
             `"${currentInstruction.systemMessage ? currentInstruction.systemMessage + "; " : ""}` +
