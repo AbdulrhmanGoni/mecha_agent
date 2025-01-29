@@ -1,3 +1,5 @@
+import { encoder } from "djwt/util";
+
 const sseSubscribers: Record<SSEEvent, SSESubscriber[]> = {
     "dataset-status": []
 }
@@ -23,6 +25,23 @@ export class SSEService {
             }
 
             return true;
+        })
+    }
+
+    dispatchEvent({ event, target, subscriberId, message }: {
+        event: SSEEvent,
+        target: string,
+        subscriberId?: string,
+        message: string
+    }) {
+        sseSubscribers[event].forEach((subscriber) => {
+            if (subscriberId) {
+                if (subscriber[target]?.subscriberId === subscriberId) {
+                    subscriber[target]?.subscriberChannel.enqueue(encoder.encode(`data: ${message}\n\n`));
+                }
+            } else {
+                subscriber[target]?.subscriberChannel.enqueue(encoder.encode(`data: ${message}\n\n`));
+            }
         })
     }
 }
