@@ -39,4 +39,26 @@ export class ApiKeysController {
 
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyDeletion })
     }
+
+    async deactivate(c: Context<never, never, { out: { json: string[] } }>) {
+        const keys = c.req.valid("json");
+        const deactivatedSuccessfully = await this.apiKeysService.deactivate(keys);
+
+        if (deactivatedSuccessfully) {
+            return c.json({ result: apiKeysResponseMessages.successfulKeyDeactivation });
+        }
+
+        throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyDeactivation })
+    }
+
+    async activate(c: Context<never, never, { out: { json: string[] } }>) {
+        const keys = c.req.valid("json");
+        const activatedSuccessfully = await this.apiKeysService.activate(keys);
+
+        if (activatedSuccessfully) {
+            return c.json({ result: apiKeysResponseMessages.successfulKeyActivation });
+        }
+
+        throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyActivation })
+    }
 }
