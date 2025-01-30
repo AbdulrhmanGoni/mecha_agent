@@ -9,3 +9,7 @@ type ApiKeyRecord = {
     status: ApiKeyStatus;
     createdAt: Date;
 }
+
+type CreateApiKeyInput = Pick<ApiKeyRecord, "keyName" | "permissions"> & {
+    maxAgeInDays: number;
+}
