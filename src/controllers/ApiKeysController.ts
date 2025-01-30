@@ -23,4 +23,20 @@ export class ApiKeysController {
 
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyCreation })
     }
+
+    async getAll(c: Context) {
+        const result = await this.apiKeysService.getAll();
+        return c.json({ result });
+    }
+
+    async delete(c: Context<never, never, { out: { json: string[] } }>) {
+        const keys = c.req.valid("json");
+        const deletedSuccessfully = await this.apiKeysService.delete(keys);
+
+        if (deletedSuccessfully) {
+            return c.json({ result: apiKeysResponseMessages.successfulKeyDeletion });
+        }
+
+        throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyDeletion })
+    }
 }
