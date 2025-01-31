@@ -74,6 +74,16 @@ export class DatasetsService {
         return null;
     }
 
+    async getOne(datasetId: string) {
+        const { rows } = await this.databaseService.query<Dataset>({
+            text: "SELECT * FROM datasets WHERE id = $1",
+            args: [datasetId],
+            camelCase: true
+        })
+
+        return rows[0]
+    }
+
     async update(datasetId: string, updateData: UpdateDatasetInput) {
         type UpdateFormat = [string, string[]]
 
