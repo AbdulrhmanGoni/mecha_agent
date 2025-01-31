@@ -54,6 +54,30 @@ export class DatasetsService {
         return null;
     }
 
+    async update(datasetId: string, updateData: UpdateDatasetInput) {
+        type UpdateFormat = [string, string[]]
+
+        const [fields, values] = Object
+            .entries(updateData)
+            .reduce<UpdateFormat>(([fields, values], [field, value], i, arr) => {
+                return [
+                    (
+                        fields + `${field} = $${i + 2}` +
+                        `${i === arr.length - 1 ? "" : ", "}`
+                    ),
+                    [...values, value || ""]
+                ]
+            }, ["", []])
+
+        const { rowCount } = await this.databaseService.query({
+            text: `UPDATE datasets SET ${fields} WHERE id = $1`,
+            args: [datasetId, ...values],
+            camelCase: true
+        })
+
+        return !!rowCount
+    }
+
     async delete(agentId: string, datasetId: string) {
         const { rowCount: datasetDeleted } = await this.databaseService.query({
             text: "DELETE FROM datasets WHERE id = $1 AND agent_id = $2;",

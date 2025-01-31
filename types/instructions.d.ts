@@ -11,6 +11,8 @@ type CreateDatasetInput = Pick<Dataset, "title" | "description" | "agentId"> & {
     datasetFile: File;
 }
 
+type UpdateDatasetInput = Partial<Pick<Dataset, "title" | "description" | "status">>
+
 type BaseInstruction = {
     systemMessage?: string;
     prompt: string;
