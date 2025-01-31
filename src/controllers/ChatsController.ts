@@ -31,4 +31,27 @@ export class ChatsController {
 
         return c.body(response, 200);
     }
+
+    async getChats(c: Context) {
+        const agentId = c.req.query("agentId") as string;
+        const result = await this.chatsService.getChats({
+            agentId,
+            user: c.get("user")
+        });
+
+        return c.json({ result }, 200);
+    }
+
+    async getChatMessages(c: Context) {
+        const agentId = c.req.query("agentId") as string;
+        const chatId = c.req.param("chatId");
+
+        const result = await this.chatsService.getChatMessages({
+            agentId,
+            chatId,
+            user: c.get("user")
+        });
+
+        return c.json({ result }, 200);
+    }
 }
