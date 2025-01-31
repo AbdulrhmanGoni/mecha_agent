@@ -53,4 +53,21 @@ export class DatasetsService {
         await transactionSession.rollback();
         return null;
     }
+
+    async delete(agentId: string, datasetId: string) {
+        const { rowCount: datasetDeleted } = await this.databaseService.query({
+            text: "DELETE FROM datasets WHERE id = $1 AND agent_id = $2;",
+            args: [datasetId, agentId],
+        })
+
+        if (datasetDeleted) {
+            this.datasetProcessingWorker.postMessage({
+                process: "delete_dataset",
+                payload: { agentId, datasetId }
+            });
+            return true
+        }
+
+        return false
+    }
 }
