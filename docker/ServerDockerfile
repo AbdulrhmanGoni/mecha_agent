@@ -8,4 +8,4 @@ COPY . .
 
 RUN deno install --entrypoint src/server.ts
 
-CMD ["deno", "run", "--allow-net", "--allow-env", "src/server.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "src/server.ts"]
