@@ -9,6 +9,26 @@ export class DatasetsService {
         private readonly datasetProcessingWorker: Worker,
         private readonly sseService: SSEService,
     ) {
+        this.datasetProcessingWorker.addEventListener("message", async (e) => {
+            switch (e.data.process) {
+                case "successful_process":
+                    await this.update(e.data.payload.datasetId, { status: "processed" });
+                    this.sseService.dispatchEvent({
+                        event: "dataset-status",
+                        target: e.data.payload.datasetId,
+                        message: "processed"
+                    });
+                    break;
+                case "failed_process":
+                    await this.update(e.data.payload.datasetId, { status: "unprocessed" });
+                    this.sseService.dispatchEvent({
+                        event: "dataset-status",
+                        target: e.data.payload.datasetId,
+                        message: "unprocessed"
+                    });
+                    break;
+            }
+        })
     }
 
     async create(datasetInput: CreateDatasetInput) {
