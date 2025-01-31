@@ -54,4 +54,17 @@ export class ChatsController {
 
         return c.json({ result }, 200);
     }
+
+    async deleteChat(c: Context) {
+        const agentId = c.req.query("agentId") as string;
+        const chatId = c.req.param("chatId");
+
+        const result = await this.chatsService.deleteChat({
+            agentId,
+            chatId,
+            user: c.get("user")
+        });
+
+        return c.json({ result }, 200);
+    }
 }
