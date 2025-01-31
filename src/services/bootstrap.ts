@@ -14,6 +14,7 @@ import { GuardService } from "./GuardService.ts";
 import { AgentsService } from "./AgentsService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { ChatsService } from "./ChatsService.ts";
+import { DatasetsService } from "./DatasetsService.ts";
 import { SSEService } from "./SSEService.ts";
 
 type ServicesDependencies = {
@@ -54,6 +55,18 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const sseService = new SSEService();
 
+    const datasetProcessingWorker = new Worker(
+        import.meta.resolve("./DatasetProcessingWorker.ts"),
+        { type: "module" }
+    );
+
+    const datasetsService = new DatasetsService(
+        databaseService,
+        objectStorageService,
+        datasetProcessingWorker,
+        sseService
+    );
+
     return {
         instructionsService,
         agentsService,
@@ -62,6 +75,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         objectStorageService,
         authService,
         guardService,
+        datasetsService,
         sseService,
     }
 };
