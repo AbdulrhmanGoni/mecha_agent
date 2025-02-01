@@ -10,5 +10,12 @@ export class DatasetsController {
 
         return c.json({ result }, 201);
     }
+
+    async update(c: Context<never, never, { out: { json: UpdateDatasetInput } }>) {
+        const updateData = c.req.valid("json");
+        const datasetId = c.req.param("datasetId") as string;
+        const result = await this.datasetsService.update(datasetId, updateData);
+        return c.json({ result });
+    }
 }
 
