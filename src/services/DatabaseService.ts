@@ -6,9 +6,10 @@ export class DatabaseService {
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
         await this.createAgentsTable();
+        await this.datasetsTable();
+        await this.createDatasetIdColumnOnAgentsTable();
         await this.createApiKeysTable();
         await this.chatsHistoryTable();
-        await this.datasetsTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -65,7 +66,6 @@ export class DatabaseService {
                     description TEXT NOT NULL,
                     avatar VARCHAR(42),
                     system_instructions TEXT,
-                    dataset_id UUID REFERENCES datasets(id) ON DELETE SET NULL,
                     dont_know_response TEXT,
                     response_syntax VARCHAR(10),
                     greeting_message VARCHAR(100),
@@ -73,6 +73,13 @@ export class DatabaseService {
                 )
             `;
         }
+    }
+
+    private async createDatasetIdColumnOnAgentsTable() {
+        await this.dbClient.queryObject`
+            ALTER TABLE agents
+            ADD COLUMN IF NOT EXISTS dataset_id UUID REFERENCES datasets(id) ON DELETE SET NULL; 
+        `;
     }
 
     private async createApiKeysTable() {
