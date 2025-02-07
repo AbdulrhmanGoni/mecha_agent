@@ -1,4 +1,5 @@
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import { inferencePermission, readPermission, writePermission } from "../constant/permissions.ts";
 import { JwtService } from "./JwtService.ts";
 
 export class AuthService {
@@ -11,8 +12,8 @@ export class AuthService {
         ) {
             return await this.jwtService.generateJwt({
                 maxAgeInDays: 30,
-                permissions: ["inference", "read", "write"],
-                user: "root"
+                permissions: [inferencePermission, readPermission, writePermission],
+                user: parsedEnvVariables.ROOT_USERNAME
             })
         }
         return false
@@ -20,7 +21,7 @@ export class AuthService {
 
     getRootUserData() {
         return {
-            name: "root",
+            name: parsedEnvVariables.ROOT_USERNAME,
             avatar: null,
         }
     }
