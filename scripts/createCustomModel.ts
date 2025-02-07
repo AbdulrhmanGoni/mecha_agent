@@ -16,6 +16,6 @@ const response = await ollamaClient.create({
 
 console.log(
     response.status === "success" ?
-        `Model '${parsedEnvVariables.MODEL_NAME}' created based on ${parsedEnvVariables.BASE_MODEL_NAME} model successfully` :
-        `Model '${parsedEnvVariables.MODEL_NAME}' creation based on ${parsedEnvVariables.BASE_MODEL_NAME} model failed`
+        `Model '${parsedEnvVariables.MODEL_NAME}' created based on '${parsedEnvVariables.BASE_MODEL_NAME}' model successfully` :
+        `Model '${parsedEnvVariables.MODEL_NAME}' creation based on '${parsedEnvVariables.BASE_MODEL_NAME}' model failed`
 )
