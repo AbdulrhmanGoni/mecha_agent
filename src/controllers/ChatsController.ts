@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { ChatsService } from "../services/ChatsService.ts";
 
 export class ChatsController {

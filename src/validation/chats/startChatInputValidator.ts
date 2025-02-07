@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import schemaParser from "../../helpers/schemaParser.ts";
-import { Next } from "npm:hono/types";
+import { Next } from "hono/types";
 import agentIdValidator from "../agents/agentIdValidator.ts";
 
 const startChatInputSchema = z.object({

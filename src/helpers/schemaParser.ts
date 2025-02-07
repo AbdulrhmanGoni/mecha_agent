@@ -1,5 +1,5 @@
 import { z, ZodRawShape } from "zod";
-import { Context } from "npm:hono";
+import { Context } from "hono";
 
 export default function schemaParser<SchemaT extends ZodRawShape, ValuesT = string>(
     c: Context,

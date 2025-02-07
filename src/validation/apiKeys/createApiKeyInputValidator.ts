@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { validator } from 'npm:hono/validator'
+import { validator } from 'hono/validator'
 import { permissionsArray } from "../../constant/permissions.ts";
 import schemaParser from "../../helpers/schemaParser.ts";
 

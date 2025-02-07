@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { ObjectStorageService } from "../services/ObjectStorageService.ts";
 
 export class MediaController {

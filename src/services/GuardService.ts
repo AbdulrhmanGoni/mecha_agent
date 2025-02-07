@@ -1,4 +1,4 @@
-import { bearerAuth } from "npm:hono/bearer-auth";
+import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
 
 type GuardRouteOptions = {

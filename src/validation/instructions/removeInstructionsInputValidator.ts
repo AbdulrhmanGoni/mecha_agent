@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validator } from 'npm:hono/validator';
+import { validator } from 'hono/validator';
 import schemaParser from "../../helpers/schemaParser.ts";
 
 const instructionIdValidator = z.string({ message: "instruction id must be string" });

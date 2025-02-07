@@ -1,6 +1,6 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { ApiKeysService } from "../services/ApiKeysService.ts";
-import { HTTPException } from 'npm:hono/http-exception';
+import { HTTPException } from 'hono/http-exception';
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
 
 export class ApiKeysController {

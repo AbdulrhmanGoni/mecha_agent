@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { AuthService } from "../services/AuthService.ts";
 
 export class AuthController {

@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { DatasetsService } from "../services/DatasetsService.ts";
 
 export class DatasetsController {

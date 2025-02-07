@@ -1,6 +1,6 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { InstructionsService } from "../services/InstructionsService.ts";
-import { HTTPException } from 'npm:hono/http-exception';
+import { HTTPException } from 'hono/http-exception';
 
 export class InstructionsController {
     constructor(private readonly instructionsService: InstructionsService) { }

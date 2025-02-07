@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { AgentsService } from "../services/AgentsService.ts";
 import AgentsResponseMessages from "../constant/response-messages/agentsResponsesMessages.ts";
 

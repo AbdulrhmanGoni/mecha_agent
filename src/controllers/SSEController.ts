@@ -1,4 +1,4 @@
-import { Context } from "npm:hono";
+import { Context } from "hono";
 import { SSEService } from "../services/SSEService.ts";
 import randomString from "../helpers/randomString.ts";
 

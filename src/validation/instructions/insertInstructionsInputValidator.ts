@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { validator } from 'npm:hono/validator';
+import { validator } from 'hono/validator';
 import schemaParser from "../../helpers/schemaParser.ts";
 
 const instructionInputSchema = z.object({
