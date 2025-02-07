@@ -1,4 +1,4 @@
-import { Ollama as OllamaClient } from "npm:ollama";
+import { Ollama as OllamaClient } from "ollama";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import { Client as MinioClient } from "minio";

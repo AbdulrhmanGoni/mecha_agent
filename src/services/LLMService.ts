@@ -1,4 +1,4 @@
-import { Message, Ollama } from "npm:ollama";
+import { Message, Ollama } from "ollama";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export class LLMService {

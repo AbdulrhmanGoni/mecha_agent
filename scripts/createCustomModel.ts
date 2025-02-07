@@ -1,4 +1,4 @@
-import { Ollama } from "npm:ollama";
+import { Ollama } from "ollama";
 import parsedEnvVariables from "../src/configurations/parseEnvironmentVariables.ts";
 
 const ollamaClient = new Ollama({ host: parsedEnvVariables.OLLAMA_HOST });

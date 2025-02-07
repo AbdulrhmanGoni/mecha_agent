@@ -1,4 +1,4 @@
-import { Ollama } from "npm:ollama";
+import { Ollama } from "ollama";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export class EmbeddingService {

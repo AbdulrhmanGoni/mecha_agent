@@ -1,4 +1,4 @@
-type ChatMessage = Pick<import("npm:ollama").Message, "content" | "role">;
+type ChatMessage = Pick<import("ollama").Message, "content" | "role">;
 
 type ChatHistory = {
     id: string;
