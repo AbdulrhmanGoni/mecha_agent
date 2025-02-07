@@ -9,6 +9,11 @@
     "deno.land/x/postgres": "https://deno.land/x/postgres@v0.19.3/mod.ts",
     "djwt": "https://deno.land/x/djwt@v3.0.2/mod.ts",
     "djwt/util": "https://deno.land/x/djwt@v3.0.2/util.ts",
+    "testing/bdd": "jsr:@std/testing/bdd",
+    "std/expect": "jsr:@std/expect",
+    "hono": "npm:hono",
+    "ollama": "npm:ollama",
+    "zod": "npm:zod",
     "minio": "npm:minio@7.1.2"
   },
   "compilerOptions": {
