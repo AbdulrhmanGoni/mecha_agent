@@ -10,7 +10,7 @@ export default function systemMessageTemplate({
 }: Agent) {
 
     const fallbackResponse = dontKnowResponse || parsedEnvVariables.DEFAULT_DONT_KNOW_RESPONSE;
-    const syntaxPrompt = responseSyntaxesPrompt[responseSyntax];
+    const syntaxPrompt = responseSyntax ? responseSyntaxesPrompt[responseSyntax] : "";
     const additionalInstructions = systemInstructions ? ", " + systemInstructions : "";
 
     return (

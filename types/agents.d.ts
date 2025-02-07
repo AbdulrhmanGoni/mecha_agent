@@ -3,15 +3,15 @@ type Agent = {
     agentName: string;
     description: string;
     avatar?: string;
-    datasetId?: string;
+    datasetId?: string | null;
     systemInstructions?: string;
     dontKnowResponse?: string;
-    responseSyntax: import("../src/constant/responseSyntaxes.ts").ResponseSyntax;
+    responseSyntax?: import("../src/constant/responseSyntaxes.ts").ResponseSyntax;
     greetingMessage?: string;
     createdAt: Date;
 }
 
-type CreateAgentFormData = Omit<Agent, "id" | "avatar" | "createdAt"> & {
+type CreateAgentFormData = Omit<Agent, "id" | "avatar" | "createdAt" | "datasetId"> & {
     avatar?: File
 }
 
