@@ -1,5 +1,7 @@
 import z from "zod";
 import { responseSyntaxes } from "../constant/responseSyntaxes.ts";
+import { defaultRootUsername, defaultRootPassword } from "../constant/root.ts";
+import rootUserSchema from "../validation/auth/rootUserSchema.ts";
 
 function parseEnvironmentVariables<
     T extends z.ZodObject<z.ZodRawShape, z.UnknownKeysParam, z.ZodTypeAny>,
@@ -18,8 +20,8 @@ function parseEnvironmentVariables<
 const envSchema = z.object({
     SERVER_PORT: z.coerce.number().default(10000),
 
-    ROOT_USERNAME: z.string(),
-    ROOT_PASSWORD: z.string(),
+    ROOT_USERNAME: rootUserSchema.shape.username.default(defaultRootUsername),
+    ROOT_PASSWORD: rootUserSchema.shape.password.default(defaultRootPassword),
 
     DB_PORT: z.coerce.number().default(5432),
     DB_HOST: z.string(),
