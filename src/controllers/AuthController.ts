@@ -4,8 +4,8 @@ import { AuthService } from "../services/AuthService.ts";
 export class AuthController {
     constructor(private authService: AuthService) { }
 
-    async logInAsRoot(c: Context) {
-        const body = await c.req.json();
+    async logInAsRoot(c: Context<never, never, { out: { json: LogInInput } }>) {
+        const body = c.req.valid("json");
         const result = await this.authService.logInAsRoot(body.username, body.password);
         return c.json({ result }, 200);
     }
