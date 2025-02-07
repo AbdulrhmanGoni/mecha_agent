@@ -1,4 +1,4 @@
-import z from "npm:zod";
+import z from "zod";
 import { responseSyntaxes } from "../constant/responseSyntaxes.ts";
 
 function parseEnvironmentVariables<

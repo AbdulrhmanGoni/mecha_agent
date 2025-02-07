@@ -1,4 +1,4 @@
-import { z } from 'npm:zod'
+import { z } from 'zod'
 import { validator } from 'npm:hono/validator'
 import schemaParser from "../../helpers/schemaParser.ts";
 

@@ -1,4 +1,4 @@
-import { z } from "npm:zod@3";
+import { z } from "zod";
 import { supportedDatasetFileTypes } from "../../constant/supportedFileTypes.ts";
 import agentIdValidator from "../agents/agentIdValidator.ts";
 

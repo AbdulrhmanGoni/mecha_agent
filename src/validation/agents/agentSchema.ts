@@ -1,4 +1,4 @@
-import { z } from "npm:zod@3";
+import { z } from "zod";
 import parsedEnvVariables from "../../configurations/parseEnvironmentVariables.ts";
 import { responseSyntaxes } from "../../constant/responseSyntaxes.ts";
 import { supportedImageTypes } from "../../constant/supportedFileTypes.ts";

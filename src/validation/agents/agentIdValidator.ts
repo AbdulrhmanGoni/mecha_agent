@@ -1,4 +1,4 @@
-import z from "npm:zod@3";
+import z from "zod";
 
 const agentIdValidator = z.string().uuid({ message: "agent id must be a valid UUID" })
 

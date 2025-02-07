@@ -1,4 +1,4 @@
-import { z } from 'npm:zod';
+import { z } from 'zod';
 import { Context } from "npm:hono";
 import schemaParser from "../../helpers/schemaParser.ts";
 import { Next } from "npm:hono/types";
