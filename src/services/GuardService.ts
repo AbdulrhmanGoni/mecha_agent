@@ -1,5 +1,6 @@
 import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
+import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 type GuardRouteOptions = {
     permissions?: Permission[],
@@ -14,9 +15,9 @@ export class GuardService {
             verifyToken: async (token, c) => {
                 const result = await this.jwtService.verifyJwt(token);
 
-                if (rootUser) {
-                    c.set("user", "root")
-                    return result.payload?.user === "root"
+                if (rootUser && result.payload?.user === parsedEnvVariables.ROOT_USERNAME) {
+                    c.set("user", parsedEnvVariables.ROOT_USERNAME)
+                    return true
                 }
 
                 if (result.errorMessage) {
