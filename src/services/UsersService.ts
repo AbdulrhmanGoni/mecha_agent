@@ -31,4 +31,18 @@ export class UsersService {
 
         return null
     }
+
+    async getByEmail(email: string) {
+        const { rows } = await this.databaseService.query<User>({
+            text: `SELECT * FROM users WHERE email = $1`,
+            args: [email],
+            camelCase: true,
+        });
+
+        if (rows[0]) {
+            return rows[0]
+        }
+
+        return null
+    }
 }
