@@ -6,6 +6,7 @@ export class DatabaseService {
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
         await this.createAgentsTable();
+        await this.createUsersTable();
         await this.datasetsTable();
         await this.createDatasetIdColumnOnAgentsTable();
         await this.createApiKeysTable();
@@ -21,6 +22,23 @@ export class DatabaseService {
         `, [tableName]
         );
         return result.rows[0].exists
+    }
+
+    private async createUsersTable() {
+        const tableExists = await this.checkTableExistance("users");
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+                CREATE TABLE users (
+                    email VARCHAR(320) PRIMARY KEY NOT NULL,
+                    username VARCHAR(80) NOT NULL,
+                    password TEXT NOT NULL,
+                    avatar TEXT,
+                    signing_method VARCHAR(11) NOT NULL,
+                    last_sign_in TIMESTAMP NOT NULL DEFAULT now(),
+                    created_at TIMESTAMP NOT NULL DEFAULT now()
+                )
+            `;
+        }
     }
 
     private async datasetsTable() {
