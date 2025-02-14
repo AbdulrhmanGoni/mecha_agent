@@ -16,6 +16,7 @@ import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { ChatsService } from "./ChatsService.ts";
 import { DatasetsService } from "./DatasetsService.ts";
 import { SSEService } from "./SSEService.ts";
+import { UsersService } from "./UsersService.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -43,6 +44,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const jwtService = new JwtService();
     await jwtService.init();
 
+    const usersService = new UsersService(databaseService);
     const agentsService = new AgentsService(databaseService, objectStorageService);
 
     const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
@@ -68,6 +70,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     );
 
     return {
+        usersService,
         instructionsService,
         agentsService,
         apiKeysService,
