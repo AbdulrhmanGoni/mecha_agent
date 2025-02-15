@@ -1,28 +1,55 @@
-import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
-import { inferencePermission, readPermission, writePermission } from "../constant/permissions.ts";
-import { JwtService } from "./JwtService.ts";
+import { compare } from "deno.land/x/bcrypt";
+import { UsersService } from "./UsersService.ts";
 
 export class AuthService {
-    constructor(private readonly jwtService: JwtService) { }
+    constructor(
+        private readonly usersService: UsersService,
+    ) { }
 
-    async logInAsRoot(username: string, password: string) {
-        if (
-            username === parsedEnvVariables.ROOT_USERNAME &&
-            password === parsedEnvVariables.ROOT_PASSWORD
-        ) {
-            return await this.jwtService.generateJwt({
-                maxAgeInDays: 30,
-                permissions: [inferencePermission, readPermission, writePermission],
-                user: parsedEnvVariables.ROOT_USERNAME
-            })
+    async signUpUser(userInput: SignUpUserInput) {
+        const user = await this.usersService.getByEmail(userInput.email);
+
+        if (user) {
+            return {
+                existingWithSameSigingMethod: user.signingMethod === userInput.signingMethod
+            }
         }
-        return false
+
+        const newUser = await this.usersService.create(userInput);
+
+        return {
+            newUser
+        }
     }
 
-    getRootUserData() {
+    async signInUser(userInput: SignInUserInput) {
+        const user = await this.usersService.getByEmail(userInput.email);
+
+        if (user) {
+            if (user.signingMethod !== userInput.signingMethod) {
+                return {
+                    success: false,
+                    wrongSigningMethod: true
+                }
+            }
+
+            const isMatched = await compare(userInput.password, user.password);
+
+            if (isMatched) {
+                return {
+                    success: true,
+                    user: {
+                        name: user.username,
+                        email: user.email,
+                        avatar: user.avatar
+                    }
+                }
+            }
+        }
+
         return {
-            name: parsedEnvVariables.ROOT_USERNAME,
-            avatar: null,
+            success: false,
+            noUser: !user
         }
     }
 }
