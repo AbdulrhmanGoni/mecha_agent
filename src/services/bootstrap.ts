@@ -51,7 +51,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const apiKeysService = new ApiKeysService(databaseService, jwtService);
 
-    const authService = new AuthService(jwtService);
+    const authService = new AuthService(usersService);
 
     const guardService = new GuardService(jwtService);
 
