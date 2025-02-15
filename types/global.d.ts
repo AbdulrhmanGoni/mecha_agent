@@ -7,16 +7,16 @@ type WithOptionalFields<Obj, Keys extends keyof Obj> = Omit<Obj, Keys> & Partial
 
 type Permission = import("../src/constant/permissions.ts").Permission
 
-type CreateJWTOptions = {
+type CreateJWTParams = {
     maxAgeInDays: number;
     permissions: Permission[];
-    user: string,
+    userEmail: User["email"];
 }
 
 type JWTPayload = import("djwt").Payload
 
 type VerifyJwtResponse = {
-    payload?: JWTPayload & Pick<CreateJWTOptions, "permissions" | "user">
+    payload?: JWTPayload & Omit<CreateJWTParams, "maxAgeInDays">
     errorMessage?: string;
 }
 
