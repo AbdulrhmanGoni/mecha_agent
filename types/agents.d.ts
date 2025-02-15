@@ -3,6 +3,7 @@ type Agent = {
     agentName: string;
     description: string;
     avatar?: string;
+    userEmail: string;
     datasetId?: string | null;
     systemInstructions?: string;
     dontKnowResponse?: string;

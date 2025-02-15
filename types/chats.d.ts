@@ -12,5 +12,5 @@ type ChatRelatedTypes = {
     chatId: string;
     chatMessages: ChatMessage[];
     onResponseComplete: (fullResponseText: string) => Promise<void>;
-    user: string
+    userEmail: string
 }

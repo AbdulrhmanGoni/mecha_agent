@@ -7,9 +7,10 @@ type ApiKeyRecord = {
     expirationDate: string;
     permissions: Permission[];
     status: ApiKeyStatus;
+    userEmail: string;
     createdAt: Date;
 }
 
-type CreateApiKeyInput = Pick<ApiKeyRecord, "keyName" | "permissions"> & {
+type CreateApiKeyInput = Pick<ApiKeyRecord, "keyName" | "permissions" | "userEmail"> & {
     maxAgeInDays: number;
 }
