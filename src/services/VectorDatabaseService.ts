@@ -40,6 +40,14 @@ export class VectorDatabaseService {
                     is_tenant: true,
                 },
             })
+
+            await this.dbClient.createPayloadIndex(this.datasetsCollection, {
+                field_name: "userEmail",
+                field_schema: {
+                    type: "keyword",
+                    is_tenant: true,
+                },
+            })
         }
     }
 
