@@ -1,6 +1,7 @@
 type Dataset = {
     id: string;
     agentId: string;
+    userEmail: string;
     title: string;
     description: string;
     status: "processing" | "processed" | "unprocessed";
@@ -22,6 +23,7 @@ type BaseInstruction = {
 type Instruction = BaseInstruction & {
     id: string;
     datasetId: string;
+    userEmail: string;
 }
 
 type InstructionInput = Instruction;
