@@ -6,20 +6,45 @@ import authResponsesMessages from "../constant/response-messages/authResponsesMe
 export class AuthController {
     constructor(private authService: AuthService) { }
 
-    async logInAsRoot(c: Context<never, never, { out: { json: LogInInput } }>) {
-        const body = c.req.valid("json");
-        const result = await this.authService.logInAsRoot(body.username, body.password);
+    async signUpUser(c: Context<never, never, { out: { json: SignUpUserInput } }>) {
+        const userInput = c.req.valid("json");
 
-        if (result) {
-            return c.json({ result }, 200);
+        const result = await this.authService.signUpUser(userInput);
+
+        if (result.newUser) {
+            return c.json({ result: result.newUser });
         }
 
-        throw new HTTPException(401, { message: authResponsesMessages.wrongCredentials })
+        const signingExistingUserQuery = c.req.query("signing-existing-user");
+
+        if (signingExistingUserQuery && ["true", "yes", "1"].includes(signingExistingUserQuery)) {
+            return this.signInUser(c)
+        }
+
+        if (result.existingWithSameSigingMethod) {
+            throw new HTTPException(401, { message: authResponsesMessages.userAlreadyExisting });
+        }
+
+        throw new HTTPException(401, { message: authResponsesMessages.userSignedInWithAnotherMethod });
     }
 
-    async getRootUserData(c: Context) {
-        const result = await this.authService.getRootUserData();
-        return c.json({ result }, 200);
+    async signInUser(c: Context<never, never, { out: { json: SignInUserInput } }>) {
+        const userInput = c.req.valid("json");
+        const result = await this.authService.signInUser(userInput);
+
+        if (result.success && result.user) {
+            return c.json({ result: result.user });
+        }
+
+        if (result.wrongSigningMethod) {
+            throw new HTTPException(401, { message: authResponsesMessages.userSignedInWithAnotherMethod });
+        }
+
+        if (result.noUser) {
+            throw new HTTPException(401, { message: authResponsesMessages.noUser });
+        }
+
+        throw new HTTPException(401, { message: authResponsesMessages.wrongCredentials });
     }
 }
 
