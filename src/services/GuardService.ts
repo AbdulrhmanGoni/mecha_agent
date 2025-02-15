@@ -1,39 +1,34 @@
 import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
-import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 type GuardRouteOptions = {
     permissions?: Permission[],
-    rootUser?: boolean
 }
 
 export class GuardService {
     constructor(private readonly jwtService: JwtService) { }
 
-    guardRoute({ permissions, rootUser }: GuardRouteOptions) {
+    guardRoute({ permissions }: GuardRouteOptions) {
         return bearerAuth({
             verifyToken: async (token, c) => {
-                const result = await this.jwtService.verifyJwt(token);
+                const { payload, errorMessage } = await this.jwtService.verifyJwt(token);
 
-                if (rootUser && result.payload?.user === parsedEnvVariables.ROOT_USERNAME) {
-                    c.set("user", parsedEnvVariables.ROOT_USERNAME)
-                    return true
+                if (payload) {
+                    const hasPermission = !!(permissions?.every((permission) => (
+                        payload.permissions?.includes(permission)
+                    )))
+
+                    if (hasPermission && payload.email) {
+                        c.set("userEmail", payload.email)
+                        return hasPermission
+                    }
                 }
 
-                if (result.errorMessage) {
-                    c.set("auth-error-message", result.errorMessage);
-                    return false;
+                if (errorMessage) {
+                    c.set("auth-error-message", errorMessage);
                 }
 
-                const hasPermission = !!(permissions?.every((permission) => (
-                    result.payload?.permissions?.includes(permission)
-                )))
-
-                if (hasPermission) {
-                    c.set("user", result.payload?.user)
-                }
-
-                return hasPermission
+                return false;
             },
             noAuthenticationHeaderMessage: { error: "Authentication header is missing" },
             invalidAuthenticationHeaderMessage: { error: "Invalid authentication header" },
