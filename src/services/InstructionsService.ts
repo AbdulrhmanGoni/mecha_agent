@@ -11,11 +11,11 @@ export class InstructionsService {
         return await this.vectorDatabaseService.update(instructions)
     }
 
-    async remove(instructionsIds: string[]) {
-        return await this.vectorDatabaseService.remove(instructionsIds)
+    async remove(userEmail: string, instructionsIds: string[]) {
+        return await this.vectorDatabaseService.remove(userEmail, instructionsIds)
     }
 
-    async clear(datasetId: string) {
-        return await this.vectorDatabaseService.clear(datasetId)
+    async clear(datasetId: string, userEmail: string) {
+        return await this.vectorDatabaseService.clear(datasetId, userEmail)
     }
 }

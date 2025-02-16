@@ -107,7 +107,10 @@ export class VectorDatabaseService {
         )
     }
 
-    async search(datasetId: string, text: string): Promise<Instruction[]> {
+    async search(
+        { text, datasetId, userEmail }:
+            { datasetId: string, userEmail: string, text: string }
+    ): Promise<Instruction[]> {
         const textEmbedding = await this.embeddingService.embedText(text);
 
         const searchResult = await this.dbClient.search(
@@ -122,6 +125,10 @@ export class VectorDatabaseService {
                                 value: datasetId,
                             },
                         },
+                        {
+                            key: "userEmail",
+                            match: { value: userEmail },
+                        },
                     ],
                 },
                 limit: 10
@@ -131,22 +138,36 @@ export class VectorDatabaseService {
         return searchResult.map(p => p.payload as Instruction)
     }
 
-    async remove(instructionsIds: string[]) {
+    async remove(userEmail: string, instructionsIds: string[]) {
         return await this.dbClient.delete(
             this.datasetsCollection,
-            { points: instructionsIds.map(id => objectIdToUUID(id)) }
+            {
+                points: instructionsIds.map(id => objectIdToUUID(id)),
+                filter: {
+                    must: {
+                        key: "userEmail",
+                        match: { value: userEmail },
+                    }
+                }
+            }
         )
     }
 
-    async clear(datasetId: string) {
+    async clear(datasetId: string, userEmail: string) {
         return await this.dbClient.delete(
             this.datasetsCollection,
             {
                 filter: {
-                    must: {
-                        key: "datasetId",
-                        match: { value: datasetId }
-                    }
+                    must: [
+                        {
+                            key: "datasetId",
+                            match: { value: datasetId },
+                        },
+                        {
+                            key: "userEmail",
+                            match: { value: userEmail },
+                        }
+                    ],
                 }
             }
         )

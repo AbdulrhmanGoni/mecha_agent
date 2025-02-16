@@ -17,18 +17,20 @@ export class InstructionsController {
         return c.json({ result });
     }
 
-    async remove(c: Context<never, never, { out: { json: string[] } }>) {
+    async remove(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: string[] } }>) {
         const instructionsIds = c.req.valid("json");
-        const result = await this.instructionsService.remove(instructionsIds);
+        const userEmail = c.get("userEmail");
+        const result = await this.instructionsService.remove(userEmail, instructionsIds);
         return c.json({ result });
     }
 
-    async clear(c: Context) {
+    async clear(c: Context<{ Variables: { userEmail: string } }>) {
         const datasetId = c.req.query("datasetId");
+        const userEmail = c.get("userEmail");
         if (!datasetId) {
             throw new HTTPException(400, { message: "No dataset id provided to clear its instructions" });
         }
-        const result = await this.instructionsService.clear(datasetId);
+        const result = await this.instructionsService.clear(datasetId, userEmail);
         return c.json({ result });
     }
 }
