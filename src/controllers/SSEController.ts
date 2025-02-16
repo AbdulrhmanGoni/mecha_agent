@@ -12,9 +12,10 @@ export class SSEController {
             "Connection": "keep-alive",
         });
 
+        const userEmail = c.get("userEmail");
         const event = c.req.param("event") as SSEEvent;
         const target = c.req.param("target");
-        const subscriberId = randomString(10);
+        const subscriberId = `${userEmail}-${randomString(10)}`;
 
         const readable = this.sseService.subscribe({ event, target, subscriberId });
 
