@@ -19,19 +19,25 @@ self.onmessage = (e: DatasetProcessingWorkerEvent) => {
                 .then((result) => {
                     self.postMessage({
                         process: result ? "successful_process" : "failed_process",
-                        payload: { datasetId: e.data.payload.id }
+                        payload: {
+                            datasetId: e.data.payload.id,
+                            userEmail: e.data.payload.userEmail
+                        }
                     })
                 })
                 .catch(() => {
                     self.postMessage({
                         process: "failed_process",
-                        payload: { datasetId: e.data.payload.id }
+                        payload: {
+                            datasetId: e.data.payload.id,
+                            userEmail: e.data.payload.userEmail
+                        }
                     })
                 })
             break;
 
         case "delete_dataset":
-            datasetProcessor.deleteDataset(e.data.payload.datasetId)
+            datasetProcessor.deleteDataset(e.data.payload.datasetId, e.data.payload.userEmail)
             break;
     }
 };
