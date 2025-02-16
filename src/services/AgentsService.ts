@@ -211,7 +211,7 @@ export class AgentsService {
                     await this.objectStorageService.uploadFile(
                         this.objectStorageService.buckets.agentsAvatars,
                         newAgentAvatart,
-                        { id: avatarId }
+                        { id: avatarId, metaData: { "user-email": userEmail } }
                     );
                 }
 
