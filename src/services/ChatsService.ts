@@ -13,10 +13,10 @@ export class ChatsService {
         private readonly llmService: LLMService,
     ) { }
 
-    async fetchInstructions({ agentId, prompt }: Pick<ChatRelatedTypes, "prompt" | "agentId">) {
+    async fetchInstructions({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
         const { rows: [agentRow] } = await this.databaseService.query<Agent>({
-            text: `SELECT * FROM agents WHERE id = $1`,
-            args: [agentId],
+            text: `SELECT * FROM agents WHERE id = $1 AND user_email = $2`,
+            args: [agentId, userEmail],
             camelCase: true,
         })
 
@@ -25,8 +25,7 @@ export class ChatsService {
         }
 
         const searchResult = await this.vectorDatabaseService.search(
-            agentRow.datasetId,
-            prompt
+            { text: prompt, datasetId: agentRow.datasetId, userEmail }
         );
 
         if (!searchResult.length) {
@@ -39,15 +38,12 @@ export class ChatsService {
         }
     }
 
-    async chat({ prompt, agentId, chatMessages, onResponseComplete }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "chatMessages" | "onResponseComplete">) {
-        const result = await this.fetchInstructions({ agentId, prompt });
-
-        if (typeof result === "string") {
-            return result
-        }
-
-        const systemMessage = systemMessageTemplate(result.agent);
-        const context = contextTemplate(result.instructions);
+    async chat(
+        { agent, instructions, chatMessages, onResponseComplete }:
+            Pick<ChatRelatedTypes, "chatMessages" | "onResponseComplete"> & { instructions: Instruction[], agent: Agent }
+    ) {
+        const systemMessage = systemMessageTemplate(agent);
+        const context = contextTemplate(instructions);
 
         const llmResponse = await this.llmService.chat(
             [
@@ -65,7 +61,13 @@ export class ChatsService {
         })
     }
 
-    async startChat({ agentId, prompt, user }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "user">) {
+    async startChat({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
+        const result = await this.fetchInstructions({ agentId, prompt, userEmail });
+
+        if (typeof result === "string") {
+            return result
+        }
+
         const chatId = crypto.randomUUID();
 
         const newMessage = {
@@ -74,8 +76,8 @@ export class ChatsService {
         }
 
         const chatResponse = await this.chat({
-            prompt,
-            agentId,
+            agent: result.agent,
+            instructions: result.instructions,
             chatMessages: [newMessage],
             onResponseComplete: async (fullResponseText) => {
                 const chatHistory = [
@@ -88,7 +90,7 @@ export class ChatsService {
                     chatId,
                     agentId,
                     chatMessages: chatHistory,
-                    user
+                    userEmail
                 })
             }
         })
@@ -99,17 +101,23 @@ export class ChatsService {
         }
     }
 
-    async continueChat({ chatId, prompt, agentId, user }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "user" | "chatId">) {
+    async continueChat({ chatId, prompt, agentId, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "chatId">) {
+        const result = await this.fetchInstructions({ agentId, prompt, userEmail });
+
+        if (typeof result === "string") {
+            return result
+        }
+
         const newMessage = {
             role: "user",
             content: prompt,
         }
 
-        const chatHistory = await this.getChatMessages({ agentId, chatId, user });
+        const chatHistory = await this.getChatMessages({ agentId, chatId, userEmail });
 
         return this.chat({
-            prompt,
-            agentId,
+            agent: result.agent,
+            instructions: result.instructions,
             chatMessages: [...chatHistory, newMessage],
             onResponseComplete: async (fullResponseText) => {
                 const newMessages = [
@@ -119,53 +127,63 @@ export class ChatsService {
                         content: fullResponseText,
                     }
                 ]
-                await this.appendMessageToChat({ chatId, chatMessages: newMessages })
+                await this.appendMessageToChat({ chatId, chatMessages: newMessages, userEmail })
             }
         })
     }
 
-    async createChat({ agentId, chatId, chatMessages, user }: Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "user" | "chatId">) {
+    async createChat(
+        { agentId, chatId, chatMessages, userEmail }:
+            Pick<ChatRelatedTypes, "chatMessages" | "agentId" | "userEmail" | "chatId">
+    ) {
         const firstPromptBegenning = chatMessages[0].content.slice(0, 40)
         await this.databaseService.query<ChatHistory | undefined>({
-            text: `INSERT INTO chats_history (id, agent_id, title, username, messages) VALUES ($1, $2, $3, $4, $5);`,
-            args: [chatId, agentId, firstPromptBegenning, user, JSON.stringify(chatMessages)],
+            text: `
+                INSERT INTO 
+                chats_history (id, agent_id, title, user_email, messages) 
+                VALUES ($1, $2, $3, $4, $5);
+            `,
+            args: [chatId, agentId, firstPromptBegenning, userEmail, JSON.stringify(chatMessages)],
             camelCase: true,
         })
     }
 
-    async getChatMessages({ agentId, chatId, user }: Pick<ChatRelatedTypes, "agentId" | "user" | "chatId">) {
+    async getChatMessages({ agentId, chatId, userEmail }: Pick<ChatRelatedTypes, "agentId" | "userEmail" | "chatId">) {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `SELECT messages FROM chats_history WHERE id = $1 AND agent_id = $2 AND username = $3`,
-            args: [chatId, agentId, user],
+            text: `SELECT messages FROM chats_history WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
+            args: [chatId, agentId, userEmail],
             camelCase: true,
         })
 
         return chatHistory?.messages || []
     }
 
-    async getChats({ agentId, user }: Pick<ChatRelatedTypes, "agentId" | "user">) {
+    async getChats({ agentId, userEmail }: Pick<ChatRelatedTypes, "agentId" | "userEmail">) {
         const { rows } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `SELECT id, agent_id, title, started_at FROM chats_history WHERE agent_id = $1 AND username = $2`,
-            args: [agentId, user],
+            text: `SELECT id, agent_id, title, started_at FROM chats_history WHERE agent_id = $1 AND user_email = $2`,
+            args: [agentId, userEmail],
             camelCase: true,
         })
 
         return rows
     }
 
-    async appendMessageToChat({ chatId, chatMessages }: Pick<ChatRelatedTypes, "chatId" | "chatMessages">) {
+    async appendMessageToChat(
+        { chatId, chatMessages, userEmail }:
+            Pick<ChatRelatedTypes, "chatId" | "chatMessages" | "userEmail">
+    ) {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `UPDATE chats_history SET messages = messages || $2::JSONB WHERE id = $1`,
-            args: [chatId, JSON.stringify(chatMessages)],
+            text: `UPDATE chats_history SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`,
+            args: [chatId, userEmail, JSON.stringify(chatMessages)],
             camelCase: true,
         })
         return chatHistory
     }
 
-    async deleteChat({ chatId, agentId, user }: Pick<ChatRelatedTypes, "chatId" | "agentId" | "user">) {
+    async deleteChat({ chatId, agentId, userEmail }: Pick<ChatRelatedTypes, "chatId" | "agentId" | "userEmail">) {
         const { rowCount } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `DELETE FROM chats_history WHERE id = $1 AND agent_id = $2 AND username = $3`,
-            args: [chatId, agentId, user],
+            text: `DELETE FROM chats_history WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
+            args: [chatId, agentId, userEmail],
             camelCase: true,
         })
         return !!rowCount

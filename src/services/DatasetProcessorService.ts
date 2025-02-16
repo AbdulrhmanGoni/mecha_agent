@@ -21,6 +21,11 @@ export class DatasetProcessorService {
             dataset.id
         );
         const fileType = readableDataset.headers?.["content-type"] as string;
+        const userEmailHeader = readableDataset.headers?.["x-amz-meta-user-email"]
+
+        if (userEmailHeader !== dataset.userEmail) {
+            return false
+        }
 
         const parser = this.parsers[fileType];
 
@@ -30,6 +35,7 @@ export class DatasetProcessorService {
                 const instruction = {
                     id: crypto.randomUUID(),
                     datasetId: dataset.id,
+                    userEmail: dataset.userEmail,
                     ...baseInstruction,
                 }
 
@@ -42,18 +48,18 @@ export class DatasetProcessorService {
         })
             .then(() => true)
             .catch(() => {
-                this.vectorDatabaseService.clear(dataset.id);
+                this.vectorDatabaseService.clear(dataset.id, dataset.userEmail);
                 return false
             })
 
         return readingResult
     }
 
-    async deleteDataset(datasetId: string) {
+    async deleteDataset(datasetId: string, userEmail: string) {
         await this.objectStorageService.deleteFile(
             this.objectStorageService.buckets.datasets,
             datasetId
         );;
-        await this.vectorDatabaseService.clear(datasetId);
+        await this.vectorDatabaseService.clear(datasetId, userEmail);
     }
 }

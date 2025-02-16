@@ -5,12 +5,12 @@ export class DatabaseService {
 
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
-        await this.createAgentsTable();
         await this.createUsersTable();
+        await this.createAgentsTable();
         await this.datasetsTable();
         await this.createDatasetIdColumnOnAgentsTable();
         await this.createApiKeysTable();
-        await this.chatsHistoryTable();
+        await this.createChatsHistoryTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -51,20 +51,21 @@ export class DatabaseService {
                     title VARCHAR(80) NOT NULL,
                     description VARCHAR(200) NOT NULL,
                     status VARCHAR(11) NOT NULL,
-                    created_at TIMESTAMP NOT NULL DEFAULT now()
+                    created_at TIMESTAMP NOT NULL DEFAULT now(),
+                    user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL
                 )
             `;
         }
     }
 
-    private async chatsHistoryTable() {
+    private async createChatsHistoryTable() {
         const tableExists = await this.checkTableExistance("chats_history");
         if (!tableExists) {
             await this.dbClient.queryObject`
                 CREATE TABLE chats_history (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
                     agent_id UUID REFERENCES agents(id) ON DELETE CASCADE,
-                    username VARCHAR(50) NOT NULL,
+                    user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
                     title VARCHAR(40) NOT NULL,
                     messages JSONB NOT NULL,
                     started_at TIMESTAMP DEFAULT NOW() NOT NULL
@@ -80,6 +81,7 @@ export class DatabaseService {
             await this.dbClient.queryObject`
                 CREATE TABLE agents (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+                    user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
                     agent_name VARCHAR(80) NOT NULL,
                     description TEXT NOT NULL,
                     avatar VARCHAR(42),
@@ -112,7 +114,8 @@ export class DatabaseService {
                 expiration_date TIMESTAMP NOT NULL,
                 permissions VARCHAR(10)[] NOT NULL,
                 status VARCHAR(10) NOT NULL DEFAULT 'Active',
-                created_at TIMESTAMP NOT NULL DEFAULT now()
+                created_at TIMESTAMP NOT NULL DEFAULT now(),
+                user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL
             )
         `;
         }

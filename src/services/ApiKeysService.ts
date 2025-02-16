@@ -7,62 +7,70 @@ export class ApiKeysService {
         private readonly jwtService: JwtService
     ) { }
 
-    async create(keyName: string, options: CreateJWTOptions) {
-        const jwtKey = await this.jwtService.generateJwt(options);
+    async create(params: CreateApiKeyInput) {
+        const { keyName, ...restParams } = params
+        const jwtKey = await this.jwtService.generateJwt(restParams);
 
         const result = await this.databaseService.query<ApiKeyRecord>({
             text: `
-                INSERT INTO api_keys (key, key_name, expiration_date, permissions)
-                VALUES ($1, $2, $3, $4)
+                INSERT INTO api_keys (key, key_name, expiration_date, permissions, user_email)
+                VALUES ($1, $2, $3, $4, $5)
                 RETURNING *;
             `,
             camelCase: true,
-            args: [jwtKey.jwt, keyName, jwtKey.expirationDate, options.permissions],
+            args: [
+                jwtKey.jwt,
+                keyName,
+                jwtKey.expirationDate,
+                params.permissions,
+                params.userEmail
+            ],
         });
 
         return result.rows[0]
     }
 
-    async getAll() {
+    async getAll(userEmail: string) {
         const result = await this.databaseService.query<ApiKeyRecord>({
-            text: "SELECT * FROM api_keys",
-            camelCase: true
+            text: "SELECT * FROM api_keys WHERE user_email = $1",
+            camelCase: true,
+            args: [userEmail]
         })
         return result.rows
     }
 
-    async getOne(id: string[]) {
+    async getOne(userEmail: string, id: string) {
         const result = await this.databaseService.query<ApiKeyRecord>({
-            text: "SELECT * FROM api_keys WHERE id = $1",
-            args: [id],
+            text: "SELECT * FROM api_keys WHERE id = $1 AND user_email = $2",
+            args: [id, userEmail],
             camelCase: true,
         })
 
         return result.rows[0]
     }
 
-    async delete(keysIds: string[]) {
+    async delete(userEmail: string, keysIds: string[]) {
         const result = await this.databaseService.query<ApiKeyRecord>({
-            text: "DELETE FROM api_keys WHERE id = ANY($1)",
-            args: [keysIds],
+            text: "DELETE FROM api_keys WHERE id = ANY($1) AND user_email = $2",
+            args: [keysIds, userEmail],
         })
 
         return !!result.rowCount
     }
 
-    async deactivate(keysIds: string[]) {
+    async deactivate(userEmail: string, keysIds: string[]) {
         const result = await this.databaseService.query({
-            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1)",
-            args: [keysIds, "Inactive"],
+            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1) AND user_email = $3",
+            args: [keysIds, "Inactive", userEmail],
         })
 
         return !!result.rowCount
     }
 
-    async activate(keysIds: string[]) {
+    async activate(userEmail: string, keysIds: string[]) {
         const result = await this.databaseService.query({
-            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1)",
-            args: [keysIds, "Active"],
+            text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1) AND user_email = $3",
+            args: [keysIds, "Active", userEmail],
         })
 
         return !!result.rowCount

@@ -4,6 +4,7 @@ import { ObjectStorageService } from "./ObjectStorageService.ts";
 
 const agentRowFieldsNamesMap: Record<string, string> = {
     agentName: "agent_name",
+    userEmail: "user_email",
     systemInstructions: "system_instructions",
     datasetId: "dataset_id",
     dontKnowResponse: "dont_know_response",
@@ -17,7 +18,7 @@ export class AgentsService {
         private objectStorageService: ObjectStorageService,
     ) { }
 
-    async create(newAgent: CreateAgentFormData) {
+    async create(userEmail: string, newAgent: CreateAgentFormData) {
         const { avatar, ...agentData } = newAgent
 
         let avatarId = null;
@@ -30,7 +31,7 @@ export class AgentsService {
         type CreationDataFormat = [string, string, string[]];
 
         const [fields, placeholders, values] = Object
-            .entries({ ...agentData, avatar: avatarId })
+            .entries({ ...agentData, userEmail, avatar: avatarId })
             .reduce<CreationDataFormat>(([fields, placeholders, values], [field, value], i, arr) => {
                 return [
                     (
@@ -60,7 +61,7 @@ export class AgentsService {
                     await this.objectStorageService.uploadFile(
                         this.objectStorageService.buckets.agentsAvatars,
                         newAgent.avatar,
-                        { id: avatarId }
+                        { id: avatarId, metaData: { "user-email": userEmail } }
                     );
                 } catch {
                     await transaction.rollback();
@@ -76,7 +77,7 @@ export class AgentsService {
         return false;
     }
 
-    async getOne(id: string) {
+    async getOne(id: string, userEmail: string) {
         const result = await this.databaseService.query<Agent>({
             text: `
                 SELECT 
@@ -91,15 +92,16 @@ export class AgentsService {
                             )
                         ELSE NULL 
                     END AS dataset 
-                FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id WHERE agents.id = $1;
+                FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id 
+                WHERE agents.id = $1 AND agents.user_email = $2;
             `,
-            args: [id],
+            args: [id, userEmail],
             camelCase: true,
         })
         return result.rows[0]
     }
 
-    async getAll() {
+    async getAll(userEmail: string) {
         const result = await this.databaseService.query<Agent>({
             text: `
             SELECT 
@@ -114,17 +116,19 @@ export class AgentsService {
                         )
                     ELSE NULL 
                 END AS dataset 
-            FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id;
+            FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id
+            WHERE agents.user_email = $1
         `,
-            camelCase: true
+            camelCase: true,
+            args: [userEmail]
         })
         return result.rows
     }
 
-    async delete(agentId: string) {
+    async delete(agentId: string, userEmail: string) {
         const { rows: [agent] } = await this.databaseService.query<Agent | null>({
-            text: "SELECT avatar FROM agents WHERE id = $1;",
-            args: [agentId],
+            text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
+            args: [agentId, userEmail],
             camelCase: true,
         })
 
@@ -136,8 +140,8 @@ export class AgentsService {
         await transaction.begin();
 
         const result = await transaction.queryObject<Agent>({
-            text: "DELETE FROM agents WHERE id = $1;",
-            args: [agentId],
+            text: "DELETE FROM agents WHERE id = $1 AND user_email = $2;",
+            args: [agentId, userEmail],
             camelCase: true,
         })
 
@@ -157,10 +161,10 @@ export class AgentsService {
         return !!result.rowCount
     }
 
-    async update(agentId: string, updateData: UpdateAgentFormData) {
+    async update(agentId: string, userEmail: string, updateData: UpdateAgentFormData) {
         const { rows: [agent] } = await this.databaseService.query<Agent | null>({
-            text: "SELECT avatar FROM agents WHERE id = $1;",
-            args: [agentId],
+            text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
+            args: [agentId, userEmail],
             camelCase: true,
         })
 
@@ -185,7 +189,7 @@ export class AgentsService {
                 return [
                     (
                         fields +
-                        `${agentRowFieldsNamesMap[field] || field} = $${i + 2}` +
+                        `${agentRowFieldsNamesMap[field] || field} = $${i + 3}` +
                         `${i === arr.length - 1 ? "" : ", "}`
                     ),
                     [...values, value || ""]
@@ -196,8 +200,8 @@ export class AgentsService {
         await transaction.begin();
 
         const result = await transaction.queryObject<Agent>({
-            text: `UPDATE agents SET ${fields} WHERE id = $1;`,
-            args: [agentId, ...values],
+            text: `UPDATE agents SET ${fields} WHERE id = $1 AND user_email = $2;`,
+            args: [agentId, userEmail, ...values],
             camelCase: true,
         })
 
