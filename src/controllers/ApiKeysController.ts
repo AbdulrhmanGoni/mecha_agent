@@ -6,14 +6,15 @@ import apiKeysResponseMessages from "../constant/response-messages/apiKeysRespon
 export class ApiKeysController {
     constructor(private apiKeysService: ApiKeysService) { }
 
-    async create(c: Context<never, never, { out: { json: CreateApiKeyInput } }>) {
+    async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: CreateApiKeyInput } }>) {
         const body = c.req.valid("json");
+        const userEmail = c.get("userEmail");
         const newKey = await this.apiKeysService.create(
-            body.keyName,
             {
+                keyName: body.keyName,
                 maxAgeInDays: body.maxAgeInDays,
                 permissions: body.permissions,
-                user: c.get("user")
+                userEmail,
             }
         );
 
@@ -24,14 +25,16 @@ export class ApiKeysController {
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyCreation })
     }
 
-    async getAll(c: Context) {
-        const result = await this.apiKeysService.getAll();
+    async getAll(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+        const result = await this.apiKeysService.getAll(userEmail);
         return c.json({ result });
     }
 
-    async delete(c: Context<never, never, { out: { json: string[] } }>) {
+    async delete(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: string[] } }>) {
         const keys = c.req.valid("json");
-        const deletedSuccessfully = await this.apiKeysService.delete(keys);
+        const userEmail = c.get("userEmail");
+        const deletedSuccessfully = await this.apiKeysService.delete(userEmail, keys);
 
         if (deletedSuccessfully) {
             return c.json({ result: apiKeysResponseMessages.successfulKeyDeletion });
@@ -40,9 +43,10 @@ export class ApiKeysController {
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyDeletion })
     }
 
-    async deactivate(c: Context<never, never, { out: { json: string[] } }>) {
+    async deactivate(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: string[] } }>) {
         const keys = c.req.valid("json");
-        const deactivatedSuccessfully = await this.apiKeysService.deactivate(keys);
+        const userEmail = c.get("userEmail");
+        const deactivatedSuccessfully = await this.apiKeysService.deactivate(userEmail, keys);
 
         if (deactivatedSuccessfully) {
             return c.json({ result: apiKeysResponseMessages.successfulKeyDeactivation });
@@ -51,9 +55,10 @@ export class ApiKeysController {
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyDeactivation })
     }
 
-    async activate(c: Context<never, never, { out: { json: string[] } }>) {
+    async activate(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: string[] } }>) {
         const keys = c.req.valid("json");
-        const activatedSuccessfully = await this.apiKeysService.activate(keys);
+        const userEmail = c.get("userEmail");
+        const activatedSuccessfully = await this.apiKeysService.activate(userEmail, keys);
 
         if (activatedSuccessfully) {
             return c.json({ result: apiKeysResponseMessages.successfulKeyActivation });
