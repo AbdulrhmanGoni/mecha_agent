@@ -1,7 +1,8 @@
 import { encoder } from "djwt/util";
+import { AbortableAsyncIterator, ChatResponse } from "ollama";
 
 type ChatResponseHandlerParams = {
-    llmResponse: any;
+    llmResponse: AbortableAsyncIterator<ChatResponse>;
     onResponseComplete: (responseText: string) => Promise<void>;
 }
 
