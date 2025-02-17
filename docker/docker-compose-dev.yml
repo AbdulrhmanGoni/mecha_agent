@@ -22,7 +22,7 @@ services:
       - dev-object-storage
 
   dev_database:
-    image: postgres:latest
+    image: postgres:17.3
     container_name: dev_database_container
     ports:
       - 5432:5432
@@ -36,7 +36,7 @@ services:
       - development-network
 
   dev_vector_database: 
-    image: qdrant/qdrant:latest
+    image: qdrant/qdrant:v1.13.3
     container_name: dev_vector_database_container
     ports:
       - 6333:6333
@@ -48,7 +48,7 @@ services:
       - development-network
 
   dev_ollama: 
-    image: ollama/ollama:latest
+    image: ollama/ollama:0.5.11
     container_name: dev_ollama_container
     volumes:
       - ollama-data:/root/.ollama
