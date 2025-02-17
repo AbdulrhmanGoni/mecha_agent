@@ -3,15 +3,12 @@ import parsedEnvVariables from "../src/configurations/parseEnvironmentVariables.
 
 const ollamaClient = new Ollama({ host: parsedEnvVariables.OLLAMA_HOST });
 
-const modelfile = `
-FROM ${parsedEnvVariables.BASE_MODEL_NAME}
-
-PARAMETER temperature 0.1
-`
-
 const response = await ollamaClient.create({
     model: parsedEnvVariables.MODEL_NAME,
-    modelfile,
+    from: parsedEnvVariables.BASE_MODEL_NAME,
+    parameters: {
+        temperature: 0.1
+    }
 })
 
 console.log(

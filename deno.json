@@ -13,7 +13,7 @@
     "@std/testing/bdd": "jsr:@std/testing/bdd",
     "@std/expect": "jsr:@std/expect",
     "hono": "npm:hono",
-    "ollama": "npm:ollama",
+    "ollama": "npm:ollama@^0.5.13",
     "zod": "npm:zod",
     "minio": "npm:minio@7.1.2"
   },
