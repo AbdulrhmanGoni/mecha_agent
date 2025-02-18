@@ -1,3 +1,5 @@
+import { UsersController } from "./UsersController.ts";
+import { UsersService } from "../services/UsersService.ts";
 import { AgentsController } from "./AgentsController.ts";
 import { ApiKeysController } from "./ApiKeysController.ts";
 import { AuthController } from "./AuthController.ts";
@@ -16,6 +18,7 @@ import { SSEService } from "../services/SSEService.ts";
 import { DatasetsService } from "../services/DatasetsService.ts";
 
 type controllersDependencies = {
+    usersService: UsersService;
     instructionsService: InstructionsService;
     agentsService: AgentsService;
     datasetsService: DatasetsService;
@@ -27,6 +30,10 @@ type controllersDependencies = {
 }
 
 export default function bootstrapControllers(dependencies: controllersDependencies) {
+    const usersController = new UsersController(
+        dependencies.usersService
+    );
+
     const instructionsController = new InstructionsController(
         dependencies.instructionsService
     );
@@ -60,6 +67,7 @@ export default function bootstrapControllers(dependencies: controllersDependenci
     );
 
     return {
+        usersController,
         chatsController,
         instructionsController,
         agentsController,
