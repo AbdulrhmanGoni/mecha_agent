@@ -12,7 +12,7 @@ type Agent = {
     createdAt: Date;
 }
 
-type CreateAgentFormData = Omit<Agent, "id" | "avatar" | "createdAt" | "datasetId"> & {
+type CreateAgentFormData = Omit<Agent, "id" | "userEmail" | "avatar" | "createdAt" | "datasetId"> & {
     avatar?: File
 }
 

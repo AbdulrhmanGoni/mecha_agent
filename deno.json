@@ -20,6 +20,7 @@
   "compilerOptions": {
     "types": [
       "./types/global.d.ts",
+      "./types/users.d.ts",
       "./types/instructions.d.ts",
       "./types/apiKeys.d.ts",
       "./types/agents.d.ts",
