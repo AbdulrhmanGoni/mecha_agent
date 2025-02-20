@@ -6,7 +6,7 @@ services:
     container_name: dev_server_container
     ports:
       - 10000:10000
-    command: deno run --allow-net --allow-env --allow-read --watch src/server.ts
+    command: deno run -N -E -R --watch src/server.ts
     image: mecha_agent_server:dev
     volumes:
       - ../src:/assistant-server/src:ro
@@ -51,7 +51,7 @@ services:
     image: ollama/ollama:0.5.11
     container_name: dev_ollama_container
     volumes:
-      - ollama-data:/root/.ollama
+      - ollama-data-cloned:/root/.ollama
     restart: always
     networks:
       - development-network
@@ -79,6 +79,6 @@ networks:
 
 volumes:
   dev_database_storage:
-  ollama-data:
+  ollama-data-cloned:
   qdrant_storage:
   dev_object_storage:
