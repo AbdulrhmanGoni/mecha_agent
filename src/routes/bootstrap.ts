@@ -18,6 +18,7 @@ import sseRoutesBuilder from "./sseRoutes.ts";
 import { SSEController } from "../controllers/SSEController.ts";
 import { UsersController } from "../controllers/UsersController.ts";
 import usersRoutesBuilder from "./usersRoutes.ts";
+import globalErrorsHandler from "../helpers/globalErrorsHandler.ts";
 
 type RoutesDependencies = {
     usersController: UsersController;
@@ -89,6 +90,8 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
 
     const app = new Hono().route("/api", api);
+
+    app.onError(globalErrorsHandler)
 
     return app
 };
