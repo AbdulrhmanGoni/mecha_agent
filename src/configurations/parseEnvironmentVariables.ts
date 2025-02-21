@@ -20,9 +20,6 @@ function parseEnvironmentVariables<
 const envSchema = z.object({
     SERVER_PORT: z.coerce.number().default(10000),
 
-    ROOT_USERNAME: rootUserSchema.shape.username.default(defaultRootUsername),
-    ROOT_PASSWORD: rootUserSchema.shape.password.default(defaultRootPassword),
-
     DB_PORT: z.coerce.number().default(5432),
     DB_HOST: z.string(),
     DB_NAME: z.string(),
