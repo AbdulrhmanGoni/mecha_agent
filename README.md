@@ -91,6 +91,12 @@ deno task start:dev
 Now the development server should be running on http://localhost:10000 on your
 machine
 
+To stop the running development mode run :point_down:
+
+```
+deno task stop:dev
+```
+
 > [!NOTE]
 > If you made any changes under `src` directory in your machine, The changes
 > will be reflected to the running container and you will see your changes
@@ -104,9 +110,4 @@ Build command
 deno task build:dev
 ```
 
-To stop the running development mode run :point_down:
-
-```
-deno task stop:dev
-```
 
