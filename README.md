@@ -20,13 +20,14 @@ questions based on given datasets by the users
 
 #### [Deno](https://deno.com/)
 
-The used JavaScript / TypeScript runtime for building the server. <br/> Install
-it from [here](https://docs.deno.com/runtime/getting_started/installation/)
+The used JavaScript / TypeScript runtime for building the server. <br/> If you
+don't have it, Install it from
+[here](https://docs.deno.com/runtime/getting_started/installation/)
 
 #### [Docker](https://www.docker.com/)
 
-The platform for running all components of the system in containers. <br/>
-Install it from [here](https://docs.docker.com/desktop/)
+The platform for running all components of the system in containers. <br/> If
+you don't have it, Install it from [here](https://docs.docker.com/desktop/)
 
 > [!NOTE]
 > After having Docker on your machine, You will have to download the image of
@@ -94,8 +95,8 @@ machine
 > If you made any changes under `src` directory in your machine, The changes
 > will be reflected to the running container and you will see your changes
 > because `src` directory is binded with the one inside the container, but if
-> made your changes in the other files and directories, you will have to rebuild
-> of the development image (mecha_agent_server:dev) to see your changes.
+> you made your changes in the other files and directories, you will have to
+> rebuild of the development image (mecha_agent_server:dev) to see your changes.
 
 Build command
 
