@@ -14,7 +14,7 @@ export class AgentsController {
             return c.json({ result: AgentsResponseMessages.successfulAgentCreation }, 201);
         }
 
-        return c.json({ error: AgentsResponseMessages.failedAgentCreation }, 404);
+        return c.json({ error: AgentsResponseMessages.failedAgentCreation }, 400);
     }
 
     async getOne(c: Context<{ Variables: { userEmail: string } }>) {
@@ -44,7 +44,11 @@ export class AgentsController {
             return c.json({ result: AgentsResponseMessages.successfulAgentDeletion }, 200);
         }
 
-        return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 404);
+        if (result === null) {
+            return c.json({ error: `${AgentsResponseMessages.failedAgentDeletion}: ${AgentsResponseMessages.noAgentOrUser}` }, 404);
+        }
+
+        return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 400);
     }
 
     async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: UpdateAgentFormData } }>) {

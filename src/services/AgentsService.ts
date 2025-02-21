@@ -53,9 +53,9 @@ export class AgentsService {
         const result = await transaction.queryObject(`
             INSERT INTO agents (${fields})
             VALUES (${placeholders});
-        `, values)
+        `, values).catch(() => null);
 
-        if (result.rowCount) {
+        if (result && result.rowCount) {
             if (newAgent.avatar && avatarId) {
                 try {
                     await this.objectStorageService.uploadFile(
@@ -73,7 +73,7 @@ export class AgentsService {
             return true;
         }
 
-        await transaction.rollback();
+        await transaction.rollback().catch(() => null);
         return false;
     }
 
@@ -133,7 +133,7 @@ export class AgentsService {
         })
 
         if (!agent) {
-            return false
+            return null
         }
 
         const transaction = this.databaseService.createTransaction("deleting_agent")
