@@ -14,3 +14,98 @@ questions based on given datasets by the users
 - Creating and Managing API Keys to access the system from outside :key:.
 - The ability to interact with agents via API using API Keys 🧑‍💻.
 
+## Get Started
+
+### Prerequisites :gear:
+
+#### [Deno](https://deno.com/)
+
+The used JavaScript / TypeScript runtime for building the server. <br/> Install
+it from [here](https://docs.deno.com/runtime/getting_started/installation/)
+
+#### [Docker](https://www.docker.com/)
+
+The platform for running all components of the system in containers. <br/>
+Install it from [here](https://docs.docker.com/desktop/)
+
+> [!NOTE]
+> After having Docker on your machine, You will have to download the image of
+> each component in this RAG system, The component are `denoland/deno`,
+> `postgres`, `qdrant/qdrant`, `minio/minio` and `ollama/ollama` images
+
+### Installation :arrow_down:
+
+- Clone the repository and enter project's directory
+
+  ```
+  git clone https://github.com/AbdulrhmanGoni/mecha_agent.git
+  cd mecha_agent
+  ```
+
+- Install dependencies
+
+  Now, You have to install the docker images of the components of this RAG
+  system to be able to run the system correctly.
+
+  ```
+  docker pull denoland/deno postgres:17.3 qdrant/qdrant:v1.13.3 ollama/ollama:0.5.11 minio/minio
+  ```
+
+### Environment Variables :ledger:
+
+You have to create `.env.development` file inside `docker` folder and set the
+required environment variables in order to be able to run the system in
+development mode correctly, You can simply copy the environment variables with
+their default values from `.env.example` file to get started faster and you can
+adjust the values later as you want.
+
+```
+cp docker/.env.example docker/.env.development
+```
+
+> [!TIP]
+> Open `.env.example` file for more details about environment variables
+
+### Build and run :rocket:
+
+> [!NOTE]
+> The first time you run `deno task start:dev` command, The development image
+> will start builting before the server starts bacause you don't have it yet,
+> And the next times you run this command the dev server will start faster
+> without builting step.
+
+> [!WARNING]
+> The first time you run `deno task start:dev` command, The chosen LLM in
+> `BASE_MODEL_NAME` environment variable will start being downloaded and this
+> may take a long time and lots of disk space based on model's size and your
+> network connection speed. This happends only in the first time and the
+> subsequent times the starting will be faster :rocket:
+
+Run the system in development mode
+
+```
+deno task start:dev
+```
+
+Now the development server should be running on http://localhost:10000 on your
+machine
+
+> [!NOTE]
+> If you made any changes under `src` directory in your machine, The changes
+> will be reflected to the running container and you will see your changes
+> because `src` directory is binded with the one inside the container, but if
+> made your changes in the other files and directories, you will have to rebuild
+> of the development image (mecha_agent_server:dev) to see your changes.
+
+Build command
+
+```
+deno task build:dev
+```
+
+To stop the running development mode run :point_down:
+
+```
+deno task stop:dev
+```
+
