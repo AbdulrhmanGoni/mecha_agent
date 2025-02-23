@@ -3,7 +3,7 @@ import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 export class InstructionsService {
     constructor(private readonly vectorDatabaseService: VectorDatabaseService) { }
 
-    async insert(instructions: InstructionInput[]) {
+    async insert(instructions: Instruction[]) {
         return await this.vectorDatabaseService.insert(instructions)
     }
 

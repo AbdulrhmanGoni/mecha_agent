@@ -5,15 +5,27 @@ import { HTTPException } from 'hono/http-exception';
 export class InstructionsController {
     constructor(private readonly instructionsService: InstructionsService) { }
 
-    async insert(c: Context<never, never, { out: { json: Instruction[] } }>) {
+    async insert(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: InstructionInput[] } }>) {
         const instructions = c.req.valid("json");
-        const result = await this.instructionsService.insert(instructions);
+        const userEmail = c.get("userEmail");
+
+        const result = await this.instructionsService.insert(
+            instructions.map((instruction) => {
+                return { ...instruction, userEmail }
+            })
+        );
         return c.json({ result });
     }
 
-    async update(c: Context<never, never, { out: { json: UpdateInstructionInput[] } }>) {
+    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: Omit<UpdateInstructionInput, "userEmail">[] } }>) {
         const instructions = c.req.valid("json");
-        const result = await this.instructionsService.update(instructions);
+        const userEmail = c.get("userEmail");
+
+        const result = await this.instructionsService.update(
+            instructions.map((instruction) => {
+                return { ...instruction, userEmail }
+            })
+        );
         return c.json({ result });
     }
 

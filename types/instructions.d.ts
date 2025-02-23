@@ -26,9 +26,9 @@ type Instruction = BaseInstruction & {
     userEmail: string;
 }
 
-type InstructionInput = Instruction;
+type InstructionInput = Omit<Instruction, "userEmail">;
 
-type UpdateInstructionInput = WithOptionalFields<Instruction, "response" | "prompt">;
+type UpdateInstructionInput = (WithOptionalFields<Instruction, "response" | "prompt">);
 
 type DatasetProcessingWorkerTask = "new_dataset" | "delete_dataset" | "successful_process" | "failed_process"
 
