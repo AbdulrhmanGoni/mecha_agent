@@ -9,7 +9,7 @@ export class UsersService {
     async create(userInput: SignUpUserInput) {
         const hashedPassword = await hash(userInput.password);
 
-        const { rows } = await this.databaseService.query<User>({
+        const { rows } = await this.databaseService.query<Pick<User, "avatar" | "email"> & { name: string }>({
             text: `
                 INSERT INTO users(username, email, password, avatar, signing_method) 
                 VALUES($1, $2, $3, $4, $5)
