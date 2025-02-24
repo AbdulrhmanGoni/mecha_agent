@@ -1,5 +1,4 @@
 import { z } from "zod";
-import parsedEnvVariables from "../../configurations/parseEnvironmentVariables.ts";
 import { responseSyntaxes } from "../../constant/responseSyntaxes.ts";
 import { supportedImageTypes } from "../../constant/supportedFileTypes.ts";
 
@@ -20,7 +19,7 @@ const agentSchema = z.object({
     avatar: avatarFieldValidator,
     systemInstructions: z.string().max(10000).optional(),
     dontKnowResponse: z.string().max(100).optional(),
-    greetingMessage: z.string().max(80).default(parsedEnvVariables.DEFAULT_GREETING_MESSAGE),
+    greetingMessage: z.string().max(80).optional(),
     responseSyntax: z.enum(responseSyntaxes).optional(),
 })
 
