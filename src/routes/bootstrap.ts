@@ -36,6 +36,7 @@ type RoutesDependencies = {
 export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     const usersRoutes = usersRoutesBuilder(
         dependencies.usersController,
+        dependencies.guardService
     );
 
     const authRoutes = authRoutesBuilder(
