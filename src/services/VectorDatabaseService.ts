@@ -51,7 +51,7 @@ export class VectorDatabaseService {
         }
     }
 
-    async insert(instructions: InstructionInput[]) {
+    async insert(instructions: Instruction[]) {
         const points = new Array<Schemas["PointStruct"]>(instructions.length)
 
         for (let i = 0; i < instructions.length; i++) {

@@ -11,7 +11,6 @@ export class UsersController {
         const userEmail = c.get("userEmail");
         const user = await this.usersService.getByEmail(userEmail)
 
-
         if (user) {
             const { password: _, username: name, ...userData } = user
             return c.json({ result: { name, ...userData } })
