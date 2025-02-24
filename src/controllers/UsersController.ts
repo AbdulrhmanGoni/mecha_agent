@@ -16,6 +16,6 @@ export class UsersController {
             return c.json({ result: { name, ...userData } })
         }
 
-        return c.json({ error: authResponsesMessages.noUser }, 400)
+        return c.json({ error: authResponsesMessages.noUser }, 404)
     }
 }
