@@ -8,7 +8,9 @@ const AgentsResponseMessages = {
     failedAgentCreation: "Failed to create the agent",
     failedAgentDeletion: "Failed to delete the agent",
     failedAgentUpdate: "Failed to update the agent",
-    notFoundAgent: "Agent not found"
+    notFoundAgent: "Agent not found",
+
+    noUpdateData: "Specify at least one field to update",
 }
 
 export default AgentsResponseMessages

@@ -55,13 +55,25 @@ export class AgentsController {
         const agentId = c.req.param("agentId") as string;
         const updateData = c.req.valid("form");
         const userEmail = c.get("userEmail");
+
+        if (!Object.keys(updateData).length) {
+            return c.json({ error: AgentsResponseMessages.noUpdateData }, 400);
+        }
+
         const result = await this.agentsService.update(agentId, userEmail, updateData);
 
         if (result) {
             return c.json({ result: AgentsResponseMessages.successfulAgentUpdate }, 200);
         }
 
-        return c.json({ error: AgentsResponseMessages.failedAgentUpdate }, 404);
+        if (result === null) {
+            return c.json(
+                { error: `${AgentsResponseMessages.failedAgentUpdate}, ${AgentsResponseMessages.noAgentOrUser}` },
+                404
+            );
+        }
+
+        return c.json({ error: AgentsResponseMessages.failedAgentUpdate }, 400);
     }
 }
 

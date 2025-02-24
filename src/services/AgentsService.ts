@@ -169,7 +169,7 @@ export class AgentsService {
         })
 
         if (!agent) {
-            return false
+            return null
         }
 
         const { avatar: newAgentAvatart, removeAvatar, ...restUpdateData } = updateData;
