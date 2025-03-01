@@ -1,7 +1,5 @@
 import z from "zod";
 import { responseSyntaxes } from "../constant/responseSyntaxes.ts";
-import { defaultRootUsername, defaultRootPassword } from "../constant/root.ts";
-import rootUserSchema from "../validation/auth/rootUserSchema.ts";
 
 function parseEnvironmentVariables<
     T extends z.ZodObject<z.ZodRawShape, z.UnknownKeysParam, z.ZodTypeAny>,
