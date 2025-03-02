@@ -4,7 +4,7 @@ type ReadFileLineByLineOptions = {
     onLine: (line: string, lineNumber?: number) => void;
 }
 
-export async function readFileLineByLine(readableFile: Readable, { onLine }: ReadFileLineByLineOptions) {
+export async function readFileLineByLine(readableFile: Readable | ReadableStream, { onLine }: ReadFileLineByLineOptions) {
     const decoder = new TextDecoder();
     let buffer = "";
     let lineNumber = 1;
