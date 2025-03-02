@@ -143,7 +143,7 @@ export class DatasetsService {
         if (datasetDeleted) {
             this.datasetProcessingWorker.postMessage({
                 process: "delete_dataset",
-                payload: { agentId, datasetId }
+                payload: { datasetId, userEmail }
             });
             return true
         }
