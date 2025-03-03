@@ -9,15 +9,17 @@ export default function systemMessageTemplate({
     responseSyntax
 }: Agent) {
 
-    const fallbackResponse = dontKnowResponse || parsedEnvVariables.DEFAULT_DONT_KNOW_RESPONSE;
     const syntaxPrompt = responseSyntax ? responseSyntaxesPrompt[responseSyntax] : "";
     const additionalInstructions = systemInstructions ? ", " + systemInstructions : "";
 
     return (
-        `You are '${agentName}', and your description is "${description}",` +
-        "Your job is to respond to the users based on the provided context, " +
-        `If you couldn't find a suitable answer from the context, ` +
-        `Just respond '${fallbackResponse}'${syntaxPrompt ? ", " + syntaxPrompt : ""}` +
-        additionalInstructions
+        `
+        You are "${agentName}", and your description is "${description}",
+        You are an AI chat bot assistant that answers questions based on the context provided.
+        If a question is unclear, ask for clarification. 
+        If the context does not contain enough information to answer a question, 
+        Just respond '${dontKnowResponse || parsedEnvVariables.DEFAULT_DONT_KNOW_RESPONSE}',
+        ${syntaxPrompt} ${additionalInstructions}
+        `
     )
 };
