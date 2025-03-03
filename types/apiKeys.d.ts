@@ -4,7 +4,7 @@ type ApiKeyRecord = {
     id: string;
     key: string;
     keyName: string;
-    expirationDate: string;
+    expirationDate: Date;
     permissions: Permission[];
     status: ApiKeyStatus;
     userEmail: string;
