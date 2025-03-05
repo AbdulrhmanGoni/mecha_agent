@@ -27,7 +27,7 @@ export default function datasetsRoutesBuilder(
     datasetsRoutes.patch(
         '/:datasetId',
         updateDatasetInputValidator,
-        datasetsController.delete.bind(datasetsController)
+        datasetsController.update.bind(datasetsController)
     );
 
     return datasetsRoutes;
