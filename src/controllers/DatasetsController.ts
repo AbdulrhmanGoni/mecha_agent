@@ -32,6 +32,11 @@ export class DatasetsController {
 
     async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateDatasetInput } }>) {
         const updateData = c.req.valid("json");
+
+        if (!Object.keys(updateData).length) {
+            return c.json({ error: datasetsResponsesMessages.noUpdateData });
+        }
+
         const datasetId = c.req.param("datasetId") as string;
         const userEmail = c.get("userEmail");
         const result = await this.datasetsService.update(datasetId, userEmail, updateData);

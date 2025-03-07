@@ -5,6 +5,8 @@ const datasetsResponsesMessages = {
     failedUpdate: "Update the dataset failed",
     failedDeletion: "Dataset deletion failed",
     failedCreation: "Dataset creation failed",
+
+    noUpdateData: "Specify at least one field to update",
 }
 
 export default datasetsResponsesMessages
