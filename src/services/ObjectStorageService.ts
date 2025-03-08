@@ -1,3 +1,4 @@
+// @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
 import { Readable } from "node:stream";
 import crypto from "node:crypto";

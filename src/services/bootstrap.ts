@@ -1,5 +1,6 @@
 import { Ollama } from "ollama";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
+// @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
 import { EmbeddingService } from "./EmbeddingService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
@@ -44,7 +45,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const jwtService = new JwtService();
     await jwtService.init();
 
-    const usersService = new UsersService(databaseService);
+    const usersService = new UsersService(databaseService, objectStorageService);
     const agentsService = new AgentsService(databaseService, objectStorageService);
 
     const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);

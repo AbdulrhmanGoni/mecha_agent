@@ -1,5 +1,6 @@
 import { Ollama as OllamaClient } from "ollama";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
+// @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 
