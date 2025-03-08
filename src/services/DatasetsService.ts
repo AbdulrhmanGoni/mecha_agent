@@ -125,7 +125,6 @@ export class DatasetsService {
         const { rowCount } = await this.databaseService.query({
             text: `UPDATE datasets SET ${fields} WHERE id = $1 AND user_email = $2`,
             args: [datasetId, userEmail, ...values],
-            camelCase: true
         })
 
         return !!rowCount

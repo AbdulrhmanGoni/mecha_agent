@@ -59,7 +59,7 @@ export class DatasetProcessorService {
         await this.objectStorageService.deleteFile(
             this.objectStorageService.buckets.datasets,
             datasetId
-        );;
+        );
         await this.vectorDatabaseService.clear(datasetId, userEmail);
     }
 }
