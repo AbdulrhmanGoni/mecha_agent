@@ -38,6 +38,24 @@ self.onmessage = (e: DatasetProcessingWorkerEvent) => {
 
         case "delete_dataset":
             datasetProcessor.deleteDataset(e.data.payload.datasetId, e.data.payload.userEmail)
+                .then(() => {
+                    self.postMessage({
+                        process: "successful_deletion",
+                        payload: {
+                            datasetId: e.data.payload.datasetId,
+                            userEmail: e.data.payload.userEmail
+                        }
+                    })
+                })
+                .catch(() => {
+                    self.postMessage({
+                        process: "failed_deletion",
+                        payload: {
+                            datasetId: e.data.payload.datasetId,
+                            userEmail: e.data.payload.userEmail
+                        }
+                    })
+                })
             break;
     }
 };
