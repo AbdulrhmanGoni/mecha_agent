@@ -8,8 +8,9 @@ export class ObjectStorageService {
     constructor(private readonly minioClient: MinioClient) { }
 
     readonly buckets = {
-        agentsAvatars: "agents-avatars",
-        datasets: "datasets"
+        agentsAvatars: "users-avatars",
+        usersAvatars: "agents-avatars",
+        datasets: "datasets",
     }
 
     async init() {
