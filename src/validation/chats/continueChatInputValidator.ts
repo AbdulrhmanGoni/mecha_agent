@@ -6,7 +6,7 @@ import agentIdValidator from "../agents/agentIdValidator.ts";
 import chatIdValidator from "./chatIdValidator.ts";
 
 const continueChatInputSchema = z.object({
-    prompt: z.string(),
+    prompt: z.string().min(1),
     agentId: agentIdValidator,
     chatId: chatIdValidator,
 }).strict();

@@ -5,7 +5,7 @@ import { Next } from "hono/types";
 import agentIdValidator from "../agents/agentIdValidator.ts";
 
 const startChatInputSchema = z.object({
-    prompt: z.string(),
+    prompt: z.string().min(1),
     agentId: agentIdValidator
 }).strict();
 
