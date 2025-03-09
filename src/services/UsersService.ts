@@ -54,8 +54,12 @@ export class UsersService {
     }
 
     async update(email: string, updateData: UpdateUserData) {
-        const { newAvatar, ...updateUserData } = updateData
+        const { newAvatar, removeAvatar, ...updateUserData } = updateData
         let newAvatarId: string = ""
+
+        if (removeAvatar) {
+            Object.assign(updateUserData, { avatar: null });
+        }
 
         if (newAvatar?.size && newAvatar?.name) {
             const fileExtention = mimeTypeToFileExtentionMap[newAvatar.type];
@@ -80,8 +84,8 @@ export class UsersService {
         const transaction = this.databaseService.createTransaction("update_user_data")
         await transaction.begin();
 
-        const { rowCount } = await transaction.queryObject<User>({
-            text: `UPDATE users SET ${fields} WHERE email = $1`,
+        const { rowCount, rows: [{ avatar: oldAvatar }] } = await transaction.queryObject<User>({
+            text: `UPDATE users SET ${fields} WHERE email = $1 RETURNING avatar`,
             args: [email, ...values],
             camelCase: true,
         });
@@ -100,6 +104,13 @@ export class UsersService {
                 )
                     .then(() => false)
                     .catch(() => true)
+            }
+
+            if (oldAvatar && (removeAvatar || newAvatar)) {
+                await this.objectStorage.deleteFile(
+                    this.objectStorage.buckets.usersAvatars,
+                    oldAvatar,
+                )
             }
 
             if (!uploadFileFailed) {

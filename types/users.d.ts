@@ -13,3 +13,8 @@ type User = SignUpUserInput & {
     createdAt: Date;
     lastSignIn: Date;
 }
+
+type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {
+    newAvatar: File;
+    removeAvatar: boolean;
+}>

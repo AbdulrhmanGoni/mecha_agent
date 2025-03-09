@@ -7,6 +7,7 @@ import { ParsedFormValue } from "hono/types";
 const updateUserDataInputSchema = z.object({
     username: z.string().min(3).max(70).optional(),
     newAvatar: avatarFieldValidator.optional(),
+    removeAvatar: z.coerce.boolean().optional(),
 }).strict()
 
 const updateUserDataInputValidator = validator('form', (value, c) => {
