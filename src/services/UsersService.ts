@@ -1,9 +1,16 @@
 import { hash } from "deno.land/x/bcrypt";
 import { DatabaseService } from "./DatabaseService.ts";
+import { ObjectStorageService } from "./ObjectStorageService.ts";
+import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
+
+const userRowFieldsNamesMap: Record<string, string> = {
+    lastSignIn: "last_sign_in",
+}
 
 export class UsersService {
     constructor(
         private readonly databaseService: DatabaseService,
+        private readonly objectStorage: ObjectStorageService,
     ) { }
 
     async create(userInput: SignUpUserInput) {
@@ -44,5 +51,66 @@ export class UsersService {
         }
 
         return null
+    }
+
+    async update(email: string, updateData: UpdateUserData) {
+        const { newAvatar, ...updateUserData } = updateData
+        let newAvatarId: string = ""
+
+        if (newAvatar?.size && newAvatar?.name) {
+            const fileExtention = mimeTypeToFileExtentionMap[newAvatar.type];
+            newAvatarId = `${crypto.randomUUID()}.${fileExtention}`;
+            Object.assign(updateUserData, { avatar: newAvatarId });
+        }
+
+        type UpdateDataFormat = [string, (string | Date)[]]
+        const [fields, values] = Object
+            .entries(updateUserData)
+            .reduce<UpdateDataFormat>(([fields, values], [field, value], i, arr) => {
+                return [
+                    (
+                        fields +
+                        `${userRowFieldsNamesMap[field] || field} = $${i + 2}` +
+                        `${i === arr.length - 1 ? "" : ", "}`
+                    ),
+                    [...values, value || ""]
+                ]
+            }, ["", []])
+
+        const transaction = this.databaseService.createTransaction("update_user_data")
+        await transaction.begin();
+
+        const { rowCount } = await transaction.queryObject<User>({
+            text: `UPDATE users SET ${fields} WHERE email = $1`,
+            args: [email, ...values],
+            camelCase: true,
+        });
+
+        if (rowCount) {
+            let uploadFileFailed = false;
+
+            if (newAvatar && newAvatarId) {
+                uploadFileFailed = await this.objectStorage.uploadFile(
+                    this.objectStorage.buckets.usersAvatars,
+                    newAvatar,
+                    {
+                        id: newAvatarId,
+                        metaData: { "user-email": email }
+                    }
+                )
+                    .then(() => false)
+                    .catch(() => true)
+            }
+
+            if (!uploadFileFailed) {
+                await transaction.commit();
+
+                return true
+            }
+        }
+
+        await transaction.rollback();
+
+        return false
     }
 }
