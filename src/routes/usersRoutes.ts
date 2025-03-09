@@ -1,7 +1,8 @@
 import { Hono } from "hono";
 import { UsersController } from "../controllers/UsersController.ts";
 import { GuardService } from "../services/GuardService.ts";
-import { readPermission } from "../constant/permissions.ts";
+import { readPermission, writePermission } from "../constant/permissions.ts";
+import updateUserDataInputValidator from "../validation/users/updateUserDataInputValidator.ts";
 
 export default function usersRoutesBuilder(
     usersController: UsersController,
@@ -12,6 +13,12 @@ export default function usersRoutesBuilder(
     authRoutes.get('/',
         guardService.guardRoute({ permissions: [readPermission] }),
         usersController.getUserData.bind(usersController)
+    );
+
+    authRoutes.patch('/',
+        guardService.guardRoute({ permissions: [writePermission] }),
+        updateUserDataInputValidator,
+        usersController.updateUserData.bind(usersController)
     );
 
     return authRoutes;
