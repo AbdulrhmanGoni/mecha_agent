@@ -36,6 +36,10 @@ export class AuthService {
             const isMatched = await compare(userInput.password, user.password);
 
             if (isMatched) {
+                await this.usersService.update(userInput.email, { lastSignIn: new Date() })
+                    .then(() => true)
+                    .catch(() => false)
+
                 return {
                     success: true,
                     user: {
