@@ -9,16 +9,18 @@ export class ApiKeysService {
 
     async create(params: CreateApiKeyInput) {
         const { keyName, ...restParams } = params
-        const jwtKey = await this.jwtService.generateJwt(restParams);
+        const apiKeyId = crypto.randomUUID()
+        const jwtKey = await this.jwtService.generateJwt(restParams, { apiKeyId });
 
         const result = await this.databaseService.query<ApiKeyRecord>({
             text: `
-                INSERT INTO api_keys (key, key_name, expiration_date, permissions, user_email)
-                VALUES ($1, $2, $3, $4, $5)
+                INSERT INTO api_keys (id, key, key_name, expiration_date, permissions, user_email)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 RETURNING *;
             `,
             camelCase: true,
             args: [
+                apiKeyId,
                 jwtKey.jwt,
                 keyName,
                 jwtKey.expirationDate,
