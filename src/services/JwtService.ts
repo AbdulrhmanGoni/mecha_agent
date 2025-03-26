@@ -19,12 +19,13 @@ export class JwtService {
         )
     }
 
-    async generateJwt(options: CreateJWTParams) {
+    async generateJwt(options: CreateJWTParams, additionalPayload?: Record<string, string>) {
         const expirationDate = genDateAfterNDays(options.maxAgeInDays);
         const payload: Payload = {
             exp: getNumericDate(expirationDate),
             permissions: options.permissions,
-            email: options.userEmail
+            email: options.userEmail,
+            ...additionalPayload
         };
 
         const header: Header = { alg: "HS512", typ: "JWT", };
