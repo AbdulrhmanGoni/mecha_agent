@@ -20,6 +20,7 @@ export class GuardService {
 
                     if (hasPermission && payload.email) {
                         c.set("userEmail", payload.email)
+                        payload.apiKeyId && c.set("apiKeyId", payload.apiKeyId)
                         return hasPermission
                     }
                 }
