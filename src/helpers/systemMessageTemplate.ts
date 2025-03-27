@@ -1,4 +1,5 @@
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import { responseSyntaxesPrompt } from "../constant/responseSyntaxes.ts";
 
 export default function systemMessageTemplate({
@@ -18,7 +19,7 @@ export default function systemMessageTemplate({
         You are an AI chat bot assistant that answers questions based on the context provided.
         If a question is unclear, ask for clarification. 
         If the context does not contain enough information to answer a question, 
-        Just respond '${dontKnowResponse || parsedEnvVariables.DEFAULT_DONT_KNOW_RESPONSE}',
+        Just respond '${dontKnowResponse || chatsResponsesMessages.dontKnow}',
         ${syntaxPrompt} ${additionalInstructions}
         `
     )

@@ -1,7 +1,7 @@
 import { DatabaseService } from "./DatabaseService.ts";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
-import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import chatResponseHandler from "../helpers/chatResponseHandler.ts";
 import contextTemplate from "../helpers/contextTemplate.ts";
 import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
@@ -21,7 +21,7 @@ export class ChatsService {
         })
 
         if (!agentRow.datasetId) {
-            return `Sorry!, I don't have a dataset to answer based on.`
+            return chatsResponsesMessages.noDataset
         }
 
         const searchResult = await this.vectorDatabaseService.search(
@@ -29,7 +29,7 @@ export class ChatsService {
         );
 
         if (!searchResult.length) {
-            return agentRow.dontKnowResponse || parsedEnvVariables.DEFAULT_DONT_KNOW_RESPONSE
+            return agentRow.dontKnowResponse || chatsResponsesMessages.dontKnow
         }
 
         return {
