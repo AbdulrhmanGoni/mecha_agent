@@ -1,0 +1,78 @@
+services:
+  testing_server:
+    build: 
+      context: ../
+      dockerfile: docker/ServerDockerfile
+    container_name: testing_server_container
+    ports:
+      - 10001:10001
+    image: mecha_agent_server:test
+    volumes:
+      - ../src:/assistant-server/src:ro
+      - ../tests:/assistant-server/tests:ro
+      - ../types:/assistant-server/types:ro
+      - ../scripts/createCustomModel.ts:/assistant-server/scripts/createCustomModel.ts
+    env_file:
+      - .env.testing
+    networks:
+      - testing-network
+    depends_on:
+      - testing_database
+      - testing_vector_database
+      - testing_ollama
+      - testing-object-storage
+
+  testing_database:
+    image: postgres:17.3
+    container_name: testing_database_container
+    ports:
+      - 10002:5432
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - testing-network
+    restart: always
+
+  testing_vector_database: 
+    image: qdrant/qdrant:v1.13.3
+    container_name: testing_vector_database_container
+    ports:
+      - 10003:6333
+      - 10033:6334
+    networks:
+      - testing-network
+    restart: always
+
+  testing_ollama:
+    image: ollama/ollama:0.5.11
+    container_name: testing_ollama_container
+    volumes:
+      - ollama-data-cloned:/root/.ollama
+    networks:
+      - testing-network
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: always
+
+  testing-object-storage:
+    image: minio/minio
+    container_name: testing_object_storage_container
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${OBJECT_STORAGE_USERNAME}
+      - MINIO_ROOT_PASSWORD=${OBJECT_STORAGE_PASSWORD}
+    ports:
+      - 10004:9000
+      - 10044:9001
+    networks:
+      - testing-network
+    restart: always
+
+networks:
+  testing-network:
+    driver: bridge
+
+volumes:
+  ollama-data-cloned:
