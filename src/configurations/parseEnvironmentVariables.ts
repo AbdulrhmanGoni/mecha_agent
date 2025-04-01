@@ -34,7 +34,7 @@ const envSchema = z.object({
 
     OLLAMA_HOST: z.string(),
 
-    MODEL_NAME: z.string().default("llama3.2:3b"),
+    MODEL_NAME: z.string().default("qwen2.5:3b-instruct"),
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),
     DEFAULT_RESPONSE_SYNTAX: z.enum(responseSyntaxes).optional(),
     DEFAULT_GREETING_MESSAGE: z.string().default("Hello, How can i help you?"),
