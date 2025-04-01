@@ -6,6 +6,7 @@ services:
     container_name: testing_server_container
     ports:
       - 10001:10001
+    command: deno run -N -E -R --watch src/server.ts
     image: mecha_agent_server:test
     volumes:
       - ../src:/assistant-server/src:ro
