@@ -11,7 +11,6 @@ services:
       - ../src:/assistant-server/src:ro
       - ../tests:/assistant-server/tests:ro
       - ../types:/assistant-server/types:ro
-      - ../scripts/createCustomModel.ts:/assistant-server/scripts/createCustomModel.ts
     env_file:
       - .env.testing
     networks:

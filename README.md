@@ -77,10 +77,10 @@ cp docker/.env.example docker/.env.development
 
 > [!WARNING]
 > The first time you run `deno task start:dev` command, The chosen LLM in
-> `BASE_MODEL_NAME` environment variable will start being downloaded and this
-> may take a long time and lots of disk space based on model's size and your
-> network connection speed. This happends only in the first time and the
-> subsequent times the starting will be faster :rocket:
+> `MODEL_NAME` environment variable will start being downloaded and this may
+> take a long time and lots of disk space based on model's size and your network
+> connection speed. This happends only in the first time and the subsequent
+> times the starting will be faster :rocket:
 
 Run the system in development mode
 

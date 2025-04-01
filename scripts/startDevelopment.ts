@@ -14,15 +14,7 @@ const pullEmbeddingModelCommand = new Deno.Command("docker", {
 });
 
 const pullLLMCommand = new Deno.Command("docker", {
-    args: ["exec", "-it", "dev_ollama_container", "ollama", "pull", `${parsedEnvVariables.BASE_MODEL_NAME}`],
-});
-
-const createCustomModelFileCommand = new Deno.Command("docker", {
-    args: [
-        "exec", "-it", "dev_server_container", "deno", "run",
-        "--allow-read", "--allow-net", "--allow-env", "--allow-run",
-        "/assistant-server/scripts/createCustomModel.ts"
-    ],
+    args: ["exec", "-it", "dev_ollama_container", "ollama", "pull", `${parsedEnvVariables.MODEL_NAME}`],
 });
 
 await startDevMode.spawn().output();
@@ -30,5 +22,3 @@ await startDevMode.spawn().output();
 await pullEmbeddingModelCommand.spawn().output();
 
 await pullLLMCommand.spawn().output();
-
-await createCustomModelFileCommand.spawn().output()
