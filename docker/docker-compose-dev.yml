@@ -50,7 +50,7 @@ services:
     image: ollama/ollama:0.5.11
     container_name: dev_ollama_container
     volumes:
-      - ollama-data-cloned:/root/.ollama
+      - ollama_data:/root/.ollama
     restart: always
     networks:
       - development-network
@@ -78,6 +78,6 @@ networks:
 
 volumes:
   dev_database_storage:
-  ollama-data-cloned:
+  ollama_data:
   qdrant_storage:
   dev_object_storage:
