@@ -18,16 +18,20 @@ function parseEnvironmentVariables<
 const envSchema = z.object({
     DENO_ENV: z.enum(["testing", "production", "development"]).default("development"),
 
+    GEMINI_API_KEY: z.string().optional(),
+
     SERVER_PORT: z.coerce.number().default(10000),
 
-    DB_PORT: z.coerce.number().default(5432),
+    DB_PORT: z.coerce.number().optional(),
     DB_HOST: z.string(),
     DB_NAME: z.string(),
     DB_USERNAME: z.string(),
     DB_PASSWORD: z.string(),
+    DB_REQUIRE_SSL_MODE: z.string().optional(),
 
-    VECTOR_DB_PORT: z.coerce.number().default(6333),
+    VECTOR_DB_PORT: z.coerce.number().optional(),
     VECTOR_DB_HOST: z.string(),
+    VECTOR_DB_API_KEY: z.string().optional(),
 
     OBJECT_STORAGE_DB_PORT: z.coerce.number().default(9000),
     OBJECT_STORAGE_DB_HOST: z.string(),
