@@ -16,6 +16,8 @@ function parseEnvironmentVariables<
 };
 
 const envSchema = z.object({
+    DENO_ENV: z.enum(["testing", "production", "development"]).default("development"),
+
     SERVER_PORT: z.coerce.number().default(10000),
 
     DB_PORT: z.coerce.number().default(5432),
@@ -32,7 +34,7 @@ const envSchema = z.object({
     OBJECT_STORAGE_USERNAME: z.string(),
     OBJECT_STORAGE_PASSWORD: z.string(),
 
-    OLLAMA_HOST: z.string(),
+    OLLAMA_HOST: z.string().optional(),
 
     MODEL_NAME: z.string().default("qwen2.5:3b-instruct"),
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),

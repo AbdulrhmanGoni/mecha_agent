@@ -1,9 +1,10 @@
 import { HTTPResponseError } from "hono/types";
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export default async (err: Error | HTTPResponseError, c: Context) => {
-    if (Deno.env.get("DENO_ENV") !== "production") {
+    if (parsedEnvVariables.DENO_ENV !== "production") {
         console.log(err)
     }
 
