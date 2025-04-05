@@ -19,6 +19,7 @@
     "@std/expect": "jsr:@std/expect",
     "hono": "jsr:@hono/hono",
     "ollama": "npm:ollama@^0.5.13",
+    "@google/genai": "npm:@google/genai",
     "zod": "npm:zod",
     "minio": "npm:minio@8.0.4"
   },
