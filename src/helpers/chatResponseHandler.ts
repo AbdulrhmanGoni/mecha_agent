@@ -1,12 +1,12 @@
 import { encoder } from "djwt/util";
-import { AbortableAsyncIterator, ChatResponse } from "ollama";
 
-type ChatResponseHandlerParams = {
-    llmResponse: AbortableAsyncIterator<ChatResponse>;
-    onResponseComplete: (responseText: string) => Promise<void>;
+type ChatResponseStreamHandlerParams<T> = {
+    llmResponse: ReadableStream<T>;
+    extractChunkData: (chunk: T) => string;
+    onResponseComplete?: ChatRequestOptions["onResponseComplete"];
 }
 
-export default function chatResponseHandler({ onResponseComplete, llmResponse }: ChatResponseHandlerParams): ReadableStream {
+export default function chatResponseHandler<T>({ extractChunkData, onResponseComplete, llmResponse }: ChatResponseStreamHandlerParams<T>): ReadableStream {
     const { readable, writable } = new TransformStream();
 
     (async () => {
@@ -14,15 +14,16 @@ export default function chatResponseHandler({ onResponseComplete, llmResponse }:
         let responseText = "";
 
         for await (const llmResponsePart of llmResponse) {
-            writer.write(encoder.encode(llmResponsePart.message.content));
-            responseText += llmResponsePart.message.content
+            const chunk = extractChunkData(llmResponsePart)
+            writer.write(encoder.encode(chunk));
+            responseText += chunk
         }
 
         writer.close();
 
         return responseText
     })().then(async (responseText) => {
-        await onResponseComplete(responseText)
+        await onResponseComplete?.(responseText)
     })
 
     return readable;
