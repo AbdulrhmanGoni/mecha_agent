@@ -21,7 +21,7 @@ export class VectorDatabaseService {
         if (!collectionExists.exists) {
             await this.dbClient.createCollection(this.datasetsCollection, {
                 vectors: {
-                    size: 384,
+                    size: this.embeddingService.embeddingDimensions,
                     distance: "Cosine",
                     on_disk: true,
                 },
@@ -61,7 +61,7 @@ export class VectorDatabaseService {
 
             points[i] = {
                 id: objectIdToUUID(instructions[i].id),
-                vector: instructionEmbedding.embedding,
+                vector: instructionEmbedding,
                 payload: instructions[i]
             }
         }
@@ -96,7 +96,7 @@ export class VectorDatabaseService {
 
             updatedInstructionsPoints[i] = {
                 id: oldInstructionsPoints[i].id,
-                vector: updatedInstructionEmbedding.embedding,
+                vector: updatedInstructionEmbedding,
                 payload: updatedPayload
             }
         }
@@ -116,7 +116,7 @@ export class VectorDatabaseService {
         const searchResult = await this.dbClient.search(
             this.datasetsCollection,
             {
-                vector: textEmbedding.embedding,
+                vector: textEmbedding,
                 filter: {
                     must: [
                         {
