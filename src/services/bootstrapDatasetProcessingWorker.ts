@@ -1,4 +1,3 @@
-import { Ollama } from "ollama";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 // @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
@@ -9,12 +8,12 @@ import { DatasetProcessorService } from "./DatasetProcessorService.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
-    ollamaClient: Ollama;
+    embeddingClient: EmbeddingClientInterface;
     minioClient: MinioClient;
 }
 
 export function bootstrapDatasetProcessingWorker(dependencies: ServicesDependencies) {
-    const embeddingService = new EmbeddingService(dependencies.ollamaClient);
+    const embeddingService = new EmbeddingService(dependencies.embeddingClient);
 
     const vectorDatabaseService = new VectorDatabaseService(dependencies.vectorDatabaseClient, embeddingService);
 

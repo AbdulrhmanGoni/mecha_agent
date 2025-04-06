@@ -7,7 +7,7 @@ import { bootstrapDatasetProcessingWorker } from "./bootstrapDatasetProcessingWo
 const configurations = datasetProcessingWorkerConfigs();
 
 const datasetProcessor = bootstrapDatasetProcessingWorker({
-    ollamaClient: configurations.ollamaClient,
+    embeddingClient: configurations.embeddingClient,
     vectorDatabaseClient: configurations.vectorDatabaseClient,
     minioClient: configurations.minioClient,
 });
