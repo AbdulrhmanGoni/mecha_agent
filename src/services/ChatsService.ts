@@ -2,7 +2,6 @@ import { DatabaseService } from "./DatabaseService.ts";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
-import chatResponseHandler from "../helpers/chatResponseHandler.ts";
 import contextTemplate from "../helpers/contextTemplate.ts";
 import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
 
@@ -53,12 +52,10 @@ export class ChatsService {
                 },
                 ...chatMessages,
             ],
+            { onResponseComplete }
         )
 
-        return chatResponseHandler({
-            llmResponse,
-            onResponseComplete,
-        })
+        return llmResponse
     }
 
     async startChat({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
@@ -81,7 +78,8 @@ export class ChatsService {
             chatMessages: [newMessage],
             onResponseComplete: async (fullResponseText) => {
                 const chatHistory = [
-                    newMessage, {
+                    newMessage,
+                    {
                         role: "agent",
                         content: fullResponseText,
                     }
