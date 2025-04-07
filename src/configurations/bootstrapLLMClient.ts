@@ -20,10 +20,6 @@ export function bootstrapLLMClient() {
         }
 
         case "development": {
-            if (!parsedEnvVariables.GEMINI_API_KEY) {
-                throw new Error("'GEMINI_API_KEY' environment variable is missing");
-            }
-
             const ollamaClient = new OllamaClient({ host: parsedEnvVariables.OLLAMA_HOST });
             llmClient = new OllamaLLMClient(ollamaClient);
             break;
