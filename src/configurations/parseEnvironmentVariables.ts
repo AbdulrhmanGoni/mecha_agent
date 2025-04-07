@@ -16,7 +16,7 @@ function parseEnvironmentVariables<
 };
 
 const envSchema = z.object({
-    DENO_ENV: z.enum(["testing", "production", "development"]).default("development"),
+    DENO_ENV: z.enum(["testing", "production", "development"]),
 
     GEMINI_API_KEY: z.string().optional(),
 
@@ -33,10 +33,11 @@ const envSchema = z.object({
     VECTOR_DB_HOST: z.string(),
     VECTOR_DB_API_KEY: z.string().optional(),
 
-    OBJECT_STORAGE_DB_PORT: z.coerce.number().default(9000),
+    OBJECT_STORAGE_DB_PORT: z.coerce.number().optional(),
     OBJECT_STORAGE_DB_HOST: z.string(),
     OBJECT_STORAGE_USERNAME: z.string(),
     OBJECT_STORAGE_PASSWORD: z.string(),
+    OBJECT_STORAGE_SSL: z.string().optional(),
 
     OLLAMA_HOST: z.string().optional(),
 

@@ -13,7 +13,7 @@ export async function bootstrapConfigurations() {
     const minioClient = new MinioClient({
         endPoint: parsedEnvVariables.OBJECT_STORAGE_DB_HOST,
         port: parsedEnvVariables.OBJECT_STORAGE_DB_PORT,
-        useSSL: false,
+        useSSL: parsedEnvVariables.OBJECT_STORAGE_SSL === "true",
         accessKey: parsedEnvVariables.OBJECT_STORAGE_USERNAME,
         secretKey: parsedEnvVariables.OBJECT_STORAGE_PASSWORD,
     })
