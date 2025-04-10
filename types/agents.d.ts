@@ -7,7 +7,7 @@ type Agent = {
     datasetId?: string | null;
     systemInstructions?: string;
     dontKnowResponse?: string;
-    responseSyntax?: import("../src/constant/responseSyntaxes.ts").ResponseSyntax;
+    responseSyntax?: import("../src/constant/agents.ts").ResponseSyntax;
     greetingMessage?: string;
     createdAt: Date;
 }
