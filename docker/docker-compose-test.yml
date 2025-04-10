@@ -1,6 +1,6 @@
 services:
   testing_server:
-    build: 
+    build:
       context: ../
       dockerfile: docker/ServerDockerfile
     container_name: testing_server_container
@@ -19,7 +19,6 @@ services:
     depends_on:
       - testing_database
       - testing_vector_database
-      - testing_ollama
       - testing-object-storage
 
   testing_database:
@@ -35,7 +34,7 @@ services:
       - testing-network
     restart: always
 
-  testing_vector_database: 
+  testing_vector_database:
     image: qdrant/qdrant:v1.13.3
     container_name: testing_vector_database_container
     ports:
@@ -43,17 +42,6 @@ services:
       - 10033:6334
     networks:
       - testing-network
-    restart: always
-
-  testing_ollama:
-    image: ollama/ollama:0.5.11
-    container_name: testing_ollama_container
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - testing-network
-    environment:
-      - OLLAMA_HOST=0.0.0.0
     restart: always
 
   testing-object-storage:
@@ -73,6 +61,3 @@ services:
 networks:
   testing-network:
     driver: bridge
-
-volumes:
-  ollama_data:

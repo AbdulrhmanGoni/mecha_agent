@@ -9,16 +9,4 @@ const startTestingMode = new Deno.Command("docker", {
     }
 });
 
-const pullEmbeddingModelCommand = new Deno.Command("docker", {
-    args: ["exec", "-it", "testing_ollama_container", "ollama", "pull", `${parsedEnvVariables.EMBEDDING_MODEL_NAME}`],
-});
-
-const pullLLMCommand = new Deno.Command("docker", {
-    args: ["exec", "-it", "testing_ollama_container", "ollama", "pull", `${parsedEnvVariables.MODEL_NAME}`],
-});
-
 await startTestingMode.spawn().output();
-
-await pullEmbeddingModelCommand.spawn().output();
-
-await pullLLMCommand.spawn().output();
