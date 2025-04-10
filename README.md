@@ -110,4 +110,54 @@ Build command
 deno task build:dev
 ```
 
+## Tests :test_tube:
 
+All tests are written in Behavior-Driven Development (BDD) style using
+`@std/testing/bdd` module form the
+[standard library of Deno](https://docs.deno.com/runtime/fundamentals/standard_library/).
+
+> [!IMPORTANT]
+> Before you run any tests, You have to build the image of testing environment
+> and get it up and running to be able to run the tests because i made the tests
+> run in an isolated testing environment inside a docker container instead of
+> running directly on the host machine.
+
+- To Build the testing image run this command
+
+  ```
+  deno task build:test
+  ```
+
+> [!NOTE]
+> You need to tun this command only once to build the testing image, and after
+> that you just have to start the testing environment container and then run
+> tests commands.
+
+- To start the testing environment container run this command
+
+  ```
+  deno task test:setup
+  ```
+
+- To run the unit tests
+
+  ```
+  deno task test:unit
+  ```
+
+- To run the integration tests
+
+  ```
+  deno task test:integration
+  ```
+
+- To run the end to end tests
+
+  ```
+  deno task test:e2e
+  ```
+
+> [!IMPORTANT]
+> If you changed something outside `/src` and `/tests` directories, you may need
+> to re-build the testing image and re-run the testing container to see the
+> effect of your changes.
