@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { responseSyntaxes } from "../../constant/responseSyntaxes.ts";
+import { responseSyntaxTypes } from "../../constant/agents.ts";
 import avatarFieldValidator from "../shared/avatarFieldValidator.ts";
 
 const agentSchema = z.object({
@@ -9,7 +9,7 @@ const agentSchema = z.object({
     systemInstructions: z.string().max(10000).optional(),
     dontKnowResponse: z.string().max(100).optional(),
     greetingMessage: z.string().max(80).optional(),
-    responseSyntax: z.enum(responseSyntaxes).optional(),
+    responseSyntax: z.enum(responseSyntaxTypes).optional(),
 })
 
 export default agentSchema

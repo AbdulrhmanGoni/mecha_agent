@@ -1,5 +1,4 @@
 import z from "zod";
-import { responseSyntaxes } from "../constant/responseSyntaxes.ts";
 
 function parseEnvironmentVariables<
     T extends z.ZodObject<z.ZodRawShape, z.UnknownKeysParam, z.ZodTypeAny>,
@@ -43,8 +42,6 @@ const envSchema = z.object({
 
     MODEL_NAME: z.string().default("qwen2.5:3b-instruct"),
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),
-    DEFAULT_RESPONSE_SYNTAX: z.enum(responseSyntaxes).optional(),
-    DEFAULT_GREETING_MESSAGE: z.string().default("Hello, How can i help you?"),
 
     JWT_SECRET_KEY: z.string(),
 });
