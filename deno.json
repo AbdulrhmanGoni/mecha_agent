@@ -31,6 +31,7 @@
       "./types/instructions.d.ts",
       "./types/apiKeys.d.ts",
       "./types/agents.d.ts",
+      "./types/tests.d.ts",
       "./types/chats.d.ts"
     ]
   }
