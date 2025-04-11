@@ -92,5 +92,33 @@ export default function updateUserDataTests({ db, objectStorage }: { db: Postgre
 
             expect(updatedUser.avatar.split(".")[0]).toMatch(uuidMatcher);
         });
+
+        it("Should succeed to remove user's avatar", async () => {
+            const { rows: [userBeforeUpdate] } = await db.queryObject<{ avatar: string }>(
+                `SELECT avatar FROM users WHERE email = $1`,
+                [testingUserCredentials.email]
+            )
+            expect(userBeforeUpdate.avatar.split(".")[0]).toMatch(uuidMatcher);
+
+            const request = new MechaTester(testingUserCredentials.email);
+
+            const updateFormData = new FormData();
+            updateFormData.set("removeAvatar", "true");
+
+            const response = await request.patch(endpoint)
+                .body(updateFormData)
+                .send()
+
+            const { result } = await response.json<{ result: string }>()
+
+            expect(result).toBe(usersResponsesMessages.successfulUpdate);
+
+            const { rows: [updatedUser] } = await db.queryObject<{ avatar: string }>(
+                `SELECT avatar FROM users WHERE email = $1`,
+                [testingUserCredentials.email]
+            )
+
+            expect(updatedUser.avatar).toBeFalsy();
+        });
     });
 };
