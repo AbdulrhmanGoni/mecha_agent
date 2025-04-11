@@ -1,5 +1,7 @@
 import { encoder } from "djwt/util";
 
+export const mockLLMResponse = "Abdulrhman Goni will be a great software engineer"
+
 export class MockLLMClient implements LLMClientInterface {
     constructor() { }
 
@@ -7,15 +9,14 @@ export class MockLLMClient implements LLMClientInterface {
         await Promise.resolve()
         return new ReadableStream({
             start(controller) {
-                const mockResponse = "Say 'Abdulrhman Goni will be a great software engineer'"
-                const chunks = mockResponse.split(" ")
+                const chunks = mockLLMResponse.split(" ")
 
                 for (let i = 0; i < chunks.length; i++) {
                     controller.enqueue(encoder.encode(chunks[i] + (chunks.length - 1 === i ? "" : " ")))
                 }
 
                 controller.close()
-                options?.onResponseComplete?.(mockResponse)
+                options?.onResponseComplete?.(mockLLMResponse)
             }
         })
     }
