@@ -6,6 +6,7 @@ import { MechaTester } from "../../helpers/mechaTester.ts";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import { fakeUserEmail, testingUserCredentials } from "../../mock/data/mockUsers.ts";
+import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
 // @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
 
@@ -119,6 +120,50 @@ export default function createAgentTests(
             expect(error).toMatch(/Not supported/g);
             expect(error).toMatch(/avatar/g);
             expect(error).toMatch(/type/g);
+        });
+
+        it("Should succeed to create a new agent with avatar", async () => {
+            const user = { ...testingUserCredentials, email: "anotheruser@yahoo.com" }
+            await insertUserIntoDB({ db, user });
+
+            const newAgent = getRandomMockNewAgentInput();
+
+            const newAgentForm = new FormData();
+
+            Object.entries(newAgent).forEach(([key, value]) => {
+                newAgentForm.set(key, value)
+            });
+
+            const avatarFileURL = import.meta.resolve("../../mock/media/fake-avatar.png")
+            const avatarFile = new Blob(
+                [Deno.readFileSync(avatarFileURL.replace("file://", ""))],
+                { type: "image/png" }
+            );
+
+            newAgentForm.set("avatar", avatarFile);
+
+            const request = new MechaTester(user.email);
+
+            const response = await request.post(endpoint)
+                .body(newAgentForm)
+                .send()
+
+            const { result } = await response.json<{ result: string }>();
+
+            expect(result).toBe(AgentsResponseMessages.successfulAgentCreation);
+
+            const { rows: [agent] } = await db.queryObject<Pick<Agent, "avatar">>({
+                text: "SELECT avatar FROM agents WHERE user_email = $1",
+                args: [user.email],
+                camelCase: true
+            })
+
+            if (agent.avatar) {
+                avatarsToDelete.push(agent.avatar)
+            }
+
+            expect(agent.avatar?.endsWith(".png")).toBe(true)
+            expect(agent.avatar?.slice(0, uuidLength)).toMatch(uuidMatcher)
         });
     })
 }
