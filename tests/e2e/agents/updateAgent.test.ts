@@ -8,6 +8,7 @@ import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import { randomUUID } from "node:crypto";
+import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
 // @deno-types="minio/dist/esm/minio.d.mts"
 import { Client as MinioClient } from "minio";
 
@@ -117,6 +118,86 @@ export default function updateAgentTests(
 
             expect(agent.description).toBe(updateData.description)
             expect(agent.systemInstructions).toBe(updateData.systemInstructions)
+        });
+
+        it("Should succeed to update the avatar of the agent", async () => {
+            const newAgent = getRandomMockNewAgentInput();
+            const newAgentId = randomUUID();
+
+            await insertAgentsIntoDB({
+                db,
+                agents: [{
+                    id: newAgentId,
+                    agentName: newAgent.agentName,
+                    description: newAgent.description,
+                    userEmail: testingUserCredentials.email,
+                }]
+            });
+
+            const avatarFileURL = import.meta.resolve("../../mock/media/fake-avatar.png")
+            const avatarFile = new Blob(
+                [Deno.readFileSync(avatarFileURL.replace("file://", ""))],
+                { type: "image/png" }
+            );
+
+            const updateAgentFormData = new FormData();
+            updateAgentFormData.set("avatar", avatarFile)
+
+            const request = new MechaTester(testingUserCredentials.email);
+            const response = await request.patch(endpoint.replace(":id", newAgentId))
+                .body(updateAgentFormData)
+                .send()
+
+            const res = await response.json<{ result: string }>();
+
+            expect(res.result).toBe(AgentsResponseMessages.successfulAgentUpdate);
+
+            const { rows: [agent] } = await db.queryObject<Pick<Agent, "avatar">>({
+                text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2",
+                args: [newAgentId, testingUserCredentials.email],
+                camelCase: true
+            })
+
+            if (agent.avatar) {
+                avatarsToDelete.push(agent.avatar)
+            }
+
+            expect(agent.avatar?.endsWith(".png")).toBe(true)
+            expect(agent.avatar?.slice(0, uuidLength)).toMatch(uuidMatcher)
+        });
+
+        it("Should fail to update the avatar of the agent because the new avatar is invalid", async () => {
+            const newAgent = getRandomMockNewAgentInput();
+            const newAgentId = randomUUID();
+
+            await insertAgentsIntoDB({
+                db,
+                agents: [{
+                    id: newAgentId,
+                    agentName: newAgent.agentName,
+                    description: newAgent.description,
+                    userEmail: testingUserCredentials.email,
+                }]
+            });
+
+            const invalidAvatarFile = new Blob(
+                ["col1, col2 \n val1, val2"],
+                { type: "text/csv" }
+            );
+
+            const updateAgentFormData = new FormData();
+            updateAgentFormData.set("avatar", invalidAvatarFile);
+
+            const request = new MechaTester(testingUserCredentials.email);
+            const response = await request.patch(endpoint.replace(":id", newAgentId))
+                .body(updateAgentFormData)
+                .send()
+
+            const { error } = await response.json<{ error: string }>();
+
+            expect(error).toMatch(/Not supported/g);
+            expect(error).toMatch(/avatar/g);
+            expect(error).toMatch(/type/g);
         });
     })
 }
