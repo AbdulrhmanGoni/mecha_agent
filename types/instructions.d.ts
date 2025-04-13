@@ -32,4 +32,4 @@ type UpdateInstructionInput = (WithOptionalFields<Instruction, "response" | "pro
 
 type DatasetProcessingWorkerTask = "new_dataset" | "delete_dataset" | "successful_process" | "failed_process"
 
-type DatasetProcessingWorkerEvent = MessageEvent<{ process: DatasetProcessingWorkerTask; payload: any }>
+type DatasetProcessingWorkerEvent = MessageEvent<{ process: DatasetProcessingWorkerTask; payload: unknown }>

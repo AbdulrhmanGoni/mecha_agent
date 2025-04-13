@@ -14,14 +14,15 @@ const datasetProcessor = bootstrapDatasetProcessingWorker({
 
 self.onmessage = (e: DatasetProcessingWorkerEvent) => {
     switch (e.data.process) {
-        case "new_dataset":
-            datasetProcessor.processDataset(e.data.payload)
+        case "new_dataset": {
+            const payload = e.data.payload as Dataset
+            datasetProcessor.processDataset(payload)
                 .then((result) => {
                     self.postMessage({
                         process: result ? "successful_process" : "failed_process",
                         payload: {
-                            datasetId: e.data.payload.id,
-                            userEmail: e.data.payload.userEmail
+                            datasetId: payload.id,
+                            userEmail: payload.userEmail
                         }
                     })
                 })
@@ -29,21 +30,22 @@ self.onmessage = (e: DatasetProcessingWorkerEvent) => {
                     self.postMessage({
                         process: "failed_process",
                         payload: {
-                            datasetId: e.data.payload.id,
-                            userEmail: e.data.payload.userEmail
+                            datasetId: payload.id,
+                            userEmail: payload.userEmail
                         }
                     })
                 })
             break;
-
-        case "delete_dataset":
-            datasetProcessor.deleteDataset(e.data.payload.datasetId, e.data.payload.userEmail)
+        }
+        case "delete_dataset": {
+            const payload = e.data.payload as { datasetId: string, userEmail: string }
+            datasetProcessor.deleteDataset(payload.datasetId, payload.userEmail)
                 .then(() => {
                     self.postMessage({
                         process: "successful_deletion",
                         payload: {
-                            datasetId: e.data.payload.datasetId,
-                            userEmail: e.data.payload.userEmail
+                            datasetId: payload.datasetId,
+                            userEmail: payload.userEmail
                         }
                     })
                 })
@@ -51,11 +53,12 @@ self.onmessage = (e: DatasetProcessingWorkerEvent) => {
                     self.postMessage({
                         process: "failed_deletion",
                         payload: {
-                            datasetId: e.data.payload.datasetId,
-                            userEmail: e.data.payload.userEmail
+                            datasetId: payload.datasetId,
+                            userEmail: payload.userEmail
                         }
                     })
                 })
             break;
+        }
     }
 };
