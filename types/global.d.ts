@@ -11,7 +11,7 @@ type CreateJWTParams = {
 type JWTPayload = import("djwt").Payload
 
 type VerifyJwtResponse = {
-    payload?: JWTPayload & Omit<CreateJWTParams, "maxAgeInDays">
+    payload?: JWTPayload & Omit<CreateJWTParams, "maxAgeInDays"> & { apiKeyId?: string }
     errorMessage?: string;
 }
 
