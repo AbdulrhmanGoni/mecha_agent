@@ -54,7 +54,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const authService = new AuthService(usersService);
 
-    const guardService = new GuardService(jwtService);
+    const guardService = new GuardService(jwtService, databaseService);
 
     const sseService = new SSEService();
 
