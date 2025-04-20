@@ -10,6 +10,8 @@ const apiKeysResponseMessages = {
 
     inactiveApiKey: "The API Key is inactive",
     unknownApiKey: "The API Key is unknown",
+
+    apiKeysLimitReached: "You have reached the maximum allowed number of API Keys",
 }
 
 export default apiKeysResponseMessages

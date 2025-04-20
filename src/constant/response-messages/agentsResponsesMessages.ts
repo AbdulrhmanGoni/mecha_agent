@@ -11,6 +11,8 @@ const AgentsResponseMessages = {
     notFoundAgent: "Agent not found",
 
     noUpdateData: "Specify at least one field to update",
+
+    agentsLimitReached: "You have reached the maximum allowed number of agents",
 }
 
 export default AgentsResponseMessages
