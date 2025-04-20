@@ -35,6 +35,10 @@ export class DatabaseService {
                     avatar TEXT,
                     signing_method VARCHAR(11) NOT NULL,
                     last_sign_in TIMESTAMP NOT NULL DEFAULT now(),
+                    current_plan VARCHAR(10) NOT NULL DEFAULT 'Free',
+                    agents_count SMALLINT NOT NULL DEFAULT 0,
+                    api_keys_count SMALLINT NOT NULL DEFAULT 0,
+                    inferences_count INTEGER NOT NULL DEFAULT 0,
                     created_at TIMESTAMP NOT NULL DEFAULT now()
                 )
             `;
