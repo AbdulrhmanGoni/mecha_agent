@@ -25,6 +25,6 @@ type Plan = {
     planName: "Free" | "Pro"
     maxAgentsCount: number,
     maxApiKeysCount: number,
-    maxInferencesCount: number,
+    maxInferencesPerDay: number,
     subscriptionCostPerMonth: number,
 }
