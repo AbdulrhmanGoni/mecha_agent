@@ -46,7 +46,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     await jwtService.init();
 
     const usersService = new UsersService(databaseService, objectStorageService);
-    const agentsService = new AgentsService(databaseService, objectStorageService);
 
     const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
 
@@ -62,6 +61,8 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         import.meta.resolve("./DatasetProcessingWorker.ts"),
         { type: "module" }
     );
+
+    const agentsService = new AgentsService(databaseService, objectStorageService, datasetProcessingWorker);
 
     const datasetsService = new DatasetsService(
         databaseService,
