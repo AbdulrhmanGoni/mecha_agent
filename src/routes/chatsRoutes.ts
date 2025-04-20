@@ -34,7 +34,7 @@ export default function chatsRoutesBuilder(
 
     chatsRoutes.get(
         '/:chatId',
-        guardService.guardRoute({ permissions: [inferencePermission] }),
+        guardService.guardRoute({ permissions: [readPermission] }),
         getChatMessagesInputValidator,
         chatsController.getChatMessages.bind(chatsController)
     );
