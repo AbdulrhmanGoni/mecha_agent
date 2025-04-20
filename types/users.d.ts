@@ -12,6 +12,10 @@ type SignUpUserInput = SignInUserInput & {
 type User = SignUpUserInput & {
     createdAt: Date;
     lastSignIn: Date;
+    agentsCount: number;
+    apiKeysCount: number;
+    inferencesCount: number;
+    currentPlan: Plan["planName"];
 }
 
 type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {

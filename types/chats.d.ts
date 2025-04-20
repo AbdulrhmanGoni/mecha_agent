@@ -13,7 +13,7 @@ interface EmbeddingClientInterface {
 }
 
 type ChatRequestOptions = {
-    onResponseComplete?: (responseText: string) => Promise<void>;
+    onResponseComplete?: (responseText: string) => Promise<void> | void;
 }
 
 type ChatHistory = {
