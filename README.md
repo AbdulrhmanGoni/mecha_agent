@@ -7,8 +7,7 @@ questions based on given datasets by the users
 
 - Creating multiple agents :robot:.
 - Giving each agent system instructions to customize its attitude :memo:.
-- Upload a dataset for an agent to answer questions based on it
-  :card_index_dividers:.
+- Upload a dataset for an agent to answer questions based on it :file_folder:.
 - Chatting with agents :speech_balloon:.
 - Saving chats histories :bookmark:.
 - Creating and Managing API Keys to access the system from outside :key:.
