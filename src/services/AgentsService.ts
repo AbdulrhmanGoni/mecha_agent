@@ -1,3 +1,4 @@
+import { plans } from "../constant/plans.ts";
 import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
@@ -16,9 +17,25 @@ export class AgentsService {
     constructor(
         private databaseService: DatabaseService,
         private objectStorageService: ObjectStorageService,
+        private datasetProcessingWorker: Worker,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
+        const { rows: [user] } = await this.databaseService.query<Pick<User, "agentsCount" | "currentPlan">>({
+            text: 'SELECT agents_count, current_plan FROM users WHERE email = $1',
+            camelCase: true,
+            args: [userEmail],
+        });
+
+        const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
+
+        if (!(user.agentsCount < plan.maxAgentsCount)) {
+            return {
+                success: false,
+                limitReached: true,
+            }
+        }
+
         const { avatar, ...agentData } = newAgent
 
         let avatarId = null;
@@ -55,7 +72,12 @@ export class AgentsService {
             VALUES (${placeholders});
         `, values).catch(() => null);
 
-        if (result && result.rowCount) {
+        const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
+            text: 'UPDATE users SET agents_count = agents_count + 1 WHERE email = $1',
+            args: [userEmail],
+        });
+
+        if (result?.rowCount && updateUserResult.rowCount) {
             if (newAgent.avatar && avatarId) {
                 try {
                     await this.objectStorageService.uploadFile(
@@ -65,16 +87,22 @@ export class AgentsService {
                     );
                 } catch {
                     await transaction.rollback();
-                    return false;
+                    return {
+                        success: false,
+                    }
                 }
             }
 
             await transaction.commit();
-            return true;
+            return {
+                success: true,
+            }
         }
 
         await transaction.rollback().catch(() => null);
-        return false;
+        return {
+            success: false,
+        }
     }
 
     async getOne(id: string, userEmail: string) {
@@ -126,8 +154,8 @@ export class AgentsService {
     }
 
     async delete(agentId: string, userEmail: string) {
-        const { rows: [agent] } = await this.databaseService.query<Agent | null>({
-            text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
+        const { rows: [agent] } = await this.databaseService.query<Pick<Agent, "avatar" | "datasetId"> | null>({
+            text: "SELECT avatar, dataset_id FROM agents WHERE id = $1 AND user_email = $2;",
             args: [agentId, userEmail],
             camelCase: true,
         })
@@ -145,6 +173,28 @@ export class AgentsService {
             camelCase: true,
         })
 
+        if (result.rowCount !== 1) {
+            await transaction.rollback();
+            return false
+        }
+
+        const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
+            text: 'UPDATE users SET agents_count = agents_count - 1 WHERE email = $1',
+            args: [userEmail],
+        });
+
+        if (updateUserResult.rowCount !== 1) {
+            await transaction.rollback();
+            return false
+        }
+
+        if (agent.datasetId) {
+            this.datasetProcessingWorker.postMessage({
+                process: "delete_dataset",
+                payload: { userEmail, datasetId: agent.datasetId }
+            });
+        }
+
         if (agent.avatar) {
             try {
                 await this.objectStorageService.deleteFile(
@@ -158,7 +208,7 @@ export class AgentsService {
         }
 
         await transaction.commit();
-        return !!result.rowCount
+        return true
     }
 
     async update(agentId: string, userEmail: string, updateData: UpdateAgentFormData) {
