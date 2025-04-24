@@ -8,11 +8,15 @@ export default async function bootstrapApp() {
 
     const services = await bootstrapServices(configurations);
 
-    const controllers = bootstrapControllers(services);
+    const controllers = bootstrapControllers({
+        services,
+    });
 
     const app = bootstrapRoutes({
-        ...controllers,
-        guardService: services.guardService,
+        controllers,
+        services: {
+            guardService: services.guardService,
+        },
     });
 
     return app

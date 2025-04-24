@@ -18,52 +18,54 @@ import { SSEService } from "../services/SSEService.ts";
 import { DatasetsService } from "../services/DatasetsService.ts";
 
 type controllersDependencies = {
-    usersService: UsersService;
-    instructionsService: InstructionsService;
-    agentsService: AgentsService;
-    datasetsService: DatasetsService;
-    authService: AuthService;
-    apiKeysService: ApiKeysService;
-    chatsService: ChatsService;
-    objectStorageService: ObjectStorageService;
-    sseService: SSEService;
+    services: {
+        usersService: UsersService;
+        instructionsService: InstructionsService;
+        agentsService: AgentsService;
+        datasetsService: DatasetsService;
+        authService: AuthService;
+        apiKeysService: ApiKeysService;
+        chatsService: ChatsService;
+        objectStorageService: ObjectStorageService;
+        sseService: SSEService;
+    };
 }
 
 export default function bootstrapControllers(dependencies: controllersDependencies) {
     const usersController = new UsersController(
-        dependencies.usersService
+        dependencies.services.usersService
     );
 
     const instructionsController = new InstructionsController(
-        dependencies.instructionsService
+        dependencies.services.instructionsService
     );
 
     const agentsController = new AgentsController(
-        dependencies.agentsService
+        dependencies.services.agentsService
     );
 
     const datasetsController = new DatasetsController(
-        dependencies.datasetsService
+        dependencies.services.datasetsService
     );
 
     const chatsController = new ChatsController(
-        dependencies.chatsService
+        dependencies.services.chatsService
     );
 
     const mediaController = new MediaController(
-        dependencies.objectStorageService
+        dependencies.services.objectStorageService
     );
 
     const apiKeysController = new ApiKeysController(
-        dependencies.apiKeysService
+        dependencies.services.apiKeysService
     );
 
     const authController = new AuthController(
-        dependencies.authService
+        dependencies.services.authService
     );
 
     const sseController = new SSEController(
-        dependencies.sseService
+        dependencies.services.sseService
     );
 
     return {

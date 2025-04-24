@@ -21,60 +21,64 @@ import usersRoutesBuilder from "./usersRoutes.ts";
 import globalErrorsHandler from "../helpers/globalErrorsHandler.ts";
 
 type RoutesDependencies = {
-    usersController: UsersController;
-    agentsController: AgentsController;
-    datasetsController: DatasetsController;
-    instructionsController: InstructionsController;
-    apiKeysController: ApiKeysController;
-    chatsController: ChatsController;
-    authController: AuthController;
-    mediaController: MediaController;
-    sseController: SSEController;
-    guardService: GuardService;
+    controllers: {
+        usersController: UsersController;
+        agentsController: AgentsController;
+        datasetsController: DatasetsController;
+        instructionsController: InstructionsController;
+        apiKeysController: ApiKeysController;
+        chatsController: ChatsController;
+        authController: AuthController;
+        mediaController: MediaController;
+        sseController: SSEController;
+    },
+    services: {
+        guardService: GuardService;
+    }
 }
 
 export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     const usersRoutes = usersRoutesBuilder(
-        dependencies.usersController,
-        dependencies.guardService
+        dependencies.controllers.usersController,
+        dependencies.services.guardService
     );
 
     const authRoutes = authRoutesBuilder(
-        dependencies.authController,
+        dependencies.controllers.authController,
     );
 
     const agentsRoutes = agentsRoutesBuilder(
-        dependencies.agentsController,
-        dependencies.guardService
+        dependencies.controllers.agentsController,
+        dependencies.services.guardService
     );
 
     const instructionsRoutes = instructionsRoutesBuilder(
-        dependencies.instructionsController,
-        dependencies.guardService
+        dependencies.controllers.instructionsController,
+        dependencies.services.guardService
     );
 
     const apiKeysRoutes = apiKeysRoutesBuilder(
-        dependencies.apiKeysController,
-        dependencies.guardService
+        dependencies.controllers.apiKeysController,
+        dependencies.services.guardService
     );
 
     const mediaRoutes = mediaRoutesBuilder(
-        dependencies.mediaController,
-        dependencies.guardService
+        dependencies.controllers.mediaController,
+        dependencies.services.guardService
     );
 
     const chatsRoutes = chatsRoutesBuilder(
-        dependencies.chatsController,
-        dependencies.guardService
+        dependencies.controllers.chatsController,
+        dependencies.services.guardService,
     );
 
     const datasetsRoutes = datasetsRoutesBuilder(
-        dependencies.datasetsController,
-        dependencies.guardService
+        dependencies.controllers.datasetsController,
+        dependencies.services.guardService
     );
 
     const sseRoutes = sseRoutesBuilder(
-        dependencies.sseController,
+        dependencies.controllers.sseController,
     );
 
     const api = new Hono();
