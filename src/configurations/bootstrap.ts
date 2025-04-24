@@ -5,6 +5,7 @@ import { Client as MinioClient } from "minio";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 import { bootstrapLLMClient } from "./bootstrapLLMClient.ts";
+import { kvStoreClient } from "./denoKvStoreClient.ts";
 
 export async function bootstrapConfigurations() {
     const llmClient = bootstrapLLMClient()
@@ -39,6 +40,7 @@ export async function bootstrapConfigurations() {
         databaseClient,
         llmClient,
         embeddingClient,
-        minioClient
+        minioClient,
+        kvStoreClient,
     }
 };
