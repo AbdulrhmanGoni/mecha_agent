@@ -16,6 +16,7 @@ import { InstructionsService } from "../services/InstructionsService.ts";
 import { ObjectStorageService } from "../services/ObjectStorageService.ts";
 import { SSEService } from "../services/SSEService.ts";
 import { DatasetsService } from "../services/DatasetsService.ts";
+import { MetricsController } from "./MetricsController.ts";
 
 type controllersDependencies = {
     services: {
@@ -29,6 +30,7 @@ type controllersDependencies = {
         objectStorageService: ObjectStorageService;
         sseService: SSEService;
     };
+    configs: { kvStoreClient: Deno.Kv; };
 }
 
 export default function bootstrapControllers(dependencies: controllersDependencies) {
@@ -68,6 +70,8 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         dependencies.services.sseService
     );
 
+    const metricsController = new MetricsController(dependencies.configs.kvStoreClient)
+
     return {
         usersController,
         chatsController,
@@ -78,6 +82,7 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         apiKeysController,
         authController,
         sseController,
+        metricsController,
     }
 };
 
