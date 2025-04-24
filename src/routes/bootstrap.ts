@@ -19,6 +19,9 @@ import { SSEController } from "../controllers/SSEController.ts";
 import { UsersController } from "../controllers/UsersController.ts";
 import usersRoutesBuilder from "./usersRoutes.ts";
 import globalErrorsHandler from "../helpers/globalErrorsHandler.ts";
+import metricsRoutesBuilder from "./metricsRoutes.ts";
+import { MetricsMiddleware } from "../middlewares/MetricsMiddleware.ts";
+import { MetricsController } from "../controllers/MetricsController.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -31,6 +34,10 @@ type RoutesDependencies = {
         authController: AuthController;
         mediaController: MediaController;
         sseController: SSEController;
+        metricsController: MetricsController;
+    },
+    middlewares: {
+        metricsMiddleware: MetricsMiddleware;
     },
     services: {
         guardService: GuardService;
@@ -81,7 +88,17 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
         dependencies.controllers.sseController,
     );
 
+    const metricsRoutes = metricsRoutesBuilder(
+        dependencies.controllers.metricsController,
+    );
+
     const api = new Hono();
+
+    api.use(
+        dependencies.middlewares.metricsMiddleware.collectTrafficMetrics.bind(
+            dependencies.middlewares.metricsMiddleware
+        ),
+    );
 
     api.route('/auth', authRoutes);
     api.route('/users', usersRoutes);
@@ -92,6 +109,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/chats', chatsRoutes);
     api.route('/datasets', datasetsRoutes);
     api.route('/sse', sseRoutes);
+    api.route('/metrics', metricsRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
 
     const app = new Hono().route("/api", api);
