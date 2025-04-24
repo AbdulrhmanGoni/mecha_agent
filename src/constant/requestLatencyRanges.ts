@@ -1,0 +1,1 @@
+export const requestLatencyRanges = [0.3, 0.6, 1, 1.5, 2, 3, 5, Infinity]
