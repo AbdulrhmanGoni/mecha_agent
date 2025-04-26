@@ -6,10 +6,12 @@ import getChatMessagesInputValidator from "../validation/chats/getChatMessagesIn
 import deleteChatInputValidator from "../validation/chats/deleteChatInputValidator.ts";
 import { inferencePermission, readPermission, writePermission } from "../constant/permissions.ts";
 import { GuardService } from "../services/GuardService.ts";
+import { InferencesMiddleware } from "../middlewares/InferencesMiddleware.ts";
 
 export default function chatsRoutesBuilder(
     chatsController: ChatsController,
     guardService: GuardService,
+    inferencesMiddleware: InferencesMiddleware,
 ) {
     const chatsRoutes = new Hono();
 
@@ -22,6 +24,7 @@ export default function chatsRoutesBuilder(
         '/new',
         guardService.guardRoute({ permissions: [inferencePermission] }),
         startChatInputValidator,
+        inferencesMiddleware.trackInferences.bind(inferencesMiddleware),
         chatsController.startChat.bind(chatsController)
     );
 
@@ -29,6 +32,7 @@ export default function chatsRoutesBuilder(
         '/:chatId',
         guardService.guardRoute({ permissions: [inferencePermission] }),
         continueChatInputValidator,
+        inferencesMiddleware.trackInferences.bind(inferencesMiddleware),
         chatsController.continueChat.bind(chatsController)
     );
 

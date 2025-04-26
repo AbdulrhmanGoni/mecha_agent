@@ -22,6 +22,7 @@ import globalErrorsHandler from "../helpers/globalErrorsHandler.ts";
 import metricsRoutesBuilder from "./metricsRoutes.ts";
 import { MetricsMiddleware } from "../middlewares/MetricsMiddleware.ts";
 import { MetricsController } from "../controllers/MetricsController.ts";
+import { InferencesMiddleware } from "../middlewares/InferencesMiddleware.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -38,6 +39,7 @@ type RoutesDependencies = {
     },
     middlewares: {
         metricsMiddleware: MetricsMiddleware;
+        inferencesMiddleware: InferencesMiddleware;
     },
     services: {
         guardService: GuardService;
@@ -77,6 +79,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     const chatsRoutes = chatsRoutesBuilder(
         dependencies.controllers.chatsController,
         dependencies.services.guardService,
+        dependencies.middlewares.inferencesMiddleware
     );
 
     const datasetsRoutes = datasetsRoutesBuilder(

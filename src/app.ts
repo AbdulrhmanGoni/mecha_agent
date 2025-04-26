@@ -12,6 +12,7 @@ export default async function bootstrapApp() {
     const middlewares = bootstrapMiddlewares({
         configs: {
             kvStoreClient: configurations.kvStoreClient,
+            databaseClient: configurations.databaseClient,
         }
     });
 

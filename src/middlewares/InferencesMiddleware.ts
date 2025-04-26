@@ -4,7 +4,7 @@ import chatsResponsesMessages from "../constant/response-messages/chatsResponses
 import { plans } from "../constant/plans.ts";
 import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 
-export class InferenceMiddleware {
+export class InferencesMiddleware {
     constructor(
         private kvStoreClient: Deno.Kv,
         private databaseClient: PostgresClient,
