@@ -73,6 +73,31 @@ services:
     networks:
       - development-network
 
+  dev_prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: dev_prometheus_container
+    ports:
+      - 9090:9090
+    volumes:
+      - dev_prometheus_data:/prometheus
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - development-network
+    depends_on:
+      - dev_server
+
+  dev_grafana:
+    image: grafana/grafana:11.6.0
+    container_name: dev_grafana_container
+    ports:
+      - 4444:3000
+    volumes:
+      - dev_grafana_data:/var/lib/grafana
+    networks:
+      - development-network
+    depends_on:
+      - dev_prometheus
+
 networks:
   development-network:
     driver: bridge
@@ -83,3 +108,5 @@ volumes:
   qdrant_storage:
   dev_object_storage:
   dev_kv_data:
+  dev_prometheus_data:
+  dev_grafana_data:
