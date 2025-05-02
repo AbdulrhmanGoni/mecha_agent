@@ -4,6 +4,7 @@ import authRouteTests from "./auth/index.test.ts";
 import usersRouteTests from "./users/index.test.ts";
 import agentsRouteTests from "./agents/index.test.ts";
 import apiKeysRouteTests from "./apiKeys/index.test.ts";
+import datasetsRouteTests from "./datasets/index.test.ts";
 
 const app = await bootstrapTestingConfigs()
 
@@ -15,4 +16,7 @@ describe("Ene to end (e2e) tests", () => {
     agentsRouteTests(app);
 
     apiKeysRouteTests(app);
+
+    datasetsRouteTests(app);
+
 })
