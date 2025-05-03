@@ -21,11 +21,17 @@ export class AgentsService {
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "agentsCount" | "currentPlan">>({
+        const { rows: [user] } = await this.databaseService.query<Pick<User, "agentsCount" | "currentPlan"> | null>({
             text: 'SELECT agents_count, current_plan FROM users WHERE email = $1',
             camelCase: true,
             args: [userEmail],
         });
+
+        if (!user) {
+            return {
+                success: false,
+            }
+        }
 
         const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
 
