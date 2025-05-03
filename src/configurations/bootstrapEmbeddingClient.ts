@@ -31,7 +31,7 @@ export function bootstrapEmbeddingClient() {
         }
 
         default:
-            throw new Error("'DENO_ENV' environment variable is neither 'testing', 'development' nor 'production'");
+            throw new Error("'DENO_ENV' environment variable should be neither 'testing', 'development' nor 'production'");
     }
 
     return embeddingClient

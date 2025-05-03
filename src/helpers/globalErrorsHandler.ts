@@ -15,6 +15,6 @@ export default async (err: Error | HTTPResponseError, c: Context) => {
             return c.json(await err.getResponse().json(), err.status);
         }
     } else {
-        return c.json({ error: "Unexpected Error !" }, 500)
+        return c.json({ error: "Unexpected Server Error !" }, 500)
     }
 }
