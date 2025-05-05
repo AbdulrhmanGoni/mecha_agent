@@ -99,5 +99,40 @@ export default function datasetProcessingWorkerTests(
                 }
             })
         });
+
+        it("Should fail to complete dataset deletion and send back 'failed_deletion' message", async () => {
+            worker.postMessage(({
+                process: "delete_dataset",
+                payload: {},
+            }));
+
+            await new Promise<void>((resolve) => {
+                worker.onmessage = (e) => {
+                    expect(e.data.process).toBe("failed_deletion");
+                    expect(e.data.payload.datasetId).toBeUndefined();
+                    expect(e.data.payload.userEmail).toBeUndefined();
+                    resolve()
+                }
+            })
+        });
+
+        it("Should handle deleting the dataset and send back 'successful_deletion' message", async () => {
+            worker.postMessage(({
+                process: "delete_dataset",
+                payload: {
+                    datasetId: dataset.id,
+                    userEmail: dataset.userEmail
+                },
+            }));
+
+            await new Promise<void>((resolve) => {
+                worker.onmessage = (e) => {
+                    expect(e.data.process).toBe("successful_deletion");
+                    expect(e.data.payload.datasetId).toBe(dataset.id);
+                    expect(e.data.payload.userEmail).toBe(dataset.userEmail);
+                    resolve()
+                }
+            })
+        });
     });
 };
