@@ -138,7 +138,7 @@ export class ChatsService {
         await this.databaseService.query<ChatHistory | undefined>({
             text: `
                 INSERT INTO 
-                chats_history (id, agent_id, title, user_email, messages) 
+                chats (id, agent_id, title, user_email, messages) 
                 VALUES ($1, $2, $3, $4, $5);
             `,
             args: [chatId, agentId, firstPromptBegenning, userEmail, JSON.stringify(chatMessages)],
@@ -148,7 +148,7 @@ export class ChatsService {
 
     async getChatMessages({ agentId, chatId, userEmail }: Pick<ChatRelatedTypes, "agentId" | "userEmail" | "chatId">) {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `SELECT messages FROM chats_history WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
+            text: `SELECT messages FROM chats WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
             args: [chatId, agentId, userEmail],
             camelCase: true,
         })
@@ -158,7 +158,7 @@ export class ChatsService {
 
     async getChats({ agentId, userEmail }: Pick<ChatRelatedTypes, "agentId" | "userEmail">) {
         const { rows } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `SELECT id, agent_id, title, started_at FROM chats_history WHERE agent_id = $1 AND user_email = $2`,
+            text: `SELECT id, agent_id, title, started_at FROM chats WHERE agent_id = $1 AND user_email = $2`,
             args: [agentId, userEmail],
             camelCase: true,
         })
@@ -171,7 +171,7 @@ export class ChatsService {
             Pick<ChatRelatedTypes, "chatId" | "chatMessages" | "userEmail">
     ) {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `UPDATE chats_history SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`,
+            text: `UPDATE chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`,
             args: [chatId, userEmail, JSON.stringify(chatMessages)],
             camelCase: true,
         })
@@ -180,7 +180,7 @@ export class ChatsService {
 
     async deleteChat({ chatId, agentId, userEmail }: Pick<ChatRelatedTypes, "chatId" | "agentId" | "userEmail">) {
         const { rowCount } = await this.databaseService.query<ChatHistory | undefined>({
-            text: `DELETE FROM chats_history WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
+            text: `DELETE FROM chats WHERE id = $1 AND agent_id = $2 AND user_email = $3`,
             args: [chatId, agentId, userEmail],
             camelCase: true,
         })

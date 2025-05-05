@@ -62,10 +62,10 @@ export class DatabaseService {
     }
 
     private async createChatsHistoryTable() {
-        const tableExists = await this.checkTableExistance("chats_history");
+        const tableExists = await this.checkTableExistance("chats");
         if (!tableExists) {
             await this.dbClient.queryObject`
-                CREATE TABLE chats_history (
+                CREATE TABLE chats (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
                     agent_id UUID REFERENCES agents(id) ON DELETE CASCADE,
                     user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
