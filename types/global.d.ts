@@ -1,3 +1,5 @@
+/// <reference lib="deno.unstable" />
+
 type WithOptionalFields<Obj, Keys extends keyof Obj> = Omit<Obj, Keys> & Partial<Pick<Obj, Keys>>;
 
 type Permission = import("../src/constant/permissions.ts").Permission
