@@ -3,8 +3,7 @@ import { expect } from "@std/expect";
 import { MechaTester } from "../../helpers/mechaTester.ts";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import { getRandomMockNewAgentInput } from "../../mock/data/mockAgents.ts";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 import createTestingDatasetForAgent from "../../helpers/createTestingDatasetForAgent.ts";

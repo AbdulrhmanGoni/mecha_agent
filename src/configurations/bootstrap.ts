@@ -1,7 +1,6 @@
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 import { Client as PostgresClient } from "deno.land/x/postgres";
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 import { bootstrapLLMClient } from "./bootstrapLLMClient.ts";

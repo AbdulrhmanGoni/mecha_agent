@@ -4,8 +4,7 @@ import { testingUserCredentials } from "../mock/data/mockUsers.ts";
 import createTestingDatasetForAgent from "../helpers/createTestingDatasetForAgent.ts";
 import { getRandomMockNewAgentInput } from "../mock/data/mockAgents.ts";
 import { Client as PostgresClient } from "deno.land/x/postgres";
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 
 export default function datasetProcessingWorkerTests(

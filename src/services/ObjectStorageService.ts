@@ -1,5 +1,4 @@
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import { Readable } from "node:stream";
 import crypto from "node:crypto";
 import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";

@@ -7,8 +7,7 @@ import { Client as PostgresClient } from "deno.land/x/postgres";
 import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import { fakeUserEmail, testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 
 export default function createAgentTests(
     { db, objectStorage }: { db: PostgresClient, objectStorage: MinioClient }

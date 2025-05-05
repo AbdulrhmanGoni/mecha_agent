@@ -9,8 +9,7 @@ import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import { randomUUID } from "node:crypto";
 import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
-// @deno-types="minio/dist/esm/minio.d.mts"
-import { Client as MinioClient } from "minio";
+import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 
 export default function updateAgentTests(
     { db, objectStorage }: { db: PostgresClient, objectStorage: MinioClient }
