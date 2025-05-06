@@ -17,17 +17,18 @@ export default function agentsRoutesBuilder(
         agentsController.getAll.bind(agentsController)
     );
 
+    agentsRoutes.get(
+        '/:agentId',
+        guardService.guardRoute({ permissions: [readPermission] }),
+        agentsController.getOne.bind(agentsController)
+    );
+
     agentsRoutes.use(guardService.guardRoute({ permissions: [writePermission] }))
 
     agentsRoutes.post(
         '/',
         createAgentInputValidator,
         agentsController.create.bind(agentsController)
-    );
-
-    agentsRoutes.get(
-        '/:agentId',
-        agentsController.getOne.bind(agentsController)
     );
 
     agentsRoutes.delete(
