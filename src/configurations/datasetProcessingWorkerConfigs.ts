@@ -1,5 +1,5 @@
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
-import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
+import { Client as MinioClient } from "minio/dist/esm/minio.mjs";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 
