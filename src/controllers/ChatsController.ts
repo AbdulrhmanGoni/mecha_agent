@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { ChatsService } from "../services/ChatsService.ts";
+import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 
 export class ChatsController {
     constructor(private chatsService: ChatsService) { }
@@ -60,7 +61,11 @@ export class ChatsController {
             userEmail,
         });
 
-        return c.json({ result }, 200);
+        if (result.length) {
+            return c.json({ result }, 200);
+        } else {
+            return c.json({ error: chatsResponsesMessages.chatNotFound(chatId) }, 404);
+        }
     }
 
     async deleteChat(c: Context<{ Variables: { userEmail: string } }>) {
