@@ -11,6 +11,7 @@ export class DatabaseService {
         await this.createDatasetIdColumnOnAgentsTable();
         await this.createApiKeysTable();
         await this.createChatsHistoryTable();
+        await this.createAnonymousChatsHistoryTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -121,6 +122,22 @@ export class DatabaseService {
                 user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL
             )
         `;
+        }
+    }
+
+    private async createAnonymousChatsHistoryTable() {
+        const tableExists = await this.checkTableExistance("anonymous_chats");
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+                CREATE TABLE anonymous_chats (
+                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
+                    agent_id UUID REFERENCES agents(id) ON DELETE CASCADE,
+                    user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
+                    title VARCHAR(40) NOT NULL,
+                    messages JSONB NOT NULL,
+                    started_at TIMESTAMP DEFAULT NOW() NOT NULL
+                )
+            `
         }
     }
 
