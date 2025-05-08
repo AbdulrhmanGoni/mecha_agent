@@ -28,5 +28,6 @@ type ChatRelatedTypes = {
     chatId: string;
     chatMessages: ChatMessage[];
     onResponseComplete: (fullResponseText: string) => Promise<void>;
-    userEmail: string
+    userEmail: string;
+    isAnonymous?: boolean;
 }
