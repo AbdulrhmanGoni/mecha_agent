@@ -16,6 +16,7 @@ import { ChatsService } from "./ChatsService.ts";
 import { DatasetsService } from "./DatasetsService.ts";
 import { SSEService } from "./SSEService.ts";
 import { UsersService } from "./UsersService.ts";
+import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -23,6 +24,7 @@ type ServicesDependencies = {
     embeddingClient: EmbeddingClientInterface;
     llmClient: LLMClientInterface;
     minioClient: MinioClient;
+    kvStoreClient: Deno.Kv;
 }
 
 export async function bootstrapServices(dependencies: ServicesDependencies) {
@@ -46,7 +48,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const usersService = new UsersService(databaseService, objectStorageService);
 
-    const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
+    const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService, kvStoreClient);
 
     const apiKeysService = new ApiKeysService(databaseService, jwtService);
 

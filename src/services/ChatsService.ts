@@ -4,13 +4,25 @@ import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import contextTemplate from "../helpers/contextTemplate.ts";
 import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
+import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 
 export class ChatsService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly vectorDatabaseService: VectorDatabaseService,
         private readonly llmService: LLMService,
-    ) { }
+        private readonly kvStoreClient: Deno.Kv,
+    ) {
+        this.kvStoreClient.listenQueue((msg) => {
+            if (msg.task === "delete-expired-anonymous-chats") {
+                this.databaseService.query(
+                    `DELETE FROM anonymous_chats WHERE (started_at + INTERVAL '1 day') < NOW()`
+                ).then(({ rowCount }) => {
+                    console.log("'delete-expired-anonymous-chats' task done, deleted rows:", rowCount)
+                })
+            }
+        });
+    }
 
     async fetchInstructions({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
         const { rows: [agentRow] } = await this.databaseService.query<Agent>({
@@ -213,3 +225,7 @@ export class ChatsService {
         return !!rowCount
     }
 }
+
+Deno.cron("Delete expired anonymous chats", "0 */12 * * *", () => {
+    kvStoreClient.enqueue({ task: "delete-expired-anonymous-chats" });
+});
