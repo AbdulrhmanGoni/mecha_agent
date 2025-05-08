@@ -7,6 +7,7 @@ export class ChatsController {
 
     async startChat(c: Context<{ Variables: { userEmail: string } }>) {
         const agentId = c.req.query("agentId") as string;
+        const isAnonymous = c.req.query("anonymous") === "yes";
         const userEmail = c.get("userEmail");
         const body = await c.req.json();
 
@@ -14,6 +15,7 @@ export class ChatsController {
             agentId,
             prompt: body.prompt,
             userEmail,
+            isAnonymous,
         });
 
         if (typeof result === "string") {
@@ -26,6 +28,7 @@ export class ChatsController {
     async continueChat(c: Context<{ Variables: { userEmail: string } }>) {
         const chatId = c.req.param("chatId");
         const agentId = c.req.query("agentId") as string;
+        const isAnonymous = c.req.query("anonymous") === "yes";
         const userEmail = c.get("userEmail");
         const body = await c.req.json();
 
@@ -34,6 +37,7 @@ export class ChatsController {
             prompt: body.prompt,
             chatId,
             userEmail,
+            isAnonymous,
         });
 
         return c.body(response, 200);
@@ -54,11 +58,13 @@ export class ChatsController {
         const agentId = c.req.query("agentId") as string;
         const chatId = c.req.param("chatId");
         const userEmail = c.get("userEmail");
+        const isAnonymous = c.req.query("anonymous") === "yes"
 
         const result = await this.chatsService.getChatMessages({
             agentId,
             chatId,
             userEmail,
+            isAnonymous,
         });
 
         if (result.length) {
@@ -72,11 +78,13 @@ export class ChatsController {
         const agentId = c.req.query("agentId") as string;
         const chatId = c.req.param("chatId");
         const userEmail = c.get("userEmail");
+        const isAnonymous = c.req.query("anonymous") === "yes"
 
         const result = await this.chatsService.deleteChat({
             agentId,
             chatId,
             userEmail,
+            isAnonymous,
         });
 
         return c.json({ result }, 200);
