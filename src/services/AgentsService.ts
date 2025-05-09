@@ -52,7 +52,7 @@ export class AgentsService {
             avatarId = `${crypto.randomUUID()}.${fileExtention}`;
         }
 
-        type CreationDataFormat = [string, string, (string | boolean)[]];
+        type CreationDataFormat = [string, string, (string | boolean | null)[]];
 
         const [fields, placeholders, values] = Object
             .entries({ ...agentData, userEmail, avatar: avatarId })
@@ -67,7 +67,7 @@ export class AgentsService {
                         `${placeholders}$${i + 1}` +
                         `${i === arr.length - 1 ? "" : ", "}`
                     ),
-                    [...values, value || ""]
+                    [...values, value ?? null]
                 ]
             }, ["", "", []])
 
@@ -238,7 +238,7 @@ export class AgentsService {
             avatarId = `${crypto.randomUUID()}.${fileExtention}`;
         }
 
-        type UpdateDataFormat = [string, (string | boolean)[]]
+        type UpdateDataFormat = [string, (string | boolean | null)[]]
 
         const [fields, values] = Object
             .entries(newAgentAvatart || removeAvatar ? { ...restUpdateData, avatar: avatarId } : restUpdateData)
@@ -249,7 +249,7 @@ export class AgentsService {
                         `${agentRowFieldsNamesMap[field] || field} = $${i + 3}` +
                         `${i === arr.length - 1 ? "" : ", "}`
                     ),
-                    [...values, value || ""]
+                    [...values, value ?? null]
                 ]
             }, ["", []])
 
