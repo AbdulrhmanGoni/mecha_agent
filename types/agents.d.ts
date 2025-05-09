@@ -9,6 +9,7 @@ type Agent = {
     dontKnowResponse?: string;
     responseSyntax?: import("../src/constant/agents.ts").ResponseSyntax;
     greetingMessage?: string;
+    isPublished: boolean;
     createdAt: Date;
 }
 

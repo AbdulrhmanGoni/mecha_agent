@@ -11,6 +11,7 @@ const agentRowFieldsNamesMap: Record<string, string> = {
     dontKnowResponse: "dont_know_response",
     responseSyntax: "response_syntax",
     greetingMessage: "greeting_message",
+    isPublished: "is_published",
 }
 
 export class AgentsService {
@@ -51,7 +52,7 @@ export class AgentsService {
             avatarId = `${crypto.randomUUID()}.${fileExtention}`;
         }
 
-        type CreationDataFormat = [string, string, string[]];
+        type CreationDataFormat = [string, string, (string | boolean)[]];
 
         const [fields, placeholders, values] = Object
             .entries({ ...agentData, userEmail, avatar: avatarId })
@@ -237,7 +238,7 @@ export class AgentsService {
             avatarId = `${crypto.randomUUID()}.${fileExtention}`;
         }
 
-        type UpdateDataFormat = [string, string[]]
+        type UpdateDataFormat = [string, (string | boolean)[]]
 
         const [fields, values] = Object
             .entries(newAgentAvatart || removeAvatar ? { ...restUpdateData, avatar: avatarId } : restUpdateData)

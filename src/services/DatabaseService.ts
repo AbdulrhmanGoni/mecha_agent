@@ -93,6 +93,7 @@ export class DatabaseService {
                     dont_know_response TEXT,
                     response_syntax VARCHAR(10),
                     greeting_message VARCHAR(100),
+                    is_published BOOLEAN DEFAULT false NOT NULL,
                     created_at TIMESTAMP NOT NULL DEFAULT now()
                 )
             `;
