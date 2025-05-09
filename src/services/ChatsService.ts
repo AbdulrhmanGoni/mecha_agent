@@ -25,19 +25,21 @@ export class ChatsService {
     }
 
     async fetchInstructions({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
-        const { rows: [agentRow] } = await this.databaseService.query<Agent>({
-            text: `SELECT * FROM agents WHERE id = $1 AND user_email = $2`,
+        const { rows: [agentRow] } = await this.databaseService.query<Agent | null>({
+            text: `SELECT * FROM agents WHERE id = $1 AND (is_published = true OR user_email = $2)`,
             args: [agentId, userEmail],
             camelCase: true,
         })
 
-        if (!agentRow.datasetId) {
+        if (!agentRow?.datasetId) {
             return chatsResponsesMessages.noDataset
         }
 
-        const searchResult = await this.vectorDatabaseService.search(
-            { text: prompt, datasetId: agentRow.datasetId, userEmail }
-        );
+        const searchResult = await this.vectorDatabaseService.search({
+            text: prompt,
+            datasetId: agentRow.datasetId,
+            userEmail: agentRow.isPublished ? agentRow.userEmail : userEmail,
+        });
 
         if (!searchResult.length) {
             return agentRow.dontKnowResponse || chatsResponsesMessages.dontKnow
