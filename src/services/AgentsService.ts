@@ -160,6 +160,20 @@ export class AgentsService {
         return result.rows
     }
 
+    async getPublishedAgent(id: string) {
+        const result = await this.databaseService.query<Agent>({
+            text: `
+                SELECT id, agent_name, avatar, user_email, greeting_message
+                FROM agents
+                WHERE id = $1 AND is_published = true;
+            `,
+            args: [id],
+            camelCase: true,
+        })
+
+        return result.rows[0]
+    }
+
     async delete(agentId: string, userEmail: string) {
         const { rows: [agent] } = await this.databaseService.query<Pick<Agent, "avatar" | "datasetId"> | null>({
             text: "SELECT avatar, dataset_id FROM agents WHERE id = $1 AND user_email = $2;",

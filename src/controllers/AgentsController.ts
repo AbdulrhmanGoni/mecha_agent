@@ -23,7 +23,12 @@ export class AgentsController {
     async getOne(c: Context<{ Variables: { userEmail: string } }>) {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
-        const result = await this.agentsService.getOne(agentId, userEmail);
+        const isPublishedAgent = c.req.query("published") === "yes";
+
+        const result =
+            isPublishedAgent ?
+                await this.agentsService.getPublishedAgent(agentId) :
+                await this.agentsService.getOne(agentId, userEmail);
 
         if (result) {
             return c.json({ result }, 200);
