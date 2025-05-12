@@ -43,6 +43,32 @@ export class AgentsController {
         return c.json({ result }, 200);
     }
 
+    async publishAgent(c: Context<{ Variables: { userEmail: string } }>) {
+        const agentId = c.req.param("agentId");
+        const userEmail = c.get("userEmail");
+
+        const result = await this.agentsService.update(agentId, userEmail, { isPublished: true });
+
+        if (result) {
+            return c.json({ result: AgentsResponseMessages.successfulPublishAgent }, 200);
+        } else {
+            return c.json({ error: AgentsResponseMessages.failedPublishAgent }, 400);
+        }
+    }
+
+    async unpublishAgent(c: Context<{ Variables: { userEmail: string } }>) {
+        const agentId = c.req.param("agentId");
+        const userEmail = c.get("userEmail");
+
+        const result = await this.agentsService.update(agentId, userEmail, { isPublished: false });
+
+        if (result) {
+            return c.json({ result: AgentsResponseMessages.successfulUnpublishAgent }, 200);
+        } else {
+            return c.json({ error: AgentsResponseMessages.failedUnpublishAgent }, 400);
+        }
+    }
+
     async delete(c: Context<{ Variables: { userEmail: string } }>) {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
