@@ -12,6 +12,7 @@ export class DatabaseService {
         await this.createApiKeysTable();
         await this.createChatsHistoryTable();
         await this.createAnonymousChatsHistoryTable();
+        await this.createSubscriptionsTable();
     }
 
     private async checkTableExistance(tableName: string) {
@@ -37,6 +38,7 @@ export class DatabaseService {
                     signing_method VARCHAR(11) NOT NULL,
                     last_sign_in TIMESTAMP NOT NULL DEFAULT now(),
                     current_plan VARCHAR(10) NOT NULL DEFAULT 'Free',
+                    subscription_id VARCHAR(255),
                     agents_count SMALLINT NOT NULL DEFAULT 0,
                     api_keys_count SMALLINT NOT NULL DEFAULT 0,
                     created_at TIMESTAMP NOT NULL DEFAULT now()
@@ -139,6 +141,22 @@ export class DatabaseService {
                     started_at TIMESTAMP DEFAULT NOW() NOT NULL
                 )
             `
+        }
+    }
+
+    private async createSubscriptionsTable() {
+        const tableExists = await this.checkTableExistance("subscriptions")
+
+        if (!tableExists) {
+            await this.dbClient.queryObject`
+            CREATE TABLE subscriptions (
+                customer_id VARCHAR(255) PRIMARY KEY NOT NULL,
+                subscription_id VARCHAR(255) NOT NULL,
+                user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT now(),
+                plan VARCHAR(10) NOT NULL
+            )
+        `;
         }
     }
 

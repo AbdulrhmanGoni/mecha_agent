@@ -32,6 +32,7 @@
       "./types/apiKeys.d.ts",
       "./types/agents.d.ts",
       "./types/tests.d.ts",
+      "./types/subscription.d.ts",
       "./types/chats.d.ts"
     ]
   }

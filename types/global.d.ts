@@ -22,11 +22,3 @@ type ObjectReadable = import("node:stream").Readable & { headers?: Record<string
 type SSEEvent = "dataset-status";
 
 type SSESubscriber = Record<string, { subscriberChannel: ReadableStreamDefaultController, subscriberId: string }>
-
-type Plan = {
-    planName: "Free" | "Pro"
-    maxAgentsCount: number,
-    maxApiKeysCount: number,
-    maxInferencesPerDay: number,
-    subscriptionCostPerMonth: number,
-}
