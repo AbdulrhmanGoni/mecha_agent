@@ -44,6 +44,12 @@ const envSchema = z.object({
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),
 
     JWT_SECRET_KEY: z.string(),
+
+    STRIPE_SECRET_KEY: z.string().optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().optional(),
+    PRO_SUBSCRIPTION_PRICE_ID: z.string().optional(),
+    SUCCESSFUL_SUBSCRIPTION_REDIRECT_URL: z.string().optional(),
+    CANCEL_SUBSCRIPTION_REDIRECT_URL: z.string().optional(),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);
