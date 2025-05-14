@@ -55,4 +55,15 @@ export class SubscriptionsController {
         const isSessionExisting = await this.subscriptionsService.verifyCheckoutSessionExistence(sessionId);
         return c.json({ result: isSessionExisting });
     }
+
+    async cancelSubscription(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+
+        const result = await this.subscriptionsService.cancelSubscription(userEmail);
+        if (result) {
+            return c.json({ result });
+        } else {
+            return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
+        }
+    }
 }
