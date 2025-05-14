@@ -14,7 +14,7 @@ export class DatasetsController {
             return c.json({ result }, 201);
         }
 
-        return c.json({ error: datasetsResponsesMessages.failedCreation });
+        return c.json({ error: datasetsResponsesMessages.failedCreation }, 400);
     }
 
     async delete(c: Context<{ Variables: { userEmail: string } }>) {
@@ -27,14 +27,14 @@ export class DatasetsController {
             return c.json({ result: datasetsResponsesMessages.successfulDeletion });
         }
 
-        return c.json({ error: datasetsResponsesMessages.failedDeletion });
+        return c.json({ error: datasetsResponsesMessages.failedDeletion }, 400);
     }
 
     async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateDatasetInput } }>) {
         const updateData = c.req.valid("json");
 
         if (!Object.keys(updateData).length) {
-            return c.json({ error: datasetsResponsesMessages.noUpdateData });
+            return c.json({ error: datasetsResponsesMessages.noUpdateData }, 400);
         }
 
         const datasetId = c.req.param("datasetId") as string;
@@ -45,7 +45,7 @@ export class DatasetsController {
             return c.json({ result: datasetsResponsesMessages.successfulUpdate });
         }
 
-        return c.json({ error: datasetsResponsesMessages.failedUpdate });
+        return c.json({ error: datasetsResponsesMessages.failedUpdate }, 400);
     }
 }
 
