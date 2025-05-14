@@ -69,7 +69,6 @@ export class DatasetsService {
         const { rowCount: updatedAgents } = await transactionSession.queryObject<Dataset>({
             text: "UPDATE agents SET dataset_id = $2 WHERE id = $1 AND user_email = $3",
             args: [dataset.agentId, dataset.id, dataset.userEmail],
-            camelCase: true
         });
 
         if (dataset && updatedAgents === 1) {

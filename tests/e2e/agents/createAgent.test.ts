@@ -154,7 +154,6 @@ export default function createAgentTests(
             const { rows: [agent] } = await db.queryObject<Pick<Agent, "avatar">>({
                 text: "SELECT avatar FROM agents WHERE user_email = $1",
                 args: [user.email],
-                camelCase: true
             })
 
             if (agent.avatar) {

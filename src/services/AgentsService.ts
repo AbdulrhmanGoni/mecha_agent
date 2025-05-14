@@ -191,7 +191,6 @@ export class AgentsService {
         const result = await transaction.queryObject<Agent>({
             text: "DELETE FROM agents WHERE id = $1 AND user_email = $2;",
             args: [agentId, userEmail],
-            camelCase: true,
         })
 
         if (result.rowCount !== 1) {
@@ -236,7 +235,6 @@ export class AgentsService {
         const { rows: [agent] } = await this.databaseService.query<Agent | null>({
             text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
             args: [agentId, userEmail],
-            camelCase: true,
         })
 
         if (!agent) {
@@ -273,7 +271,6 @@ export class AgentsService {
         const result = await transaction.queryObject<Agent>({
             text: `UPDATE agents SET ${fields} WHERE id = $1 AND user_email = $2;`,
             args: [agentId, userEmail, ...values],
-            camelCase: true,
         })
 
         try {

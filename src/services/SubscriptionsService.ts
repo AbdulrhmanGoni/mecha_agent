@@ -98,7 +98,6 @@ export class SubscriptionsService {
         const { rowCount: deletedUsers } = await session.queryObject({
             text: 'UPDATE users SET subscription_id = $2, current_plan = $3 WHERE email = $1',
             args: [subscription.userEmail, null, "Free"],
-            camelCase: true,
         });
         if (!deletedUsers) {
             await session.rollback()
@@ -108,7 +107,6 @@ export class SubscriptionsService {
         const { rowCount: deletedSubscriptions } = await session.queryObject({
             text: 'DELETE FROM subscriptions WHERE customer_id = $1',
             args: [customerId],
-            camelCase: true,
         });
         if (!deletedSubscriptions) {
             await session.rollback()

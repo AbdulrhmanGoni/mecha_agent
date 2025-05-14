@@ -29,7 +29,6 @@ export class UsersService {
                 userInput.avatar,
                 userInput.signingMethod,
             ],
-            camelCase: true,
         });
 
         if (rows[0]) {
@@ -87,7 +86,6 @@ export class UsersService {
         const { rowCount, rows: [{ avatar: oldAvatar }] } = await transaction.queryObject<User>({
             text: `UPDATE users SET ${fields} WHERE email = $1 RETURNING avatar`,
             args: [email, ...values],
-            camelCase: true,
         });
 
         if (rowCount) {

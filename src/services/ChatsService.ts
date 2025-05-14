@@ -164,7 +164,6 @@ export class ChatsService {
             text: isAnonymous ?
                 `INSERT INTO anonymous_chats ${fields} VALUES ${values}` : `INSERT INTO chats ${fields} VALUES ${values}`,
             args: [chatId, agentId, firstPromptBegenning, userEmail, JSON.stringify(chatMessages)],
-            camelCase: true,
         })
     }
 
@@ -179,7 +178,6 @@ export class ChatsService {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
             text: query,
             args: [chatId, agentId, userEmail],
-            camelCase: true,
         })
 
         return chatHistory?.messages || []
@@ -206,7 +204,6 @@ export class ChatsService {
         const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
             text: query,
             args: [chatId, userEmail, JSON.stringify(chatMessages)],
-            camelCase: true,
         })
         return chatHistory
     }
@@ -222,7 +219,6 @@ export class ChatsService {
         const { rowCount } = await this.databaseService.query<ChatHistory | undefined>({
             text: query,
             args: [chatId, agentId, userEmail],
-            camelCase: true,
         })
         return !!rowCount
     }

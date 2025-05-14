@@ -154,7 +154,6 @@ export default function updateAgentTests(
             const { rows: [agent] } = await db.queryObject<Pick<Agent, "avatar">>({
                 text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2",
                 args: [newAgentId, testingUserCredentials.email],
-                camelCase: true
             })
 
             if (agent.avatar) {

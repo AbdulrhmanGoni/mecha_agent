@@ -126,7 +126,6 @@ export default function createDatasetTests(
             const { rows: [addedDataset] } = await db.queryObject({
                 text: `SELECT id FROM datasets WHERE id = $1 AND agent_id = $2`,
                 args: [result.id, result.agentId],
-                camelCase: true
             })
 
             expect(addedDataset).toBeDefined()
