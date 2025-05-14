@@ -3,7 +3,7 @@ import createAgentInputValidator from "../validation/agents/createAgentInputVali
 import { AgentsController } from "../controllers/AgentsController.ts";
 import updateAgentInputValidator from "../validation/agents/updateAgentInputValidator.ts";
 import { GuardService } from "../services/GuardService.ts";
-import { writePermission, readPermission } from "../constant/permissions.ts";
+import { writePermission, readPermission, inferencePermission } from "../constant/permissions.ts";
 
 export default function agentsRoutesBuilder(
     agentsController: AgentsController,
@@ -21,6 +21,18 @@ export default function agentsRoutesBuilder(
         '/:agentId',
         guardService.guardRoute({ permissions: [readPermission] }),
         agentsController.getOne.bind(agentsController)
+    );
+
+    agentsRoutes.post(
+        '/:agentId/publish',
+        guardService.guardRoute({ permissions: [readPermission, writePermission, inferencePermission] }),
+        agentsController.publishAgent.bind(agentsController)
+    );
+
+    agentsRoutes.post(
+        '/:agentId/unpublish',
+        guardService.guardRoute({ permissions: [readPermission, writePermission, inferencePermission] }),
+        agentsController.unpublishAgent.bind(agentsController)
     );
 
     agentsRoutes.use(guardService.guardRoute({ permissions: [writePermission] }))
