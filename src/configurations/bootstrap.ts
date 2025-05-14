@@ -5,6 +5,7 @@ import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 import { bootstrapLLMClient } from "./bootstrapLLMClient.ts";
 import { kvStoreClient } from "./denoKvStoreClient.ts";
+import { bootstrapPaymentGatewayClient } from "./bootstrapPaymentGatewayClient.ts";
 
 export async function bootstrapConfigurations() {
     const llmClient = bootstrapLLMClient()
@@ -32,6 +33,8 @@ export async function bootstrapConfigurations() {
         database: parsedEnvVariables.DB_NAME,
     });
 
+    const paymentGatewayClientInterface = bootstrapPaymentGatewayClient();
+
     await databaseClient.connect();
 
     return {
@@ -41,5 +44,6 @@ export async function bootstrapConfigurations() {
         embeddingClient,
         minioClient,
         kvStoreClient,
+        paymentGatewayClientInterface,
     }
 };
