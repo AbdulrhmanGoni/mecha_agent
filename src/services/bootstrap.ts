@@ -17,6 +17,7 @@ import { DatasetsService } from "./DatasetsService.ts";
 import { SSEService } from "./SSEService.ts";
 import { UsersService } from "./UsersService.ts";
 import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
+import { SubscriptionsService } from "./SubscriptionsService.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -25,6 +26,7 @@ type ServicesDependencies = {
     llmClient: LLMClientInterface;
     minioClient: MinioClient;
     kvStoreClient: Deno.Kv;
+    paymentGatewayClientInterface: PaymentGatewayClientInterface;
 }
 
 export async function bootstrapServices(dependencies: ServicesDependencies) {
@@ -72,6 +74,12 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         sseService
     );
 
+    const subscriptionsService = new SubscriptionsService(
+        dependencies.paymentGatewayClientInterface,
+        databaseService,
+        dependencies.kvStoreClient,
+    );
+
     return {
         usersService,
         instructionsService,
@@ -83,5 +91,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         guardService,
         datasetsService,
         sseService,
+        subscriptionsService,
     }
 };
