@@ -66,4 +66,46 @@ export class SubscriptionsController {
             return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
         }
     }
+
+    async stripeWebhookHandler(c: Context) {
+        const signature = c.req.header('stripe-signature') as string;
+        const req = c.req.raw;
+
+        try {
+            const event = await this.subscriptionsService.verifyWebhookSigning(await req.text(), signature);
+            switch (event.type) {
+                case 'invoice.payment_succeeded': {
+                    const subscriptionId = event.data.object.lines.data[0]?.parent?.subscription_item_details?.subscription
+                    const customerId = event.data.object.customer
+                    const userEmail = event.data.object.customer_email
+                    if (userEmail && customerId && subscriptionId) {
+                        await this.subscriptionsService.createSubscription(userEmail, customerId.toString(), subscriptionId)
+                    }
+                    break;
+                }
+
+                case 'invoice.payment_failed': {
+                    const customerId = event.data.object.customer
+                    if (customerId) {
+                        await this.subscriptionsService.deleteSubscription(customerId.toString());
+                    }
+                    break;
+                }
+
+                case 'customer.subscription.deleted': {
+                    const customerId = event.data.object.customer
+                    if (customerId) {
+                        this.subscriptionsService.deleteSubscription(customerId.toString());
+                    }
+                    break;
+                }
+
+                default: console.warn('Unhandled stripe event:', event.type)
+            }
+
+            return c.text('Received', 200);
+        } catch (err) {
+            throw new Error("Webhook signature verification failed: " + (err as Error).message);
+        }
+    }
 }
