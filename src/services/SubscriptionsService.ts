@@ -119,4 +119,8 @@ export class SubscriptionsService {
         await session.commit();
         return true;
     }
+
+    verifyWebhookSigning(body: string, signature: string) {
+        return this.paymentGatewayClientInterface.verifyWebhookSigning(body, signature)
+    }
 }
