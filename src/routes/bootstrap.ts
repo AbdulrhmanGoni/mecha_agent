@@ -23,6 +23,8 @@ import metricsRoutesBuilder from "./metricsRoutes.ts";
 import { MetricsMiddleware } from "../middlewares/MetricsMiddleware.ts";
 import { MetricsController } from "../controllers/MetricsController.ts";
 import { InferencesMiddleware } from "../middlewares/InferencesMiddleware.ts";
+import subscriptionsRoutesBuilder from "./subscriptionsRoutes.ts";
+import { SubscriptionsController } from "../controllers/SubscriptionsController.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -36,6 +38,7 @@ type RoutesDependencies = {
         mediaController: MediaController;
         sseController: SSEController;
         metricsController: MetricsController;
+        subscriptionsController: SubscriptionsController;
     },
     middlewares: {
         metricsMiddleware: MetricsMiddleware;
@@ -95,6 +98,11 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
         dependencies.controllers.metricsController,
     );
 
+    const subscriptionsRoutes = subscriptionsRoutesBuilder(
+        dependencies.controllers.subscriptionsController,
+        dependencies.services.guardService,
+    );
+
     const api = new Hono();
 
     api.use(
@@ -111,6 +119,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/media', mediaRoutes);
     api.route('/chats', chatsRoutes);
     api.route('/datasets', datasetsRoutes);
+    api.route('/subscriptions', subscriptionsRoutes);
     api.route('/sse', sseRoutes);
     api.route('/metrics', metricsRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
