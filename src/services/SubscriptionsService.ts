@@ -65,4 +65,58 @@ export class SubscriptionsService {
         await session.rollback()
         return false
     }
+
+    async cancelSubscription(userEmail: string) {
+        const { rows: [user] } = await this.databaseService.query<Pick<User, "subscriptionId"> | undefined>({
+            text: "SELECT subscription_id FROM users WHERE email = $1",
+            args: [userEmail],
+            camelCase: true,
+        })
+
+        if (user?.subscriptionId) {
+            return await this.paymentGatewayClientInterface.cancelSubscription(user.subscriptionId);
+        }
+
+        return false
+    }
+
+    async deleteSubscription(customerId: string) {
+        const session = this.databaseService.createTransaction("subscription_deletion");
+        await session.begin();
+
+        const { rows: [subscription] } = await session.queryObject<{ userEmail: string }>({
+            text: 'SELECT user_email FROM subscriptions WHERE customer_id = $1',
+            args: [customerId],
+            camelCase: true,
+        });
+
+        if (!subscription) {
+            await session.rollback()
+            return false
+        }
+
+        const { rowCount: deletedUsers } = await session.queryObject({
+            text: 'UPDATE users SET subscription_id = $2, current_plan = $3 WHERE email = $1',
+            args: [subscription.userEmail, null, "Free"],
+            camelCase: true,
+        });
+        if (!deletedUsers) {
+            await session.rollback()
+            return false
+        }
+
+        const { rowCount: deletedSubscriptions } = await session.queryObject({
+            text: 'DELETE FROM subscriptions WHERE customer_id = $1',
+            args: [customerId],
+            camelCase: true,
+        });
+        if (!deletedSubscriptions) {
+            await session.rollback()
+            return false
+        }
+
+        await this.kvStoreClient.delete(["inferences", subscription.userEmail, "Pro"]);
+        await session.commit();
+        return true;
+    }
 }
