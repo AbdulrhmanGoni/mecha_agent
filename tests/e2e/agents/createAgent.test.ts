@@ -35,7 +35,7 @@ export default function createAgentTests(
 
             const newAgentForm = new FormData();
             Object.entries(newAgent).forEach(([key, value]) => {
-                newAgentForm.set(key, value)
+                newAgentForm.set(key, value.toString())
             });
 
             const request = new MechaTester(fakeUserEmail);
@@ -54,7 +54,7 @@ export default function createAgentTests(
             const newAgentForm = new FormData();
             Object.entries(newAgent).forEach(([key, value]) => {
                 if (key !== "agentName" && key !== "description") {
-                    newAgentForm.set(key, value)
+                    newAgentForm.set(key, value.toString())
                 }
             });
 
@@ -78,7 +78,7 @@ export default function createAgentTests(
 
             const newAgentForm = new FormData();
             Object.entries(newAgent).forEach(([key, value]) => {
-                newAgentForm.set(key, value)
+                newAgentForm.set(key, value.toString())
             });
 
             const request = new MechaTester(testingUserCredentials.email);
@@ -98,7 +98,7 @@ export default function createAgentTests(
             const newAgentForm = new FormData();
 
             Object.entries(newAgent).forEach(([key, value]) => {
-                newAgentForm.set(key, value)
+                newAgentForm.set(key, value.toString())
             });
 
             const invalidAvatarFile = new Blob(
@@ -130,7 +130,7 @@ export default function createAgentTests(
             const newAgentForm = new FormData();
 
             Object.entries(newAgent).forEach(([key, value]) => {
-                newAgentForm.set(key, value)
+                newAgentForm.set(key, value.toString())
             });
 
             const avatarFileURL = import.meta.resolve("../../mock/media/fake-avatar.png")
