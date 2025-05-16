@@ -201,11 +201,12 @@ export class ChatsService {
             `UPDATE anonymous_chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`
             : `UPDATE chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`
 
-        const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
+        const { rowCount } = await this.databaseService.query({
             text: query,
             args: [chatId, userEmail, JSON.stringify(chatMessages)],
         })
-        return chatHistory
+
+        return !!rowCount
     }
 
     async deleteChat(
