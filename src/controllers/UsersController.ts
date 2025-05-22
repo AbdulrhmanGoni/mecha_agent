@@ -13,7 +13,12 @@ export class UsersController {
         const user = await this.usersService.getByEmail(userEmail)
 
         if (user) {
-            const { password: _, username: name, ...userData } = user
+            const {
+                password: _,
+                subscriptionId: __,
+                username: name,
+                ...userData
+            } = user
             return c.json({ result: { name, ...userData } })
         }
 
