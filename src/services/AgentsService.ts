@@ -163,9 +163,8 @@ export class AgentsService {
     async getPublishedAgent(id: string) {
         const result = await this.databaseService.query<Agent>({
             text: `
-                SELECT id, agent_name, avatar, user_email, greeting_message
-                FROM agents
-                WHERE id = $1 AND is_published = true;
+                SELECT id, agent_name, description, avatar, user_email, greeting_message
+                FROM agents WHERE id = $1 AND is_published = true;
             `,
             args: [id],
             camelCase: true,
