@@ -61,6 +61,6 @@ export class InferencesMiddleware {
     }
 }
 
-Deno.cron("Reset users inferences rate limits", "0 0 * * *", async () => {
-    await kvStoreClient.enqueue({ task: "reset-users-inferences-rate-limits" });
+Deno.cron("Reset users inferences rate limits", "0 0 * * *", () => {
+    kvStoreClient.enqueue({ task: "reset-users-inferences-rate-limits" });
 });
