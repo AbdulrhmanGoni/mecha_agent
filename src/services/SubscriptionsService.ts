@@ -67,14 +67,46 @@ export class SubscriptionsService {
     }
 
     async cancelSubscription(userEmail: string) {
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "subscriptionId"> | undefined>({
-            text: "SELECT subscription_id FROM users WHERE email = $1",
+        const session = this.databaseService.createTransaction("subscription_cancelation");
+        await session.begin();
+
+        const { rows: [user] } = await session.queryObject<Pick<User, "subscriptionId"> | undefined>({
+            text: "UPDATE subscriptions SET status = 'canceled' WHERE user_email = $1 RETURNING subscription_id;",
             args: [userEmail],
             camelCase: true,
         })
 
         if (user?.subscriptionId) {
-            return await this.paymentGatewayClientInterface.cancelSubscription(user.subscriptionId);
+            const subscriptionCanceled = await this.paymentGatewayClientInterface.cancelSubscription(user.subscriptionId);
+            if (subscriptionCanceled) {
+                session.commit();
+                return true
+            } else {
+                session.rollback();
+            }
+        }
+
+        return false
+    }
+
+    async activateSubscription(userEmail: string) {
+        const session = this.databaseService.createTransaction("subscription_activation");
+        await session.begin();
+
+        const { rows: [user] } = await session.queryObject<Pick<User, "subscriptionId"> | undefined>({
+            text: "UPDATE subscriptions SET status = 'active' WHERE user_email = $1 RETURNING subscription_id;",
+            args: [userEmail],
+            camelCase: true,
+        })
+
+        if (user?.subscriptionId) {
+            const subscriptionCanceled = await this.paymentGatewayClientInterface.activateSubscription(user.subscriptionId);
+            if (subscriptionCanceled) {
+                session.commit();
+                return true
+            } else {
+                session.rollback();
+            }
         }
 
         return false

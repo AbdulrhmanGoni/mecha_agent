@@ -61,7 +61,18 @@ export class SubscriptionsController {
 
         const result = await this.subscriptionsService.cancelSubscription(userEmail);
         if (result) {
-            return c.json({ result });
+            return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionCancelation });
+        } else {
+            return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
+        }
+    }
+
+    async activateSubscription(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+
+        const result = await this.subscriptionsService.activateSubscription(userEmail);
+        if (result) {
+            return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionActivation });
         } else {
             return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
         }

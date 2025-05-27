@@ -1,4 +1,6 @@
 const subscriptionsResponsesMessages = {
+    successfulSubscriptionCancelation: "Your subscription has been canceled successfully",
+    successfulSubscriptionActivation: "Your subscription has been activated successfully",
     unknownPlan: (subscriptionPlan: string) => `Unknown subscription plan! (${subscriptionPlan})`,
     failedSessionCreation: "Failed to create the subscription session",
     missingPlan: "The subscription plan is missing!",
