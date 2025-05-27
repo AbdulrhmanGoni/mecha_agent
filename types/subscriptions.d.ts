@@ -19,6 +19,7 @@ type Subscription = {
 interface PaymentGatewayClientInterface {
     createSubscriptionSession(userEmail: string, priceId: string): Promise<{ url: string | null }>;
     cancelSubscription(subscriptionId: string): Promise<boolean>;
+    activateSubscription(subscriptionId: string): Promise<boolean>;
     verifyCheckoutSessionExistence(sessionId: string): Promise<boolean>;
     verifyWebhookSigning(body: string, signature: string): Promise<import("stripe").Stripe.Event>;
 }

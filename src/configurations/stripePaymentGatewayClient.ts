@@ -47,12 +47,19 @@ export class StripePaymentGatewayClient implements PaymentGatewayClientInterface
         }
     }
 
-    async cancelSubscription(subscriptionId: string) {
+    private async updateSubscriptionCancelationAtEnd(subscriptionId: string, value: boolean) {
         const updatedSubscription = await this.stripe.subscriptions.update(subscriptionId, {
-            cancel_at_period_end: true,
+            cancel_at_period_end: value,
         });
+        return updatedSubscription.cancel_at_period_end === value
+    }
 
-        return updatedSubscription.cancel_at_period_end
+    async cancelSubscription(subscriptionId: string) {
+        return await this.updateSubscriptionCancelationAtEnd(subscriptionId, true)
+    }
+
+    async activateSubscription(subscriptionId: string) {
+        return await this.updateSubscriptionCancelationAtEnd(subscriptionId, false)
     }
 
     async verifyCheckoutSessionExistence(sessionId: string) {
