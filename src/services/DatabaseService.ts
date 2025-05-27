@@ -154,6 +154,7 @@ export class DatabaseService {
                 subscription_id VARCHAR(255) NOT NULL,
                 user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL,
                 created_at TIMESTAMP NOT NULL DEFAULT now(),
+                status VARCHAR(8) NOT NULL DEFAULT 'active',
                 plan VARCHAR(10) NOT NULL
             )
         `;
