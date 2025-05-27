@@ -32,9 +32,15 @@ export default function subscriptionsRoutesBuilder(
     );
 
     subscriptionsRoutes.delete(
-        '/unsubscribe',
+        '/cancel-subscription',
         guardService.guardRoute({ permissions: [readPermission, writePermission] }),
         subscriptionsController.cancelSubscription.bind(subscriptionsController)
+    );
+
+    subscriptionsRoutes.delete(
+        '/activate-subscription',
+        guardService.guardRoute({ permissions: [readPermission, writePermission] }),
+        subscriptionsController.activateSubscription.bind(subscriptionsController)
     );
 
     return subscriptionsRoutes;
