@@ -5,13 +5,14 @@ questions based on given datasets by the users
 
 ## Features ✨
 
-- Creating multiple agents :robot:.
+- Creating multiple AI agents :robot:.
 - Giving each agent system instructions to customize its attitude :memo:.
-- Upload a dataset for an agent to answer questions based on it :file_folder:.
-- Chatting with agents :speech_balloon:.
+- Upload a dataset for an agent so it answers questions based on the dataset
+  :file_folder:.
+- Chatting with agents locally to test it :speech_balloon:.
 - Saving chats histories :bookmark:.
+- Publishing agents to the public so people can chat with them :earth_africa:.
 - Creating and Managing API Keys to access the system from outside :key:.
-- The ability to interact with agents via API using API Keys 🧑‍💻.
 
 ## Get Started
 
