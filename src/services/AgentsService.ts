@@ -298,4 +298,27 @@ export class AgentsService {
 
         return false
     }
+
+    async updateAgentPublishingState(agentId: string, userEmail: string, isPublished: boolean) {
+        const transaction = this.databaseService.createTransaction(isPublished ? "publish_agent" : "unpublish_agent")
+        await transaction.begin();
+
+        const { rowCount: agentUpdated } = await transaction.queryObject<Agent>({
+            text: 'UPDATE agents SET is_published = $3 WHERE id = $1 AND user_email = $2',
+            args: [agentId, userEmail, isPublished],
+        })
+
+        const { rowCount: userUpdated } = await transaction.queryObject<Agent>({
+            text: 'UPDATE users SET published_agents = published_agents + $2 WHERE email = $1',
+            args: [userEmail, isPublished ? 1 : -1],
+        })
+
+        if (!!userUpdated && !!agentUpdated) {
+            await transaction.commit()
+            return true
+        }
+
+        await transaction.rollback()
+        return false
+    }
 }
