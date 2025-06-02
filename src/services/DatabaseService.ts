@@ -41,6 +41,7 @@ export class DatabaseService {
                     subscription_id VARCHAR(255),
                     agents_count SMALLINT NOT NULL DEFAULT 0,
                     api_keys_count SMALLINT NOT NULL DEFAULT 0,
+                    published_agents SMALLINT NOT NULL DEFAULT 0,
                     created_at TIMESTAMP NOT NULL DEFAULT now()
                 )
             `;
