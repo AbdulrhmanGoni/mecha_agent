@@ -2,6 +2,7 @@ import { hash } from "deno.land/x/bcrypt";
 import { DatabaseService } from "./DatabaseService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
+import { plans } from "../constant/plans.ts";
 
 const userRowFieldsNamesMap: Record<string, string> = {
     lastSignIn: "last_sign_in",
@@ -11,6 +12,7 @@ export class UsersService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly objectStorage: ObjectStorageService,
+        private readonly kvStore: Deno.Kv,
     ) { }
 
     async create(userInput: SignUpUserInput) {
@@ -47,6 +49,50 @@ export class UsersService {
 
         if (rows[0]) {
             return rows[0]
+        }
+
+        return null
+    }
+
+    async getUserData(email: string) {
+        const { rows } = await this.databaseService.query<User>({
+            text: `
+                SELECT 
+                users.username as name, 
+                users.avatar, 
+                users.signing_method, 
+                users.last_sign_in, 
+                users.current_plan, 
+                users.api_keys_count, 
+                users.agents_count,
+                users.published_agents,
+                    CASE 
+                        WHEN subscriptions.subscription_id IS NOT NULL THEN
+                            json_build_object(
+                                'createdAt', subscriptions.created_at,
+                                'status', subscriptions.status
+                            )
+                        ELSE NULL 
+                    END AS subscription
+                FROM users 
+                LEFT JOIN subscriptions ON users.subscription_id = subscriptions.subscription_id
+                WHERE users.email = $1
+            `,
+            args: [email],
+            camelCase: true,
+        });
+
+        if (rows[0]) {
+            const userInferences = await this.kvStore.get<bigint>(["inferences", email, rows[0].currentPlan])
+
+            return {
+                ...rows[0],
+                email,
+                todayInference: {
+                    current: Number(userInferences.value || 0),
+                    max: plans.find((p) => p.planName === rows[0].currentPlan)?.maxInferencesPerDay
+                },
+            }
         }
 
         return null
