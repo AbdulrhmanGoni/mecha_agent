@@ -10,16 +10,10 @@ export class UsersController {
 
     async getUserData(c: Context<{ Variables: { userEmail: string } }>) {
         const userEmail = c.get("userEmail");
-        const user = await this.usersService.getByEmail(userEmail)
+        const user = await this.usersService.getUserData(userEmail)
 
         if (user) {
-            const {
-                password: _,
-                subscriptionId: __,
-                username: name,
-                ...userData
-            } = user
-            return c.json({ result: { name, ...userData } })
+            return c.json({ result: user })
         }
 
         return c.json({ error: authResponsesMessages.noUser }, 404)
