@@ -75,7 +75,7 @@ export class UsersService {
                         ELSE NULL 
                     END AS subscription
                 FROM users 
-                LEFT JOIN subscriptions ON users.subscription_id = subscriptions.subscription_id
+                JOIN subscriptions ON users.subscription_id = subscriptions.subscription_id
                 WHERE users.email = $1
             `,
             args: [email],
