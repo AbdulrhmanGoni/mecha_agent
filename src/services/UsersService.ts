@@ -84,6 +84,7 @@ export class UsersService {
 
         if (rows[0]) {
             const userInferences = await this.kvStore.get<bigint>(["inferences", email, rows[0].currentPlan])
+            const lastWeekInferences = await this.kvStore.get<number[]>(["last-week-inferences", email])
 
             return {
                 ...rows[0],
@@ -92,6 +93,7 @@ export class UsersService {
                     current: Number(userInferences.value || 0),
                     max: plans.find((p) => p.planName === rows[0].currentPlan)?.maxInferencesPerDay
                 },
+                lastWeekInferences: lastWeekInferences.value
             }
         }
 

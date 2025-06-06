@@ -55,8 +55,20 @@ export class InferencesMiddleware {
     };
 
     async resetUsersInferencesRateLimits() {
-        for await (const element of this.kvStoreClient.list({ prefix: ["inferences"] })) {
-            await this.kvStoreClient.set(element.key, new Deno.KvU64(0n))
+        for await (const record of this.kvStoreClient.list<bigint>({ prefix: ["inferences"] })) {
+            this.setLastWeekInferencesRecording(record.key[1] as string, record.value)
+            await this.kvStoreClient.set(record.key, new Deno.KvU64(0n))
+        }
+    }
+
+    private async setLastWeekInferencesRecording(userEmail: string, todayValue: bigint) {
+        const record = await this.kvStoreClient.get<number[]>(["last-week-inferences", userEmail])
+        if (record.value) {
+            record.value.pop()
+            record.value.unshift(Number(todayValue))
+            await this.kvStoreClient.set(["last-week-inferences", userEmail], record.value)
+        } else {
+            await this.kvStoreClient.set(["last-week-inferences", userEmail], [Number(todayValue), 0, 0, 0, 0, 0, 0])
         }
     }
 }
