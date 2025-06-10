@@ -32,10 +32,5 @@ export default function instructionsRoutesBuilder(
         instructionsController.remove.bind(instructionsController)
     );
 
-    instructionsRoutes.delete(
-        '/clear',
-        instructionsController.clear.bind(instructionsController)
-    );
-
     return instructionsRoutes;
 };
