@@ -6,9 +6,8 @@ export class DatabaseService {
     async init() {
         await this.dbClient.queryObject`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`;
         await this.createUsersTable();
-        await this.createAgentsTable();
         await this.datasetsTable();
-        await this.createDatasetIdColumnOnAgentsTable();
+        await this.createAgentsTable();
         await this.createApiKeysTable();
         await this.createChatsHistoryTable();
         await this.createAnonymousChatsHistoryTable();
@@ -54,11 +53,10 @@ export class DatabaseService {
             await this.dbClient.queryObject`
                 CREATE TABLE datasets (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
-                    agent_id UUID REFERENCES agents(id) ON DELETE CASCADE NOT NULL,
                     title VARCHAR(80) NOT NULL,
                     description VARCHAR(200) NOT NULL,
-                    status VARCHAR(11) NOT NULL,
                     created_at TIMESTAMP NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMP NOT NULL DEFAULT now(),
                     user_email VARCHAR(320) REFERENCES users(email) ON DELETE CASCADE NOT NULL
                 )
             `;
@@ -92,6 +90,7 @@ export class DatabaseService {
                     agent_name VARCHAR(80) NOT NULL,
                     description TEXT NOT NULL,
                     avatar VARCHAR(42),
+                    dataset_id UUID REFERENCES datasets(id) ON DELETE SET NULL,
                     system_instructions TEXT,
                     dont_know_response TEXT,
                     response_syntax VARCHAR(10),
@@ -101,13 +100,6 @@ export class DatabaseService {
                 )
             `;
         }
-    }
-
-    private async createDatasetIdColumnOnAgentsTable() {
-        await this.dbClient.queryObject`
-            ALTER TABLE agents
-            ADD COLUMN IF NOT EXISTS dataset_id UUID REFERENCES datasets(id) ON DELETE SET NULL; 
-        `;
     }
 
     private async createApiKeysTable() {
