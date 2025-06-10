@@ -35,6 +35,16 @@ export class DatasetsService {
         return rows[0]
     }
 
+    async getAll(userEmail: string) {
+        const { rows } = await this.databaseService.query<Dataset>({
+            text: "SELECT * FROM datasets WHERE user_email = $1;",
+            args: [userEmail],
+            camelCase: true
+        })
+
+        return rows
+    }
+
     async update(datasetId: string, userEmail: string, updateData: UpdateDatasetInput) {
         type UpdateFormat = [string, string[]]
 
