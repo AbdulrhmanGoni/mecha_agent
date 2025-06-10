@@ -59,12 +59,12 @@ export class DatasetsService {
     }
 
     async delete(
-        { agentId, datasetId, userEmail }:
-            { agentId: string, userEmail: string, datasetId: string }
+        { datasetId, userEmail }:
+            { userEmail: string, datasetId: string }
     ) {
         const { rowCount: datasetDeleted } = await this.databaseService.query({
-            text: "DELETE FROM datasets WHERE id = $1 AND agent_id = $2 AND user_email = $3;",
-            args: [datasetId, agentId, userEmail],
+            text: "DELETE FROM datasets WHERE id = $1 AND user_email = $2;",
+            args: [datasetId, userEmail],
         })
 
         if (datasetDeleted) {
