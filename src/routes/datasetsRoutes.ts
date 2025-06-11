@@ -19,6 +19,16 @@ export default function datasetsRoutesBuilder(
         datasetsController.create.bind(datasetsController)
     );
 
+    datasetsRoutes.get(
+        '/',
+        datasetsController.getAll.bind(datasetsController)
+    );
+
+    datasetsRoutes.get(
+        '/:datasetId',
+        datasetsController.getOne.bind(datasetsController)
+    );
+
     datasetsRoutes.delete(
         '/:datasetId',
         datasetsController.delete.bind(datasetsController)

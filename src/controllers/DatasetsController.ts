@@ -17,6 +17,29 @@ export class DatasetsController {
         return c.json({ error: datasetsResponsesMessages.failedCreation }, 400);
     }
 
+    async getOne(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+        const datasetId = c.req.param("datasetId");
+        const result = await this.datasetsService.getOne(datasetId, userEmail);
+
+        if (result) {
+            return c.json({ result }, 200);
+        }
+
+        return c.json({ error: "Failed to fetch the dataset, Maybe it doen't exist" }, 400);
+    }
+
+    async getAll(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+        const result = await this.datasetsService.getAll(userEmail);
+
+        if (result) {
+            return c.json({ result }, 200);
+        }
+
+        return c.json({ error: "Failed to fetch your datasets" }, 400);
+    }
+
     async delete(c: Context<{ Variables: { userEmail: string } }>) {
         const datasetId = c.req.param("datasetId");
         const agentId = c.req.query("agentId") as string;
