@@ -17,6 +17,12 @@ const AgentsResponseMessages = {
     noUpdateData: "Specify at least one field to update",
 
     agentsLimitReached: "You have reached the maximum allowed number of agents",
+
+    noDatasetToAssociate: "No dataset id to associate it with the agent",
+    successfulAssociation: "The dataset was associated with the agent successfully",
+    failedAssociation: "The dataset failed to be associated with the agent",
+    successfulUnassociation: "The dataset was unassociated with the agent successfully",
+    failedUnassociation: "The dataset failed to be unassociated with the agent",
 }
 
 export default AgentsResponseMessages

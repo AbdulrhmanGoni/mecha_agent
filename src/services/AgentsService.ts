@@ -299,6 +299,19 @@ export class AgentsService {
         return false
     }
 
+    async setDataset(params: { agentId: string, userEmail: string, datasetId: string, action: string }) {
+        const { rowCount: agentUpdated } = await this.databaseService.query<Agent>({
+            text: 'UPDATE agents SET dataset_id = $3 WHERE id = $1 AND user_email = $2',
+            args: [
+                params.agentId,
+                params.userEmail,
+                params.action == "unassociate" ? null : params.datasetId,
+            ],
+        })
+
+        return !!agentUpdated
+    }
+
     async updateAgentPublishingState(agentId: string, userEmail: string, isPublished: boolean) {
         const transaction = this.databaseService.createTransaction(isPublished ? "publish_agent" : "unpublish_agent")
         await transaction.begin();

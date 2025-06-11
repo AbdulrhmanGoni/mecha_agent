@@ -69,6 +69,40 @@ export class AgentsController {
         }
     }
 
+    async setDataset(c: Context<{ Variables: { userEmail: string } }>) {
+        const agentId = c.req.param("agentId");
+        const datasetId = c.req.query("datasetId");
+        const action = c.req.query("action");
+        const userEmail = c.get("userEmail");
+
+        if (!datasetId) {
+            return c.json({ error: AgentsResponseMessages.noDatasetToAssociate }, 400);
+        }
+
+        if (action != "associate" && action != "unassociate") {
+            return c.json({ error: "Unknown action" }, 400);
+        }
+
+        const result = await this.agentsService.setDataset({
+            agentId,
+            userEmail,
+            datasetId,
+            action
+        });
+
+        if (result) {
+            return c.json({
+                result: action == "associate" ?
+                    AgentsResponseMessages.successfulAssociation : AgentsResponseMessages.successfulUnassociation
+            }, 200);
+        } else {
+            return c.json({
+                result: action == "associate" ?
+                    AgentsResponseMessages.failedAssociation : AgentsResponseMessages.failedUnassociation
+            }, 400);
+        }
+    }
+
     async delete(c: Context<{ Variables: { userEmail: string } }>) {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");

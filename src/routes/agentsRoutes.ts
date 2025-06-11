@@ -35,6 +35,12 @@ export default function agentsRoutesBuilder(
         agentsController.unpublishAgent.bind(agentsController)
     );
 
+    agentsRoutes.patch(
+        '/:agentId/dataset',
+        guardService.guardRoute({ permissions: [readPermission, writePermission, inferencePermission] }),
+        agentsController.setDataset.bind(agentsController)
+    );
+
     agentsRoutes.use(guardService.guardRoute({ permissions: [writePermission] }))
 
     agentsRoutes.post(
