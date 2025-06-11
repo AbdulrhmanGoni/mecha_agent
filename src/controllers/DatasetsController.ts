@@ -42,9 +42,8 @@ export class DatasetsController {
 
     async delete(c: Context<{ Variables: { userEmail: string } }>) {
         const datasetId = c.req.param("datasetId");
-        const agentId = c.req.query("agentId") as string;
         const userEmail = c.get("userEmail");
-        const result = await this.datasetsService.delete({ agentId, datasetId, userEmail });
+        const result = await this.datasetsService.delete({ datasetId, userEmail });
 
         if (result) {
             return c.json({ result: datasetsResponsesMessages.successfulDeletion });
@@ -53,8 +52,8 @@ export class DatasetsController {
         return c.json({ error: datasetsResponsesMessages.failedDeletion }, 400);
     }
 
-    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateDatasetInput } }>) {
-        const updateData = c.req.valid("json");
+    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: UpdateDatasetInput } }>) {
+        const updateData = c.req.valid("form");
 
         if (!Object.keys(updateData).length) {
             return c.json({ error: datasetsResponsesMessages.noUpdateData }, 400);
