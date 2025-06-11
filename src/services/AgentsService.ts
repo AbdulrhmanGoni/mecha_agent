@@ -114,22 +114,7 @@ export class AgentsService {
 
     async getOne(id: string, userEmail: string) {
         const result = await this.databaseService.query<Agent>({
-            text: `
-                SELECT 
-                    agents.*,
-                    CASE 
-                        WHEN datasets.id IS NOT NULL THEN
-                            json_build_object(
-                                'id', datasets.id, 
-                                'title', datasets.title, 
-                                'description', datasets.description,
-                                'status', datasets.status
-                            )
-                        ELSE NULL 
-                    END AS dataset 
-                FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id 
-                WHERE agents.id = $1 AND agents.user_email = $2;
-            `,
+            text: 'SELECT * FROM agents WHERE id = $1 AND user_email = $2;',
             args: [id, userEmail],
             camelCase: true,
         })
@@ -138,22 +123,7 @@ export class AgentsService {
 
     async getAll(userEmail: string) {
         const result = await this.databaseService.query<Agent>({
-            text: `
-            SELECT 
-                agents.*,
-                CASE 
-                    WHEN datasets.id IS NOT NULL THEN
-                        json_build_object(
-                            'id', datasets.id, 
-                            'title', datasets.title, 
-                            'description', datasets.description,
-                            'status', datasets.status
-                        )
-                    ELSE NULL 
-                END AS dataset 
-            FROM agents LEFT JOIN datasets ON agents.id = datasets.agent_id
-            WHERE agents.user_email = $1
-        `,
+            text: 'SELECT * FROM agents WHERE user_email = $1;',
             camelCase: true,
             args: [userEmail]
         })
