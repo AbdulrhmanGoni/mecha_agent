@@ -80,9 +80,11 @@ export class VectorDatabaseService {
     }
 
     async update(instructions: UpdateInstructionInput[]) {
-        const updateData = instructions.reduce<{ ids: Array<string>, updateDataMap: Record<string, UpdateInstructionInput> }>((updateData, instruction, i) => {
-            updateData.updateDataMap[instruction.id] = instruction;
-            updateData.ids[i] = instruction.id;
+        type UpdatePreparation = { ids: Array<string>, updateDataMap: Record<string, Omit<UpdateInstructionInput, "id">> }
+        const updateData = instructions.reduce<UpdatePreparation>((updateData, instruction, i) => {
+            const { id, ...instructionData } = instruction
+            updateData.updateDataMap[id] = instructionData;
+            updateData.ids[i] = id;
             return updateData;
         }, { ids: new Array<string>(instructions.length), updateDataMap: {} })
 
