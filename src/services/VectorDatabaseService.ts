@@ -1,6 +1,5 @@
 import { QdrantClient } from "npm:@qdrant/js-client-rest";
 import { Schemas } from "npm:@qdrant/js-client-rest";
-import objectIdToUUID from "../helpers/objectIdToUUID.ts";
 import { EmbeddingService } from "./EmbeddingService.ts";
 import embedInstructionFormat from "../helpers/embedInstructionFormat.ts";
 
@@ -51,7 +50,9 @@ export class VectorDatabaseService {
         }
     }
 
-    async insert(instructions: Instruction[]) {
+    async insert(
+        { datasetId, instructions, userEmail }: { datasetId: string, userEmail: string, instructions: NewInstructionInput[] }
+    ) {
         const points = new Array<Schemas["PointStruct"]>(instructions.length)
 
         for (let i = 0; i < instructions.length; i++) {
@@ -59,21 +60,29 @@ export class VectorDatabaseService {
                 embedInstructionFormat(instructions[i])
             )
 
+            const currentDate = new Date().getTime();
+
             points[i] = {
-                id: objectIdToUUID(instructions[i].id),
+                id: crypto.randomUUID(),
                 vector: instructionEmbedding,
-                payload: instructions[i]
+                payload: {
+                    ...instructions[i],
+                    userEmail,
+                    datasetId,
+                    createdAt: currentDate,
+                    updatedAt: currentDate,
+                }
             }
         }
 
-        return await this.dbClient.upsert(this.datasetsCollection, { points })
+        return await this.dbClient.upsert(this.datasetsCollection, { points, wait: true })
+    }
     }
 
     async update(instructions: UpdateInstructionInput[]) {
         const updateData = instructions.reduce<{ ids: Array<string>, updateDataMap: Record<string, UpdateInstructionInput> }>((updateData, instruction, i) => {
-            const id = objectIdToUUID(instruction.id)
-            updateData.updateDataMap[id] = instruction;
-            updateData.ids[i] = id;
+            updateData.updateDataMap[instruction.id] = instruction;
+            updateData.ids[i] = instruction.id;
             return updateData;
         }, { ids: new Array<string>(instructions.length), updateDataMap: {} })
 
@@ -87,11 +96,12 @@ export class VectorDatabaseService {
         for (let i = 0; i < oldInstructionsPoints.length; i++) {
             const updatedPayload = {
                 ...oldInstructionsPoints[i].payload,
-                ...updateData.updateDataMap[oldInstructionsPoints[i].id]
+                ...updateData.updateDataMap[oldInstructionsPoints[i].id],
+                updatedAt: new Date().getTime(),
             }
 
             const updatedInstructionEmbedding = await this.embeddingService.embedText(
-                embedInstructionFormat(updatedPayload)
+                embedInstructionFormat(updatedPayload as Instruction)
             )
 
             updatedInstructionsPoints[i] = {
@@ -103,7 +113,7 @@ export class VectorDatabaseService {
 
         return await this.dbClient.upsert(
             this.datasetsCollection,
-            { points: updatedInstructionsPoints }
+            { points: updatedInstructionsPoints, wait: true }
         )
     }
 
@@ -142,13 +152,14 @@ export class VectorDatabaseService {
         return await this.dbClient.delete(
             this.datasetsCollection,
             {
-                points: instructionsIds.map(id => objectIdToUUID(id)),
+                points: instructionsIds,
                 filter: {
                     must: {
                         key: "userEmail",
                         match: { value: userEmail },
                     }
-                }
+                },
+                wait: true
             }
         )
     }
