@@ -3,16 +3,25 @@ import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 export class InstructionsService {
     constructor(private readonly vectorDatabaseService: VectorDatabaseService) { }
 
-    async insert(instructions: Instruction[]) {
-        return await this.vectorDatabaseService.insert(instructions)
+    async insert(
+        { datasetId, instructions, userEmail }: { datasetId: string, userEmail: string, instructions: NewInstructionInput[] }
+    ) {
+        const result = await this.vectorDatabaseService.insert({
+            datasetId,
+            instructions,
+            userEmail
+        })
+        return result.status === "completed"
     }
 
     async update(instructions: UpdateInstructionInput[]) {
-        return await this.vectorDatabaseService.update(instructions)
+        const result = await this.vectorDatabaseService.update(instructions);
+        return result.status === "completed";
     }
 
     async remove(userEmail: string, instructionsIds: string[]) {
-        return await this.vectorDatabaseService.remove(userEmail, instructionsIds)
+        const result = await this.vectorDatabaseService.remove(userEmail, instructionsIds)
+        return result.status === "completed";
     }
 
     async clear(datasetId: string, userEmail: string) {
