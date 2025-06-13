@@ -4,8 +4,6 @@ import schemaParser from "../../helpers/schemaParser.ts";
 
 const instructionInputSchema = z.object({
     id: z.string(),
-    datasetId: z.string(),
-    systemMessage: z.string().optional(),
     prompt: z.string().optional(),
     response: z.string().optional(),
 }).strict()

@@ -8,27 +8,25 @@ type Dataset = {
     createdAt: string;
 }
 
-type CreateDatasetInput = Pick<Dataset, "title" | "description" | "agentId"> & {
-    datasetFile: File;
-}
+type CreateDatasetInput = Pick<Dataset, "title" | "description">
 
-type UpdateDatasetInput = Partial<Pick<Dataset, "title" | "description" | "status">>
+type UpdateDatasetInput = Partial<Pick<Dataset, "title" | "description">>
 
-type BaseInstruction = {
-    systemMessage?: string;
-    prompt: string;
-    response: string;
-}
-
-type Instruction = BaseInstruction & {
+type Instruction = {
     id: string;
     datasetId: string;
     userEmail: string;
+    prompt: string;
+    response: string;
+    createdAt: number;
+    updatedAt: number;
 }
 
-type InstructionInput = Omit<Instruction, "userEmail">;
+type NewInstructionInput = Pick<Instruction, "prompt" | "response">;
 
-type UpdateInstructionInput = (WithOptionalFields<Instruction, "response" | "prompt">);
+
+
+type UpdateInstructionInput = WithOptionalFields<Pick<Instruction, "id" | "prompt" | "response">, "prompt" | "response">
 
 type DatasetProcessingWorkerTask = "new_dataset" | "delete_dataset" | "successful_process" | "failed_process"
 
