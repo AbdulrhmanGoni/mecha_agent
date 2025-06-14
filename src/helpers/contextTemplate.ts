@@ -1,9 +1,9 @@
 export default function contextTemplate(instructions: Instruction[]) {
-    return instructions.reduce((text, currentInstruction) => {
-        text += (
-            `"${currentInstruction.systemMessage ? currentInstruction.systemMessage + "; " : ""}` +
-            `${currentInstruction.response}", `
-        )
-        return text
-    }, "### Context: ")
+    let context = "### Context:"
+
+    for (let i = 0; i < instructions.length; i++) {
+        context += (`\n\n"${instructions[i].response}"`)
+    }
+
+    return context
 };
