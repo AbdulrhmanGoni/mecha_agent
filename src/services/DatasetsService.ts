@@ -1,4 +1,5 @@
 import { DatabaseService } from "./DatabaseService.ts";
+import { InstructionsService } from "./InstructionsService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { SSEService } from "./SSEService.ts";
 
@@ -8,6 +9,7 @@ export class DatasetsService {
         private readonly objectStorageService: ObjectStorageService,
         private readonly datasetProcessingWorker: Worker,
         private readonly sseService: SSEService,
+        private readonly instructionsService: InstructionsService,
     ) {
     }
 
@@ -25,14 +27,24 @@ export class DatasetsService {
         return rows[0]
     }
 
-    async getOne(datasetId: string, userEmail: string) {
+    async getOne(datasetId: string, userEmail: string): Promise<Dataset & { instructionsCount: number } | null> {
         const { rows } = await this.databaseService.query<Dataset>({
             text: "SELECT * FROM datasets WHERE id = $1 AND user_email = $2;",
             args: [datasetId, userEmail],
             camelCase: true
         })
 
-        return rows[0]
+        if (rows[0]) {
+            const instructionsCount = await this.instructionsService.count(datasetId, userEmail)
+            Object.defineProperty(
+                rows[0],
+                "instructionsCount",
+                { value: instructionsCount, enumerable: true }
+            )
+            return rows[0] as Dataset & { instructionsCount: number }
+        }
+
+        return null
     }
 
     async getAll(userEmail: string) {
