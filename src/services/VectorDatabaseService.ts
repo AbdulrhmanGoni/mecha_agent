@@ -77,6 +77,38 @@ export class VectorDatabaseService {
 
         return await this.dbClient.upsert(this.datasetsCollection, { points, wait: true })
     }
+
+    async list(datasetId: string, userEmail: string, params: ListInstructionParams) {
+        const result = await this.dbClient.query(this.datasetsCollection, {
+            filter: {
+                must: [
+                    {
+                        key: "datasetId",
+                        match: {
+                            value: datasetId,
+                        },
+                    },
+                    {
+                        key: "userEmail",
+                        match: { value: userEmail },
+                    },
+                ]
+            },
+            limit: params.pageSize,
+            offset: params.page * params.pageSize,
+            with_payload: true,
+        })
+
+        return result.points.map((point) => {
+            return {
+                id: point.id,
+                prompt: point.payload?.prompt,
+                response: point.payload?.response,
+                createdAt: point.payload?.createdAt,
+                updatedAt: point.payload?.updatedAt,
+            } as Instruction
+        })
+    }
     }
 
     async update(instructions: UpdateInstructionInput[]) {

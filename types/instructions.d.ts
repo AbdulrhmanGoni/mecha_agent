@@ -34,6 +34,8 @@ type QueryInstructionParams = {
 
 type SearchInstructionParams = Pick<QueryInstructionParams, "page" | "pageSize" | "searchText">
 
+type ListInstructionParams = Pick<QueryInstructionParams, "page" | "pageSize">
+
 type UpdateInstructionInput = WithOptionalFields<Pick<Instruction, "id" | "prompt" | "response">, "prompt" | "response">
 
 type DatasetProcessingWorkerTask = "new_dataset" | "delete_dataset" | "successful_process" | "failed_process"
