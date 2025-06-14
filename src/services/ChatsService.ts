@@ -24,10 +24,10 @@ export class ChatsService {
         });
     }
 
-    async fetchInstructions({ agentId, prompt, userEmail }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail">) {
+    async fetchInstructions({ agentId, prompt, userEmail, isAnonymous }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">) {
         const { rows: [agentRow] } = await this.databaseService.query<Agent | null>({
-            text: `SELECT * FROM agents WHERE id = $1 AND (is_published = true OR user_email = $2)`,
-            args: [agentId, userEmail],
+            text: 'SELECT * FROM agents WHERE id = $1 AND user_email = $2 AND ($3 = false OR is_published = true)',
+            args: [agentId, userEmail, !!isAnonymous],
             camelCase: true,
         })
 
@@ -77,7 +77,7 @@ export class ChatsService {
         { agentId, prompt, userEmail, isAnonymous }:
             Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">
     ) {
-        const result = await this.fetchInstructions({ agentId, prompt, userEmail });
+        const result = await this.fetchInstructions({ agentId, prompt, userEmail, isAnonymous });
 
         if (typeof result === "string") {
             return result
@@ -122,7 +122,7 @@ export class ChatsService {
         { chatId, prompt, agentId, userEmail, isAnonymous }:
             Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "chatId" | "isAnonymous">
     ) {
-        const result = await this.fetchInstructions({ agentId, prompt, userEmail });
+        const result = await this.fetchInstructions({ agentId, prompt, userEmail, isAnonymous });
 
         if (typeof result === "string") {
             return result
