@@ -69,9 +69,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const datasetsService = new DatasetsService(
         databaseService,
-        objectStorageService,
         datasetProcessingWorker,
-        sseService,
         instructionsService,
     );
 
