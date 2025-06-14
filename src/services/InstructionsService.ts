@@ -22,6 +22,10 @@ export class InstructionsService {
         return await this.vectorDatabaseService.search(datasetId, userEmail, params)
     }
 
+    async count(datasetId: string, userEmail: string) {
+        return await this.vectorDatabaseService.count(datasetId, userEmail)
+    }
+
     async update(instructions: UpdateInstructionInput[]) {
         const result = await this.vectorDatabaseService.update(instructions);
         return result.status === "completed";

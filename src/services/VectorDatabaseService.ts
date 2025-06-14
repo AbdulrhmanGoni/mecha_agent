@@ -109,6 +109,26 @@ export class VectorDatabaseService {
             } as Instruction
         })
     }
+
+    async count(datasetId: string, userEmail: string) {
+        const result = await this.dbClient.count(this.datasetsCollection, {
+            filter: {
+                must: [
+                    {
+                        key: "datasetId",
+                        match: {
+                            value: datasetId,
+                        },
+                    },
+                    {
+                        key: "userEmail",
+                        match: { value: userEmail },
+                    },
+                ]
+            },
+        })
+
+        return result.count
     }
 
     async update(instructions: UpdateInstructionInput[]) {
