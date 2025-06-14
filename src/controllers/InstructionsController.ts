@@ -23,6 +23,28 @@ export class InstructionsController {
         return c.json({ result: instructionsResponsesMessages.failedInsert }, 400);
     }
 
+    async query(c: Context<{ Variables: { userEmail: string } }, never, { out: { query: QueryInstructionParams } }>) {
+        const userEmail = c.get("userEmail");
+        const { page, pageSize, datasetId, searchText } = c.req.valid("query");
+
+        let result: Instruction[] = [];
+
+        if (searchText) {
+            result = await this.instructionsService.search(datasetId, userEmail, {
+                page,
+                pageSize,
+                searchText,
+            })
+        } else {
+            result = await this.instructionsService.list(datasetId, userEmail, {
+                page,
+                pageSize,
+            })
+        }
+
+        return c.json({ result });
+    }
+
     async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateInstructionInput[] } }>) {
         const instructions = c.req.valid("json");
 

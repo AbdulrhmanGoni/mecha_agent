@@ -3,8 +3,9 @@ import { InstructionsController } from "../controllers/InstructionsController.ts
 import insertInstructionsInputValidator from "../validation/instructions/insertInstructionsInputValidator.ts";
 import removeInstructionsInputValidator from "../validation/instructions/removeInstructionsInputValidator.ts";
 import updateInstructionsInputValidator from "../validation/instructions/updateInstructionsInputValidator.ts";
+import queryInstructionsParamsValidator from "../validation/instructions/queryInstructionsParamsValidator.ts";
 import { GuardService } from "../services/GuardService.ts";
-import { writePermission } from "../constant/permissions.ts";
+import { readPermission, writePermission } from "../constant/permissions.ts";
 
 export default function instructionsRoutesBuilder(
     instructionsController: InstructionsController,
@@ -12,8 +13,14 @@ export default function instructionsRoutesBuilder(
 ) {
     const instructionsRoutes = new Hono();
 
-    instructionsRoutes.use(guardService.guardRoute({ permissions: [writePermission] }),);
+    instructionsRoutes.get(
+        '/',
+        guardService.guardRoute({ permissions: [readPermission] }),
+        queryInstructionsParamsValidator,
+        instructionsController.query.bind(instructionsController),
+    );
 
+    instructionsRoutes.use(guardService.guardRoute({ permissions: [writePermission] }));
     instructionsRoutes.post(
         '/',
         insertInstructionsInputValidator,

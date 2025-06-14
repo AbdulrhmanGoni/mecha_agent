@@ -14,6 +14,14 @@ export class InstructionsService {
         return result.status === "completed"
     }
 
+    async list(datasetId: string, userEmail: string, params: ListInstructionParams) {
+        return await this.vectorDatabaseService.list(datasetId, userEmail, params)
+    }
+
+    async search(datasetId: string, userEmail: string, params: SearchInstructionParams) {
+        return await this.vectorDatabaseService.search(datasetId, userEmail, params)
+    }
+
     async update(instructions: UpdateInstructionInput[]) {
         const result = await this.vectorDatabaseService.update(instructions);
         return result.status === "completed";
