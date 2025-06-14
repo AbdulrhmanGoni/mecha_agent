@@ -25,6 +25,14 @@ type Instruction = {
 type NewInstructionInput = Pick<Instruction, "prompt" | "response">;
 
 
+type QueryInstructionParams = {
+    datasetId: string,
+    searchText: string,
+    page: number,
+    pageSize: number,
+}
+
+type SearchInstructionParams = Pick<QueryInstructionParams, "page" | "pageSize" | "searchText">
 
 type UpdateInstructionInput = WithOptionalFields<Pick<Instruction, "id" | "prompt" | "response">, "prompt" | "response">
 

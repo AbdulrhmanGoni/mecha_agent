@@ -35,10 +35,11 @@ export class ChatsService {
             return chatsResponsesMessages.noDataset
         }
 
-        const searchResult = await this.vectorDatabaseService.search({
-            text: prompt,
-            datasetId: agentRow.datasetId,
-            userEmail: agentRow.isPublished ? agentRow.userEmail : userEmail,
+        const searchResult = await this.vectorDatabaseService.search(agentRow.datasetId, userEmail, {
+            searchText: prompt,
+            page: 0,
+            pageSize: 15,
+            forLLM: true,
         });
 
         if (!searchResult.length) {

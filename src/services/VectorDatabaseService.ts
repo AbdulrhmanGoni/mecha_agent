@@ -119,11 +119,8 @@ export class VectorDatabaseService {
         )
     }
 
-    async search(
-        { text, datasetId, userEmail }:
-            { datasetId: string, userEmail: string, text: string }
-    ): Promise<Instruction[]> {
-        const textEmbedding = await this.embeddingService.embedText(text);
+    async search(datasetId: string, userEmail: string, params: SearchInstructionParams & { forLLM?: boolean }): Promise<Instruction[]> {
+        const textEmbedding = await this.embeddingService.embedText(params.searchText);
 
         const searchResult = await this.dbClient.search(
             this.datasetsCollection,
@@ -143,11 +140,22 @@ export class VectorDatabaseService {
                         },
                     ],
                 },
-                limit: 10
+                limit: params.pageSize,
+                offset: params.pageSize * params.page,
             }
         )
 
-        return searchResult.map(p => p.payload as Instruction)
+        if (params.forLLM) {
+            return searchResult.map(p => p.payload as Instruction)
+        }
+
+        return searchResult.map(point => ({
+            id: point.id,
+            prompt: point.payload!.prompt,
+            response: point.payload!.response,
+            createdAt: point.payload!.createdAt,
+            updatedAt: point.payload!.updatedAt,
+        }) as Instruction)
     }
 
     async remove(userEmail: string, instructionsIds: string[]) {
