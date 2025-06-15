@@ -277,4 +277,33 @@ export class AgentsService {
         await transaction.rollback()
         return false
     }
+
+    async publishAgent(agentId: string, userEmail: string) {
+        const { rows: [user] } = await this.databaseService.query<Pick<User, "publishedAgents" | "currentPlan"> | null>({
+            text: 'SELECT published_agents, current_plan FROM users WHERE email = $1',
+            camelCase: true,
+            args: [userEmail],
+        });
+
+        if (!user) {
+            return {
+                success: false,
+            }
+        }
+
+        const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
+
+        if (!(user.publishedAgents < plan.maxPublishedAgentsCount)) {
+            return {
+                success: false,
+                limitReached: true,
+            }
+        }
+
+        const result = await this.updateAgentPublishingState(agentId, userEmail, false)
+
+        return {
+            success: result,
+        }
+    }
 }

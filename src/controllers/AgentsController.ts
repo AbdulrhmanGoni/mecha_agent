@@ -44,12 +44,14 @@ export class AgentsController {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
 
-        const result = await this.agentsService.updateAgentPublishingState(agentId, userEmail, false);
+        const { success, limitReached } = await this.agentsService.publishAgent(agentId, userEmail);
 
-        if (result) {
+        if (success) {
             return c.json({ result: AgentsResponseMessages.successfulPublishAgent }, 200);
         } else {
-            return c.json({ error: AgentsResponseMessages.failedPublishAgent }, 400);
+            return c.json({
+                error: limitReached ? AgentsResponseMessages.agentsLimitReached : AgentsResponseMessages.failedPublishAgent
+            }, 400);
         }
     }
 
