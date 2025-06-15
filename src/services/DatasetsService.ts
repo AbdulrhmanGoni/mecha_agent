@@ -10,7 +10,10 @@ export class DatasetsService {
     }
 
     async create(userEmail: string, datasetInput: CreateDatasetInput) {
-        const { rows } = await this.databaseService.query<Dataset>({
+        const transaction = this.databaseService.createTransaction("create_dataset");
+        await transaction.begin();
+
+        const { rows } = await transaction.queryObject<Dataset>({
             text: 'INSERT INTO datasets (title, description, user_email) VALUES ($1, $2, $3) RETURNING *',
             args: [
                 datasetInput.title,
@@ -20,7 +23,20 @@ export class DatasetsService {
             camelCase: true
         });
 
-        return rows[0]
+        if (rows[0]) {
+            const updateUserResult = await transaction.queryObject({
+                text: 'UPDATE users SET datasets_count = datasets_count + 1 WHERE email = $1',
+                args: [userEmail],
+            });
+
+            if (updateUserResult.rowCount === 1) {
+                await transaction.commit();
+                return rows[0]
+            }
+        }
+
+        await transaction.rollback();
+        return null
     }
 
     async getOne(datasetId: string, userEmail: string): Promise<Dataset & { instructionsCount: number } | null> {
@@ -76,23 +92,32 @@ export class DatasetsService {
         return !!rowCount
     }
 
-    async delete(
-        { datasetId, userEmail }:
-            { userEmail: string, datasetId: string }
-    ) {
-        const { rowCount: datasetDeleted } = await this.databaseService.query({
+    async delete({ datasetId, userEmail }: { userEmail: string, datasetId: string }) {
+        const transaction = this.databaseService.createTransaction("delete_dataset");
+        await transaction.begin();
+
+        const { rowCount: datasetDeleted } = await transaction.queryObject({
             text: "DELETE FROM datasets WHERE id = $1 AND user_email = $2;",
             args: [datasetId, userEmail],
         })
 
         if (datasetDeleted) {
-            this.datasetProcessingWorker.postMessage({
-                process: "delete_dataset",
-                payload: { datasetId, userEmail }
+            const updateUserResult = await transaction.queryObject({
+                text: 'UPDATE users SET datasets_count = datasets_count - 1 WHERE email = $1',
+                args: [userEmail],
             });
-            return true
+
+            if (updateUserResult.rowCount === 1) {
+                await transaction.commit();
+                this.datasetProcessingWorker.postMessage({
+                    process: "delete_dataset",
+                    payload: { datasetId, userEmail }
+                });
+                return true
+            }
         }
 
+        await transaction.rollback();
         return false
     }
 }
