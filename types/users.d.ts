@@ -15,6 +15,7 @@ type User = SignUpUserInput & {
     agentsCount: number;
     apiKeysCount: number;
     publishedAgents: number;
+    datasetsCount: number;
     currentPlan: Plan["planName"];
     subscriptionId: string;
 }
