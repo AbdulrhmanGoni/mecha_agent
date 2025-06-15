@@ -66,6 +66,7 @@ export class UsersService {
                 users.api_keys_count, 
                 users.agents_count,
                 users.published_agents,
+                users.datasets_count,
                     CASE 
                         WHEN subscriptions.subscription_id IS NOT NULL THEN
                             json_build_object(
