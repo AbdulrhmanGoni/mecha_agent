@@ -1,4 +1,3 @@
-import { plans } from "../constant/plans.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { JwtService } from "./JwtService.ts";
 
@@ -12,21 +11,6 @@ export class ApiKeysService {
         const { keyName, ...restParams } = params
         const apiKeyId = crypto.randomUUID()
         const jwtKey = await this.jwtService.generateJwt(restParams, { apiKeyId });
-
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "apiKeysCount" | "currentPlan">>({
-            text: 'SELECT api_keys_count, current_plan FROM users WHERE email = $1',
-            camelCase: true,
-            args: [params.userEmail],
-        });
-
-        const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
-
-        if (!(user.apiKeysCount < plan.maxApiKeysCount)) {
-            return {
-                success: false,
-                limitReached: true,
-            }
-        }
 
         const transaction = this.databaseService.createTransaction("create_api_key");
         await transaction.begin();
@@ -56,18 +40,12 @@ export class ApiKeysService {
 
             if (updateUserResult.rowCount === 1) {
                 await transaction.commit();
-                return {
-                    success: true,
-                    result: result.rows[0]
-                }
+                return result.rows[0]
             }
         }
 
         await transaction.rollback();
-
-        return {
-            success: false,
-        }
+        return null
     }
 
     async getAll(userEmail: string) {

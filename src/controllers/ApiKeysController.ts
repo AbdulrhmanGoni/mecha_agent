@@ -9,7 +9,7 @@ export class ApiKeysController {
     async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: CreateApiKeyInput } }>) {
         const body = c.req.valid("json");
         const userEmail = c.get("userEmail");
-        const { success, limitReached, result } = await this.apiKeysService.create(
+        const result = await this.apiKeysService.create(
             {
                 keyName: body.keyName,
                 maxAgeInDays: body.maxAgeInDays,
@@ -18,13 +18,11 @@ export class ApiKeysController {
             }
         );
 
-        if (success) {
+        if (result) {
             return c.json({ result }, 201);
         }
 
-        throw new HTTPException(400, {
-            message: limitReached ? apiKeysResponseMessages.apiKeysLimitReached : apiKeysResponseMessages.failedKeyCreation
-        })
+        throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyCreation })
     }
 
     async getAll(c: Context<{ Variables: { userEmail: string } }>) {

@@ -8,16 +8,13 @@ export class AgentsController {
     async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: CreateAgentFormData } }>) {
         const formData = c.req.valid("form");
         const userEmail = c.get("userEmail");
-        const { success, limitReached } = await this.agentsService.create(userEmail, formData);
+        const result = await this.agentsService.create(userEmail, formData);
 
-        if (success) {
+        if (result) {
             return c.json({ result: AgentsResponseMessages.successfulAgentCreation }, 201);
         }
 
-        return c.json(
-            { error: limitReached ? AgentsResponseMessages.agentsLimitReached : AgentsResponseMessages.failedAgentCreation },
-            400
-        );
+        return c.json({ error: AgentsResponseMessages.failedAgentCreation }, 400);
     }
 
     async getOne(c: Context<{ Variables: { userEmail: string } }>) {

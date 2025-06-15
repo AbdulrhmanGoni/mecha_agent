@@ -22,27 +22,6 @@ export class AgentsService {
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "agentsCount" | "currentPlan"> | null>({
-            text: 'SELECT agents_count, current_plan FROM users WHERE email = $1',
-            camelCase: true,
-            args: [userEmail],
-        });
-
-        if (!user) {
-            return {
-                success: false,
-            }
-        }
-
-        const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
-
-        if (!(user.agentsCount < plan.maxAgentsCount)) {
-            return {
-                success: false,
-                limitReached: true,
-            }
-        }
-
         const { avatar, ...agentData } = newAgent
 
         let avatarId = null;
@@ -94,22 +73,16 @@ export class AgentsService {
                     );
                 } catch {
                     await transaction.rollback();
-                    return {
-                        success: false,
-                    }
+                    return false
                 }
             }
 
             await transaction.commit();
-            return {
-                success: true,
-            }
+            return true
         }
 
         await transaction.rollback().catch(() => null);
-        return {
-            success: false,
-        }
+        return false
     }
 
     async getOne(id: string, userEmail: string) {
