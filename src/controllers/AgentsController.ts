@@ -47,7 +47,7 @@ export class AgentsController {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
 
-        const result = await this.agentsService.updateAgentPublishingState(agentId, userEmail, true);
+        const result = await this.agentsService.updateAgentPublishingState(agentId, userEmail, false);
 
         if (result) {
             return c.json({ result: AgentsResponseMessages.successfulPublishAgent }, 200);
@@ -60,7 +60,7 @@ export class AgentsController {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
 
-        const result = await this.agentsService.updateAgentPublishingState(agentId, userEmail, false);
+        const result = await this.agentsService.updateAgentPublishingState(agentId, userEmail, true);
 
         if (result) {
             return c.json({ result: AgentsResponseMessages.successfulUnpublishAgent }, 200);
