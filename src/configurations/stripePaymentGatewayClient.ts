@@ -22,15 +22,16 @@ export class StripePaymentGatewayClient implements PaymentGatewayClientInterface
         }
     }
 
-    async createSubscriptionSession(userEmail: string, priceId: string) {
+    async createSubscriptionSession(userEmail: string, plan: Plan) {
         try {
             const session = await this.stripe.checkout.sessions.create({
                 mode: "subscription",
                 payment_method_types: ["card"],
                 customer_email: userEmail,
+                subscription_data: { metadata: { plan: plan.planName } },
                 line_items: [
                     {
-                        price: priceId,
+                        price: plan.priceId,
                         quantity: 1,
                     },
                 ],

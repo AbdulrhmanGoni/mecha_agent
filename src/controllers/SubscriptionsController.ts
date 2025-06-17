@@ -89,8 +89,24 @@ export class SubscriptionsController {
                     const subscriptionId = event.data.object.lines.data[0]?.parent?.subscription_item_details?.subscription
                     const customerId = event.data.object.customer
                     const userEmail = event.data.object.customer_email
-                    if (userEmail && customerId && subscriptionId) {
-                        await this.subscriptionsService.createSubscription(userEmail, customerId.toString(), subscriptionId)
+                    const plan = event.data.object.lines.data[0].metadata.plan
+
+                    if (userEmail && customerId && subscriptionId && plan) {
+                        await this.subscriptionsService.createSubscription({
+                            userEmail,
+                            customerId: customerId.toString(),
+                            subscriptionId,
+                            plan: plan as Plan["planName"],
+                        })
+                    } else {
+                        throw new Error(
+                            "Stripe event missing required fields:\n" +
+                            `Event id: "${event.id}"\n` +
+                            `User email: "${userEmail}"\n` +
+                            `Customer id: "${customerId}"\n` +
+                            `Subscription id: "${subscriptionId}"\n` +
+                            `Plan: "${plan}"`
+                        );
                     }
                     break;
                 }

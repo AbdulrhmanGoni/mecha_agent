@@ -23,7 +23,7 @@ export class SubscriptionsService {
 
         const session = await this.paymentGatewayClientInterface.createSubscriptionSession(
             userEmail,
-            plan.priceId
+            plan,
         )
 
         return {
@@ -36,7 +36,10 @@ export class SubscriptionsService {
         return await this.paymentGatewayClientInterface.verifyCheckoutSessionExistence(sessionId);
     }
 
-    async createSubscription(userEmail: string, customerId: string, subscriptionId: string) {
+    async createSubscription(
+        { userEmail, customerId, subscriptionId, plan }:
+            { userEmail: string, customerId: string, subscriptionId: string, plan: Plan["planName"] }
+    ) {
         const session = this.databaseService.createTransaction("subscription_creation");
         await session.begin();
 
@@ -45,19 +48,20 @@ export class SubscriptionsService {
                 INSERT INTO subscriptions(customer_id, subscription_id, user_email, plan) 
                 VALUES($1, $2, $3, $4)
             `,
-            args: [customerId, subscriptionId, userEmail, "Pro"],
+            args: [customerId, subscriptionId, userEmail, plan],
         });
 
         if (rowCount) {
             const { rowCount } = await session.queryObject({
                 text: 'UPDATE users SET subscription_id = $2, current_plan = $3 WHERE email = $1',
-                args: [userEmail, subscriptionId, "Pro"],
+                args: [userEmail, subscriptionId, plan],
             });
 
             if (rowCount) {
                 await session.commit()
-                await this.kvStoreClient.delete(["inferences", userEmail, "Free"]);
-
+                for await (const record of this.kvStoreClient.list({ prefix: ["inferences", userEmail] })) {
+                    await this.kvStoreClient.delete(record.key);
+                }
                 return true
             }
         }
