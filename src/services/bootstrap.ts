@@ -65,7 +65,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         { type: "module" }
     );
 
-    const agentsService = new AgentsService(databaseService, objectStorageService, datasetProcessingWorker);
+    const agentsService = new AgentsService(databaseService, objectStorageService);
 
     const datasetsService = new DatasetsService(
         databaseService,

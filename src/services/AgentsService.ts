@@ -18,7 +18,6 @@ export class AgentsService {
     constructor(
         private databaseService: DatabaseService,
         private objectStorageService: ObjectStorageService,
-        private datasetProcessingWorker: Worker,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
@@ -148,13 +147,6 @@ export class AgentsService {
         if (updateUserResult.rowCount !== 1) {
             await transaction.rollback();
             return false
-        }
-
-        if (agent.datasetId) {
-            this.datasetProcessingWorker.postMessage({
-                process: "delete_dataset",
-                payload: { userEmail, datasetId: agent.datasetId }
-            });
         }
 
         if (agent.avatar) {
