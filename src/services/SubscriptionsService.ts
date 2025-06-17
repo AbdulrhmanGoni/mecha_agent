@@ -116,8 +116,8 @@ export class SubscriptionsService {
         const session = this.databaseService.createTransaction("subscription_deletion");
         await session.begin();
 
-        const { rows: [subscription] } = await session.queryObject<{ userEmail: string }>({
-            text: 'SELECT user_email FROM subscriptions WHERE customer_id = $1',
+        const { rows: [subscription] } = await session.queryObject<Pick<Subscription, "userEmail" | "plan">>({
+            text: 'SELECT user_email, plan FROM subscriptions WHERE customer_id = $1',
             args: [customerId],
             camelCase: true,
         });
@@ -127,11 +127,24 @@ export class SubscriptionsService {
             return false
         }
 
+        const publishedAgentsEdit = "published_agents = CASE WHEN published_agents > 0 THEN 1 ELSE 0 END"
         const { rowCount: deletedUsers } = await session.queryObject({
-            text: 'UPDATE users SET subscription_id = $2, current_plan = $3 WHERE email = $1',
+            text: `UPDATE users SET subscription_id = $2, current_plan = $3, ${publishedAgentsEdit} WHERE email = $1`,
             args: [subscription.userEmail, null, "Free"],
         });
         if (!deletedUsers) {
+            await session.rollback()
+            return false
+        }
+
+        const { rowCount } = await session.queryObject({
+            text: `
+            UPDATE agents SET is_published = false WHERE user_email = $1 AND id NOT IN
+            (SELECT id from agents WHERE user_email = $1 AND is_published = true ORDER BY created_at LIMIT 1)
+            `,
+            args: [subscription.userEmail],
+        });
+        if (!rowCount) {
             await session.rollback()
             return false
         }
@@ -145,7 +158,7 @@ export class SubscriptionsService {
             return false
         }
 
-        await this.kvStoreClient.delete(["inferences", subscription.userEmail, "Pro"]);
+        await this.kvStoreClient.delete(["inferences", subscription.userEmail, subscription.plan]);
         await session.commit();
         return true;
     }
