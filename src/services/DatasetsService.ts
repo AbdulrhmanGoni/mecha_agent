@@ -4,7 +4,6 @@ import { InstructionsService } from "./InstructionsService.ts";
 export class DatasetsService {
     constructor(
         private readonly databaseService: DatabaseService,
-        private readonly datasetProcessingWorker: Worker,
         private readonly instructionsService: InstructionsService,
     ) {
     }
@@ -109,10 +108,6 @@ export class DatasetsService {
 
             if (updateUserResult.rowCount === 1) {
                 await transaction.commit();
-                this.datasetProcessingWorker.postMessage({
-                    process: "delete_dataset",
-                    payload: { datasetId, userEmail }
-                });
                 return true
             }
         }

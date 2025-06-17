@@ -60,16 +60,10 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const sseService = new SSEService();
 
-    const datasetProcessingWorker = new Worker(
-        import.meta.resolve("./DatasetProcessingWorker.ts"),
-        { type: "module" }
-    );
-
     const agentsService = new AgentsService(databaseService, objectStorageService);
 
     const datasetsService = new DatasetsService(
         databaseService,
-        datasetProcessingWorker,
         instructionsService,
     );
 
