@@ -22,3 +22,13 @@ type ObjectReadable = import("node:stream").Readable & { headers?: Record<string
 type SSEEvent = "dataset-status";
 
 type SSESubscriber = Record<string, { subscriberChannel: ReadableStreamDefaultController, subscriberId: string }>
+
+type BackgroundTaskMessage =
+    { task: "delete-expired-anonymous-chats" }
+    |
+    { task: "reset-users-inferences-rate-limits" }
+    |
+    {
+        task: "delete_dataset_instructions";
+        payload: { userEmail: string, datasetId: string }
+    }

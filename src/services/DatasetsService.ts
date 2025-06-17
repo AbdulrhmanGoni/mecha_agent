@@ -5,6 +5,7 @@ export class DatasetsService {
     constructor(
         private readonly databaseService: DatabaseService,
         private readonly instructionsService: InstructionsService,
+        private readonly kvClient: Deno.Kv,
     ) {
     }
 
@@ -108,6 +109,13 @@ export class DatasetsService {
 
             if (updateUserResult.rowCount === 1) {
                 await transaction.commit();
+                await this.kvClient.enqueue(
+                    {
+                        task: "delete_dataset_instructions",
+                        payload: { datasetId, userEmail },
+                    },
+                    { keysIfUndelivered: [["delete_dataset_instructions", datasetId]] }
+                )
                 return true
             }
         }

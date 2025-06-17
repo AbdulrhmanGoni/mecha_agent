@@ -2,19 +2,12 @@ import { Context, Next } from "hono";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import { plans } from "../constant/plans.ts";
-import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 
 export class InferencesMiddleware {
     constructor(
         private kvStoreClient: Deno.Kv,
         private databaseClient: PostgresClient,
-    ) {
-        this.kvStoreClient.listenQueue((msg) => {
-            if (msg.task === "reset-users-inferences-rate-limits") {
-                this.resetUsersInferencesRateLimits()
-            }
-        });
-    }
+    ) { }
 
     async trackInferences(c: Context<{ Variables: { userEmail: string, apiKeyId: string } }, never, never>, next: Next) {
         const userEmail = c.get("userEmail");
@@ -53,26 +46,4 @@ export class InferencesMiddleware {
                 .commit();
         }
     };
-
-    async resetUsersInferencesRateLimits() {
-        for await (const record of this.kvStoreClient.list<bigint>({ prefix: ["inferences"] })) {
-            this.setLastWeekInferencesRecording(record.key[1] as string, record.value)
-            await this.kvStoreClient.set(record.key, new Deno.KvU64(0n))
-        }
-    }
-
-    private async setLastWeekInferencesRecording(userEmail: string, todayValue: bigint) {
-        const record = await this.kvStoreClient.get<number[]>(["last-week-inferences", userEmail])
-        if (record.value) {
-            record.value.pop()
-            record.value.unshift(Number(todayValue))
-            await this.kvStoreClient.set(["last-week-inferences", userEmail], record.value)
-        } else {
-            await this.kvStoreClient.set(["last-week-inferences", userEmail], [Number(todayValue), 0, 0, 0, 0, 0, 0])
-        }
-    }
 }
-
-Deno.cron("Reset users inferences rate limits", "0 0 * * *", () => {
-    kvStoreClient.enqueue({ task: "reset-users-inferences-rate-limits" });
-});
