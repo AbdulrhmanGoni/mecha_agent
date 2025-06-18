@@ -3,11 +3,15 @@ export class MockPaymentGatewayClient implements PaymentGatewayClientInterface {
 
     }
 
-    async cancelSubscription(_userEmail: string) {
+    async deactivateSubscription(_userEmail: string) {
         return true
     }
 
-    async createSubscriptionSession(_userEmail: string, _priceId: string) {
+    async activateSubscription(_subscriptionId: string): Promise<boolean> {
+        return true
+    }
+
+    async createSubscriptionSession(_userEmail: string, _plan: Plan) {
         return {
             url: "http://localhost/checkout",
         }

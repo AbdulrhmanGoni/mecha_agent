@@ -55,7 +55,7 @@ export class StripePaymentGatewayClient implements PaymentGatewayClientInterface
         return updatedSubscription.cancel_at_period_end === value
     }
 
-    async cancelSubscription(subscriptionId: string) {
+    async deactivateSubscription(subscriptionId: string) {
         return await this.updateSubscriptionCancelationAtEnd(subscriptionId, true)
     }
 

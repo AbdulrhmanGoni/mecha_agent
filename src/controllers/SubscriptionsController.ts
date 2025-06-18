@@ -56,12 +56,12 @@ export class SubscriptionsController {
         return c.json({ result: isSessionExisting });
     }
 
-    async cancelSubscription(c: Context<{ Variables: { userEmail: string } }>) {
+    async deactivateSubscription(c: Context<{ Variables: { userEmail: string } }>) {
         const userEmail = c.get("userEmail");
 
-        const result = await this.subscriptionsService.cancelSubscription(userEmail);
+        const result = await this.subscriptionsService.deactivateSubscription(userEmail);
         if (result) {
-            return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionCancelation });
+            return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionDeactivation });
         } else {
             return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
         }

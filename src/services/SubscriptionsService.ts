@@ -70,19 +70,19 @@ export class SubscriptionsService {
         return false
     }
 
-    async cancelSubscription(userEmail: string) {
-        const session = this.databaseService.createTransaction("subscription_cancelation");
+    async deactivateSubscription(userEmail: string) {
+        const session = this.databaseService.createTransaction("subscription_deactivation");
         await session.begin();
 
         const { rows: [user] } = await session.queryObject<Pick<User, "subscriptionId"> | undefined>({
-            text: "UPDATE subscriptions SET status = 'canceled' WHERE user_email = $1 RETURNING subscription_id;",
+            text: "UPDATE subscriptions SET status = 'inactive' WHERE user_email = $1 RETURNING subscription_id;",
             args: [userEmail],
             camelCase: true,
         })
 
         if (user?.subscriptionId) {
-            const subscriptionCanceled = await this.paymentGatewayClientInterface.cancelSubscription(user.subscriptionId);
-            if (subscriptionCanceled) {
+            const subscriptionDeactivated = await this.paymentGatewayClientInterface.deactivateSubscription(user.subscriptionId);
+            if (subscriptionDeactivated) {
                 session.commit();
                 return true
             } else {
@@ -104,8 +104,8 @@ export class SubscriptionsService {
         })
 
         if (user?.subscriptionId) {
-            const subscriptionCanceled = await this.paymentGatewayClientInterface.activateSubscription(user.subscriptionId);
-            if (subscriptionCanceled) {
+            const subscriptionActivated = await this.paymentGatewayClientInterface.activateSubscription(user.subscriptionId);
+            if (subscriptionActivated) {
                 session.commit();
                 return true
             } else {
