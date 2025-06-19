@@ -94,7 +94,7 @@ export class UsersService {
                     current: Number(userInferences.value || 0),
                     max: plans.find((p) => p.planName === rows[0].currentPlan)?.maxInferencesPerDay
                 },
-                lastWeekInferences: lastWeekInferences.value
+                lastWeekInferences: lastWeekInferences.value || []
             }
         }
 
