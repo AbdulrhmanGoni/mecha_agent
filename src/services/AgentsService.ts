@@ -116,8 +116,8 @@ export class AgentsService {
     }
 
     async delete(agentId: string, userEmail: string) {
-        const { rows: [agent] } = await this.databaseService.query<Pick<Agent, "avatar" | "datasetId"> | null>({
-            text: "SELECT avatar, dataset_id FROM agents WHERE id = $1 AND user_email = $2;",
+        const { rows: [agent] } = await this.databaseService.query<Pick<Agent, "avatar" | "datasetId" | "isPublished"> | null>({
+            text: "SELECT avatar, dataset_id, is_published FROM agents WHERE id = $1 AND user_email = $2;",
             args: [agentId, userEmail],
             camelCase: true,
         })
@@ -140,8 +140,11 @@ export class AgentsService {
         }
 
         const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
-            text: 'UPDATE users SET agents_count = agents_count - 1 WHERE email = $1',
-            args: [userEmail],
+            text: `
+            UPDATE users SET agents_count = agents_count - 1, published_agents = published_agents - $2 
+            WHERE email = $1
+            `,
+            args: [userEmail, agent.isPublished ? 1 : 0],
         });
 
         if (updateUserResult.rowCount !== 1) {
