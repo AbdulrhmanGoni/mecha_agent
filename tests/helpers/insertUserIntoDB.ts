@@ -1,8 +1,8 @@
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import { hash } from "argon2";
+import { PasswordHasher } from "../../src/helpers/passwordHasher.ts";
 
 export default async function insertUserIntoDB({ db, user }: { db: PostgresClient, user: SignUpUserInput }) {
-    const hashedPassword = await hash(user.password);
+    const hashedPassword = await PasswordHasher.hash(user.password);
 
     return db.queryObject({
         text: `

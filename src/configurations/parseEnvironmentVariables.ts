@@ -40,7 +40,6 @@ const envSchema = z.object({
     MODEL_NAME: z.string().default("qwen2.5:3b-instruct"),
     EMBEDDING_MODEL_NAME: z.string().default("all-minilm:l6-v2"),
 
-    HASH_PASSWORDS_SECRET: z.string(),
     JWT_SECRET_KEY: z.string(),
 
     STRIPE_SECRET_KEY: z.string().optional(),

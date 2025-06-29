@@ -14,7 +14,6 @@
     "sentry": "npm:@sentry/deno@^9.29.0",
     "@std/assert": "jsr:@std/assert@1",
     "deno.land/x/postgres": "https://deno.land/x/postgres@v0.19.3/mod.ts",
-    "argon2": "jsr:@felix/argon2",
     "djwt": "https://deno.land/x/djwt@v3.0.2/mod.ts",
     "djwt/util": "https://deno.land/x/djwt@v3.0.2/util.ts",
     "@std/testing/bdd": "jsr:@std/testing/bdd",

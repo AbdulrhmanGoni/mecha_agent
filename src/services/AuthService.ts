@@ -1,6 +1,5 @@
-import { verify } from "argon2";
 import { UsersService } from "./UsersService.ts";
-import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import { PasswordHasher } from "../helpers/passwordHasher.ts";
 
 export class AuthService {
     constructor(
@@ -34,10 +33,9 @@ export class AuthService {
                 }
             }
 
-            const isMatched = await verify(
+            const isMatched = await PasswordHasher.verify(
                 userInput.password,
                 user.password,
-                Uint8Array.from(parsedEnvVariables.HASH_PASSWORDS_SECRET)
             );
 
             if (isMatched) {

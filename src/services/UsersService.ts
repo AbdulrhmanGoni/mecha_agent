@@ -1,9 +1,8 @@
-import { hash } from "argon2";
 import { DatabaseService } from "./DatabaseService.ts";
+import { PasswordHasher } from "../helpers/passwordHasher.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
 import { plans } from "../constant/plans.ts";
-import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 const userRowFieldsNamesMap: Record<string, string> = {
     lastSignIn: "last_sign_in",
@@ -17,10 +16,7 @@ export class UsersService {
     ) { }
 
     async create(userInput: SignUpUserInput) {
-        const hashedPassword = await hash(
-            userInput.password,
-            { secret: Uint8Array.from(parsedEnvVariables.HASH_PASSWORDS_SECRET) }
-        );
+        const hashedPassword = await PasswordHasher.hash(userInput.password);
 
         const { rows } = await this.databaseService.query<Pick<User, "avatar" | "email"> & { name: string }>({
             text: `
