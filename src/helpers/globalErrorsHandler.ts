@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export default async (err: Error | HTTPResponseError, c: Context) => {
-    if (parsedEnvVariables.DENO_ENV !== "production") {
+    if (parsedEnvVariables.ENVIRONMENT !== "production") {
         console.log(err)
     }
 

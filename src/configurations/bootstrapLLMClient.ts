@@ -7,7 +7,7 @@ import { GoogleLLMClient } from "./googleLLMClient.ts";
 export async function bootstrapLLMClient() {
     let llmClient: LLMClientInterface;
 
-    switch (parsedEnvVariables.DENO_ENV) {
+    switch (parsedEnvVariables.ENVIRONMENT) {
         case "production": {
             if (!parsedEnvVariables.GEMINI_API_KEY) {
                 throw new Error("'GEMINI_API_KEY' environment variable is missing");
@@ -31,7 +31,7 @@ export async function bootstrapLLMClient() {
         }
 
         default:
-            throw new Error("'DENO_ENV' environment variable should be neither 'testing', 'development' nor 'production'");
+            throw new Error("'ENVIRONMENT' environment variable should be neither 'testing', 'development' nor 'production'");
     }
 
     return llmClient

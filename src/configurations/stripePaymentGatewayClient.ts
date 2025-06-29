@@ -3,7 +3,7 @@ import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 
 export class StripePaymentGatewayClient implements PaymentGatewayClientInterface {
     constructor(private stripe: Stripe) {
-        if (parsedEnvVariables.DENO_ENV !== "testing") {
+        if (parsedEnvVariables.ENVIRONMENT !== "testing") {
             if (!parsedEnvVariables.PRO_SUBSCRIPTION_PRICE_ID) {
                 throw new Error("'PRO_SUBSCRIPTION_PRICE_ID' environment variable is missing");
             }

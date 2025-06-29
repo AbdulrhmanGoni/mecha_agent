@@ -7,7 +7,7 @@ import { OllamaEmbeddingClient } from "./ollamaEmbeddingsClient.ts";
 export async function bootstrapEmbeddingClient() {
     let embeddingClient: EmbeddingClientInterface;
 
-    switch (parsedEnvVariables.DENO_ENV) {
+    switch (parsedEnvVariables.ENVIRONMENT) {
         case "production": {
             if (!parsedEnvVariables.GEMINI_API_KEY) {
                 throw new Error("'GEMINI_API_KEY' environment variable is missing");
@@ -31,7 +31,7 @@ export async function bootstrapEmbeddingClient() {
         }
 
         default:
-            throw new Error("'DENO_ENV' environment variable should be neither 'testing', 'development' nor 'production'");
+            throw new Error("'ENVIRONMENT' environment variable should be neither 'testing', 'development' nor 'production'");
     }
 
     return embeddingClient

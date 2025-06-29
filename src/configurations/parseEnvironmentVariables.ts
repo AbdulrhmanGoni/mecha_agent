@@ -12,7 +12,7 @@ function parseEnvironmentVariables<
 };
 
 const envSchema = z.object({
-    DENO_ENV: z.enum(["testing", "production", "development"]),
+    ENVIRONMENT: z.enum(["testing", "production", "development"]),
 
     GEMINI_API_KEY: z.string().optional(),
 
@@ -47,6 +47,8 @@ const envSchema = z.object({
     PRO_SUBSCRIPTION_PRICE_ID: z.string().optional(),
     SUCCESSFUL_SUBSCRIPTION_REDIRECT_URL: z.string().optional(),
     CANCEL_SUBSCRIPTION_REDIRECT_URL: z.string().optional(),
+
+    SENTRY_DSN: z.string().optional(),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);

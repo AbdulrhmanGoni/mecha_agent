@@ -5,7 +5,7 @@ import Stripe from "stripe";
 export async function bootstrapPaymentGatewayClient() {
     let paymentGatewayClient: PaymentGatewayClientInterface;
 
-    if (parsedEnvVariables.DENO_ENV === "testing") {
+    if (parsedEnvVariables.ENVIRONMENT === "testing") {
         const { MockPaymentGatewayClient } = await import("../../tests/mock/configs/MockPaymentGatewayClient.ts")
         paymentGatewayClient = new MockPaymentGatewayClient();
     } else {
