@@ -1,12 +1,12 @@
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
-import { MockPaymentGatewayClient } from "../../tests/mock/configs/MockPaymentGatewayClient.ts";
 import { StripePaymentGatewayClient } from "./stripePaymentGatewayClient.ts";
 import Stripe from "stripe";
 
-export function bootstrapPaymentGatewayClient() {
+export async function bootstrapPaymentGatewayClient() {
     let paymentGatewayClient: PaymentGatewayClientInterface;
 
     if (parsedEnvVariables.DENO_ENV === "testing") {
+        const { MockPaymentGatewayClient } = await import("../../tests/mock/configs/MockPaymentGatewayClient.ts")
         paymentGatewayClient = new MockPaymentGatewayClient();
     } else {
         if (!parsedEnvVariables.STRIPE_SECRET_KEY) {

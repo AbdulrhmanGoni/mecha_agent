@@ -2,10 +2,9 @@ import { Ollama as OllamaClient } from "ollama";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { OllamaLLMClient } from "./ollamaLLMClient.ts";
 import { GoogleGenAI } from "@google/genai";
-import { MockLLMClient } from "../../tests/mock/configs/mockLLMClient.ts";
 import { GoogleLLMClient } from "./googleLLMClient.ts";
 
-export function bootstrapLLMClient() {
+export async function bootstrapLLMClient() {
     let llmClient: LLMClientInterface;
 
     switch (parsedEnvVariables.DENO_ENV) {
@@ -26,6 +25,7 @@ export function bootstrapLLMClient() {
         }
 
         case "testing": {
+            const { MockLLMClient } = await import("../../tests/mock/configs/mockLLMClient.ts")
             llmClient = new MockLLMClient();
             break;
         }

@@ -2,10 +2,9 @@ import { Ollama as OllamaClient } from "ollama";
 import { GoogleGenAI } from "@google/genai";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { GoogleEmbeddingClient } from "./googleEmbeddingsClient.ts";
-import { MockEmbeddingClient } from "../../tests/mock/configs/mockEmbeddingClient.ts";
 import { OllamaEmbeddingClient } from "./ollamaEmbeddingsClient.ts";
 
-export function bootstrapEmbeddingClient() {
+export async function bootstrapEmbeddingClient() {
     let embeddingClient: EmbeddingClientInterface;
 
     switch (parsedEnvVariables.DENO_ENV) {
@@ -26,6 +25,7 @@ export function bootstrapEmbeddingClient() {
         }
 
         case "testing": {
+            const { MockEmbeddingClient } = await import("../../tests/mock/configs/mockEmbeddingClient.ts")
             embeddingClient = new MockEmbeddingClient();
             break;
         }

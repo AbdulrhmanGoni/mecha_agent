@@ -8,8 +8,8 @@ import { kvStoreClient } from "./denoKvStoreClient.ts";
 import { bootstrapPaymentGatewayClient } from "./bootstrapPaymentGatewayClient.ts";
 
 export async function bootstrapConfigurations() {
-    const llmClient = bootstrapLLMClient()
-    const embeddingClient = bootstrapEmbeddingClient()
+    const llmClient = await bootstrapLLMClient()
+    const embeddingClient = await bootstrapEmbeddingClient()
 
     const minioClient = new MinioClient({
         endPoint: parsedEnvVariables.OBJECT_STORAGE_DB_HOST,
@@ -33,7 +33,7 @@ export async function bootstrapConfigurations() {
         database: parsedEnvVariables.DB_NAME,
     });
 
-    const paymentGatewayClientInterface = bootstrapPaymentGatewayClient();
+    const paymentGatewayClientInterface = await bootstrapPaymentGatewayClient();
 
     await databaseClient.connect();
 
