@@ -5,10 +5,7 @@ function parseEnvironmentVariables<
 >(schema: T): z.infer<typeof schema> {
     const vars: Record<string, string | undefined> = {};
     for (const key in schema._def.shape()) {
-        const permissionRequest = Deno.permissions.requestSync({ name: "env", variable: key })
-        if (permissionRequest.state === "granted") {
-            vars[key] = Deno.env.get(key);
-        }
+        vars[key] = Deno.env.get(key);
     }
 
     return schema.parse(vars);
