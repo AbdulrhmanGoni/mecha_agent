@@ -1,8 +1,8 @@
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import { hashSync } from "deno.land/x/bcrypt";
+import { hash } from "argon2";
 
-export default function insertUserIntoDB({ db, user }: { db: PostgresClient, user: SignUpUserInput }) {
-    const hashedPassword = hashSync(user.password);
+export default async function insertUserIntoDB({ db, user }: { db: PostgresClient, user: SignUpUserInput }) {
+    const hashedPassword = await hash(user.password);
 
     return db.queryObject({
         text: `

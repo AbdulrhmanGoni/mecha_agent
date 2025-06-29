@@ -6,7 +6,7 @@ services:
     container_name: dev_server_container
     ports:
       - 10000:10000
-    command: deno run -N -E -R -W --watch --unstable-kv --unstable-cron src/server.ts
+    command: deno run -N -E -R -W --allow-ffi --watch --unstable-kv --unstable-cron src/server.ts
     image: mecha_agent_server:dev
     volumes:
       - ../src:/assistant-server/src:ro
@@ -98,6 +98,17 @@ services:
     depends_on:
       - dev_prometheus
 
+  dev-stripe-cli:
+    image: stripe/stripe-cli:latest
+    container_name: dev_stripe_cli_container
+    command: listen -e "customer.subscription.deleted,invoice.payment_succeeded,invoice.payment_failed" -f dev_server:10000/api/subscriptions/webhook
+    volumes:
+      - dev_stripe_config:/root/.config/stripe
+    networks:
+      - development-network
+    depends_on:
+      - dev_server
+
 networks:
   development-network:
     driver: bridge
@@ -110,3 +121,4 @@ volumes:
   dev_kv_data:
   dev_prometheus_data:
   dev_grafana_data:
+  dev_stripe_config:
