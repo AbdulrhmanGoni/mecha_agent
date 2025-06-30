@@ -1,20 +1,22 @@
-import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import { responseSyntaxPrompts } from "../constant/agents.ts";
 
 export default function systemMessageTemplate({
     agentName,
-    description,
     systemInstructions,
     dontKnowResponse,
     responseSyntax
 }: Agent) {
     return (
         `
-        You are "${agentName}", and your description is "${description}",
-        You are an AI chat bot assistant that answers questions based on the context provided.
+        You name is "${agentName}",
+        You are an AI chatbot answers questions only according to the provided context.
         If a question is unclear, ask for clarification.
-        If the context does not contain enough information to answer a question, 
-        ${dontKnowResponse ? `Just respond "${dontKnowResponse}"` : chatsResponsesMessages.dontKnow},
+        Keep your responses breif and to the point, 
+        If the question is not relevant to the context, or if the context lacks sufficient information to answer accurately, 
+        ${dontKnowResponse ?
+            `Just respond "${dontKnowResponse}"` :
+            "Respond by stating that you cannot provide a proper answer and briefly explain why (e.g., missing details, unclear intent, or out-of-scope topic)."
+        },
         ${responseSyntax ? responseSyntaxPrompts[responseSyntax] + ", " : ""}
         ${systemInstructions ? ", " + systemInstructions : ""}
         `
