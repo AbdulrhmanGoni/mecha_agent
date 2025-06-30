@@ -28,6 +28,10 @@ export class InferencesMiddleware {
 
         await next();
 
+        if (c.res.status > 299 && c.res.status < 200) {
+            return
+        }
+
         if (inferences) {
             await this.kvStoreClient
                 .atomic()
