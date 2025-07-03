@@ -1,20 +1,15 @@
-# Mecha Agent
+# Mecha Agent (Web Server)
 
-Mecha Agent is a RAG Application allows users to create AI agents answer
-questions based on given datasets by the users
+This is the server side of **Mecha Agent** platform where users create their own
+AI agent chatbots, Give them custom instructions and knowledge as dataset, And
+publish them for the world to interact and chat with.
 
-## Features ✨
+## Documentation
 
-- Creating multiple AI agents :robot:.
-- Giving each agent system instructions to customize its attitude :memo:.
-- Upload a dataset for an agent so it answers questions based on the dataset
-  :file_folder:.
-- Chatting with agents locally to test it :speech_balloon:.
-- Saving chats histories :bookmark:.
-- Publishing agents to the public so people can chat with them :earth_africa:.
-- Creating and Managing API Keys to access the system from outside :key:.
+Go to the
+[**documentation site**](https:abdulrhmangoni.github.io/mecha_agent_docs) of
+**Mecha Agent** platform for more info
 
-## Get Started
 
 ### Prerequisites :gear:
 
