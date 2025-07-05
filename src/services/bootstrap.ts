@@ -19,6 +19,7 @@ import { UsersService } from "./UsersService.ts";
 import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 import { BackgroundTasksService } from "./BackgroundTasksService.ts";
+import { MailsSenderService } from "./MailsSenderService.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -55,7 +56,9 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const apiKeysService = new ApiKeysService(databaseService, jwtService);
 
-    const authService = new AuthService(usersService);
+    const mailsSenderService = new MailsSenderService();
+
+    const authService = new AuthService(usersService, mailsSenderService);
 
     const guardService = new GuardService(jwtService, databaseService);
 
@@ -93,5 +96,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         datasetsService,
         sseService,
         subscriptionsService,
+        mailsSenderService,
     }
 };
