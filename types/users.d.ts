@@ -24,3 +24,11 @@ type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {
     newAvatar: File;
     removeAvatar: boolean;
 }>
+
+type verifyEmailResponseInput = {
+    email: User["email"];
+    otp: string;
+    signature: string;
+}
+
+type verifyEmailRequestInput = Pick<verifyEmailResponseInput, "email">
