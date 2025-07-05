@@ -2,3 +2,4 @@ deno.lock
 .env**
 !.env.example
 .vscode
+**/html-mails-templates/*.min.txt

@@ -29,11 +29,17 @@ jobs:
           node-version: lts/*
 
       - name: Install step
-        run: "deno install -e src/server.ts"
+        run: deno install -e src/server.ts
+
+      - name: Prepare environment variables fo the next bundler
+        run: echo "CLIENT_URL=${{ vars.CLIENT_URL }}" >> .env
+
+      - name: Bundle HTML mails templates
+        run: deno task bundle-html-mails-templates:prod
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "mecha-agent"
           entrypoint: "src/server.ts"
-          exclude: docker,scripts,tests
+          exclude: docker,scripts,tests,html-mails-templates
