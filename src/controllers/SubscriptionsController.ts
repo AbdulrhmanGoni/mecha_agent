@@ -63,7 +63,7 @@ export class SubscriptionsController {
         if (result) {
             return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionDeactivation });
         } else {
-            return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
+            throw new HTTPException(400, { message: subscriptionsResponsesMessages.subscriptionDeactivationFailed })
         }
     }
 
@@ -74,7 +74,7 @@ export class SubscriptionsController {
         if (result) {
             return c.json({ result: subscriptionsResponsesMessages.successfulSubscriptionActivation });
         } else {
-            return c.json({ error: subscriptionsResponsesMessages.notSubscribed }, 400);
+            throw new HTTPException(400, { message: subscriptionsResponsesMessages.subscriptionDeactivationFailed })
         }
     }
 
