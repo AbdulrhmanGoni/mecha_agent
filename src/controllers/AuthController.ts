@@ -1,6 +1,5 @@
 import { Context } from "hono";
 import { AuthService } from "../services/AuthService.ts";
-import { HTTPException } from "hono/http-exception";
 import authResponsesMessages from "../constant/response-messages/authResponsesMessages.ts";
 
 export class AuthController {
@@ -22,10 +21,14 @@ export class AuthController {
         }
 
         if (result.existingWithSameSigingMethod) {
-            throw new HTTPException(401, { message: authResponsesMessages.userAlreadyExisting });
+            return c.json({ error: authResponsesMessages.userAlreadyExisting }, 400)
         }
 
-        throw new HTTPException(401, { message: authResponsesMessages.userSignedInWithAnotherMethod });
+        if (result.notVerifiedEmail) {
+            return c.json({ error: authResponsesMessages.notVerifiedEmail }, 400)
+        }
+
+        return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 400)
     }
 
     async signInUser(c: Context<never, never, { out: { json: SignInUserInput } }>) {
@@ -37,14 +40,14 @@ export class AuthController {
         }
 
         if (result.wrongSigningMethod) {
-            throw new HTTPException(401, { message: authResponsesMessages.userSignedInWithAnotherMethod });
+            return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 401);
         }
 
         if (result.noUser) {
-            throw new HTTPException(401, { message: authResponsesMessages.noUser });
+            return c.json({ error: authResponsesMessages.noUser }, 401);
         }
 
-        throw new HTTPException(401, { message: authResponsesMessages.wrongCredentials });
+        return c.json({ error: authResponsesMessages.wrongCredentials }, 401);
     }
 
     async verifyEmailRequestInput(c: Context<never, never, { out: { query: verifyEmailRequestInput } }>) {
