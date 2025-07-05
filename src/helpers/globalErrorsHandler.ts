@@ -12,10 +12,13 @@ export default async (err: Error | HTTPResponseError, c: Context<never, never, n
     Promise.resolve().then(() => Sentry.captureException(err, {
         user: { email: c.get("userEmail") },
         extra: {
-            route: c.req.routePath,
+            route: `${c.req.method} ${c.req.routePath}`,
             fullUrl: c.req.url,
-            origin: "server",
-            payload: c.req.valid("json") || c.req.valid("form") || c.req.valid("query")
+            payload: {
+                json: c.req.valid("json"),
+                form: c.req.valid("form"),
+                query: c.req.valid("query"),
+            }
         }
     }))
 
