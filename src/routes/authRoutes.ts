@@ -30,7 +30,7 @@ export default function authRoutesBuilder(
     authRoutes.post(
         '/verify-email',
         verifyEmailResponseInputValidator,
-        authController.verifyEmailResponse.bind(authController)
+        authController.verifyEmailResponseInput.bind(authController)
     );
 
     return authRoutes;
