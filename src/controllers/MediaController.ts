@@ -25,6 +25,9 @@ export class MediaController {
                 imageStream.on("end", () => {
                     controller.close();
                 })
+                imageStream.on("error", () => {
+                    controller.error("Unexpected error occurred during reading the file");
+                })
             }
         })
 
