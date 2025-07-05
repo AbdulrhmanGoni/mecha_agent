@@ -49,6 +49,11 @@ const envSchema = z.object({
     CANCEL_SUBSCRIPTION_REDIRECT_URL: z.string().optional(),
 
     SENTRY_DSN: z.string().optional(),
+
+    MAIL_SENDER_HOST: z.string().optional(),
+    MAIL_SENDER_PORT: z.string().optional(),
+    MAIL_SENDER_USER: z.string(),
+    MAIL_SENDER_PASS: z.string(),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);
