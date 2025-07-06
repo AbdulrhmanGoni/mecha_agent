@@ -25,10 +25,22 @@ type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {
     removeAvatar: boolean;
 }>
 
-type verifyEmailResponseInput = {
-    email: User["email"];
+type ValidationPurpose = "sign-up" | "reset-password"
+
+type VerifiedEmailRecord = `${string}_${ValidationPurpose}`
+
+type VerifiedEmailsStore = Set<VerifiedEmailRecord>
+
+type OneTimePasswordsStore = {
     otp: string;
     signature: string;
 }
 
-type verifyEmailRequestInput = Pick<verifyEmailResponseInput, "email">
+type VerifyEmailResponseInput = {
+    email: User["email"];
+    otp: string;
+    signature: string;
+    purpose: ValidationPurpose;
+}
+
+type verifyEmailRequestInput = Pick<VerifyEmailResponseInput, "email">

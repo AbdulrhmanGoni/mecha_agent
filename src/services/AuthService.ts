@@ -5,13 +5,12 @@ import generateOTP from "../helpers/generateOTP.ts";
 import createOneTimePasswordMail from "../helpers/createOneTimePasswordMail.ts";
 import randomString from "../helpers/randomString.ts";
 
-type OneTimePasswordsStore = {
-    otp: string;
-    signature: string;
-}
-
 const OTPs = new Map<string, OneTimePasswordsStore>();
-const verifiedEmails = new Set<string>();
+const verifiedEmails: VerifiedEmailsStore = new Set();
+
+function formVerifiedEmailRecord(email: string, validFor: ValidationPurpose): VerifiedEmailRecord {
+    return `${email}_${validFor}`
+}
 
 export class AuthService {
     constructor(
@@ -22,7 +21,10 @@ export class AuthService {
     otpVerificationPeriodInMs = 1000 * 60 * 3;
 
     async signUpUser(userInput: SignUpUserInput) {
-        if (userInput.signingMethod === "credentials" && !verifiedEmails.has(userInput.email)) {
+        if (
+            userInput.signingMethod === "credentials" &&
+            !verifiedEmails.has(formVerifiedEmailRecord(userInput.email, "sign-up"))
+        ) {
             return {
                 notVerifiedEmail: true
             }
@@ -109,15 +111,19 @@ export class AuthService {
         return { otpSent: mailSent }
     }
 
-    verifyOTP(email: string, otp: string, signature: string) {
+    verifyOTP({ email, otp, signature, purpose }: VerifyEmailResponseInput) {
         const otpStore = OTPs.get(email);
 
         if (otp === otpStore?.otp && signature === otpStore?.signature) {
+            const verifiedEmailRecord = formVerifiedEmailRecord(email, purpose);
+
             OTPs.delete(email);
-            verifiedEmails.add(email)
+            verifiedEmails.add(verifiedEmailRecord)
+
             setTimeout(() => {
-                verifiedEmails.delete(email)
+                verifiedEmails.delete(verifiedEmailRecord)
             }, this.otpVerificationPeriodInMs)
+
             return true
         }
 

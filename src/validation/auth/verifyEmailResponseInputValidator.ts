@@ -6,6 +6,7 @@ const verifyEmailResponseInputSchema = z.object({
     email: z.string().email(),
     otp: z.string(),
     signature: z.string(),
+    purpose: z.enum(["sign-up", "reset-password"]),
 }).strict()
 
 const verifyEmailResponseInputValidator = validator('query', (value, c) => {
