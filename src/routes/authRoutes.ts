@@ -24,13 +24,13 @@ export default function authRoutesBuilder(
     authRoutes.get(
         '/verify-email',
         verifyEmailRequestInputValidator,
-        authController.verifyEmailRequestInput.bind(authController)
+        authController.verifyEmailRequest.bind(authController)
     );
 
     authRoutes.post(
         '/verify-email',
         verifyEmailResponseInputValidator,
-        authController.verifyEmailResponseInput.bind(authController)
+        authController.verifyEmailResponse.bind(authController)
     );
 
     return authRoutes;

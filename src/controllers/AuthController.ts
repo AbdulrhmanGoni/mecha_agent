@@ -50,7 +50,7 @@ export class AuthController {
         return c.json({ error: authResponsesMessages.wrongCredentials }, 401);
     }
 
-    async verifyEmailRequestInput(c: Context<never, never, { out: { query: verifyEmailRequestInput } }>) {
+    async verifyEmailRequest(c: Context<never, never, { out: { query: verifyEmailRequestInput } }>) {
         const { email } = c.req.valid("query");
         const { otpSent, signature } = await this.authService.generateAndSendOTP(email)
         if (otpSent) {
@@ -60,7 +60,7 @@ export class AuthController {
         return c.json({ error: authResponsesMessages.failedToSendOTP }, 400);
     }
 
-    verifyEmailResponseInput(c: Context<never, never, { out: { query: verifyEmailResponseInput } }>) {
+    verifyEmailResponse(c: Context<never, never, { out: { query: verifyEmailResponseInput } }>) {
         const { email, otp, signature } = c.req.valid("query");
 
         const verified = this.authService.verifyOTP(email, otp, signature)
