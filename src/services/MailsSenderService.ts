@@ -13,7 +13,10 @@ export class MailsSenderService {
         }
 
         if (parsedEnvVariables.ENVIRONMENT == "production") {
-            this.mailjet = Mailjet.Client.apiConnect(auth.user, auth.pass)
+            if (!parsedEnvVariables.MAIL_SENDER_KEY) {
+                throw "'MAIL_SENDER_KEY' environment variable is missing"
+            }
+            this.mailjet = Mailjet.Client.apiConnect(parsedEnvVariables.MAIL_SENDER_KEY, auth.pass)
         } else {
             this.transporter = createTransport({
                 host: parsedEnvVariables.MAIL_SENDER_HOST,

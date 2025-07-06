@@ -54,6 +54,7 @@ const envSchema = z.object({
     MAIL_SENDER_PORT: z.string().optional(),
     MAIL_SENDER_USER: z.string(),
     MAIL_SENDER_PASS: z.string(),
+    MAIL_SENDER_KEY: z.string().optional(),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);
