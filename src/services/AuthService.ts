@@ -85,14 +85,12 @@ export class AuthService {
 
     async generateAndSendOTP(email: string) {
         const otp = generateOTP()
-        const { accepted } = await this.mailsSenderService.send({
+        const mailSent = await this.mailsSenderService.send({
             subject: "Email Verification",
             text: "Hi, Here is your one time password (OTP) to verify your email with Mecha Agent platform: " + otp,
-            to: email,
+            to: [email],
             html: await createOneTimePasswordMail(otp),
         });
-
-        const mailSent = accepted.some(email => email === email);
 
         if (mailSent) {
             const signature = randomString(10);

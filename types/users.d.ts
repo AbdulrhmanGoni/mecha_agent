@@ -44,3 +44,10 @@ type VerifyEmailResponseInput = {
 }
 
 type verifyEmailRequestInput = Pick<VerifyEmailResponseInput, "email">
+
+type SendMailOptions = {
+    to: string[],
+    subject: string,
+    text: string,
+    html: string,
+}
