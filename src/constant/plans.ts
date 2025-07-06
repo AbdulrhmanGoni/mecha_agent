@@ -4,7 +4,7 @@ export const plans: Plan[] = [
     {
         planName: "Free",
         maxPublishedAgentsCount: 1,
-        maxInferencesPerDay: 30,
+        maxInferencesPerDay: 50,
         subscriptionCostPerMonth: 0,
         priceId: ""
     },
