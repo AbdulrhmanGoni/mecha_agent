@@ -41,7 +41,7 @@ export class MailsSenderService {
                                 Email: parsedEnvVariables.MAIL_SENDER_USER,
                                 Name: "Mecha Agent",
                             },
-                            To: mailOptions.to.map((Email) => { Email }),
+                            To: mailOptions.to.map((Email) => ({ Email })),
                             Subject: mailOptions.subject,
                             TextPart: mailOptions.text,
                             HTMLPart: mailOptions.html
