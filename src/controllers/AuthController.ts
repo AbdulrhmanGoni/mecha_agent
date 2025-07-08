@@ -14,21 +14,25 @@ export class AuthController {
             return c.json({ result: result.newUser });
         }
 
-        const signingExistingUserQuery = c.req.query("signing-existing-user");
+        if (result.userExists) {
+            const signingExistingUserQuery = c.req.query("signing-existing-user");
 
-        if (signingExistingUserQuery && ["true", "yes", "1"].includes(signingExistingUserQuery)) {
-            return this.signInUser(c)
-        }
+            if (signingExistingUserQuery && ["true", "yes", "1"].includes(signingExistingUserQuery)) {
+                return this.signInUser(c)
+            }
 
-        if (result.existingWithSameSigingMethod) {
+            if (result.notSameSigningMethod) {
+                return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 400)
+            }
+
             return c.json({ error: authResponsesMessages.userAlreadyExisting }, 400)
         }
 
-        if (result.notVerifiedEmail) {
+        if (authResponsesMessages.notVerifiedEmail) {
             return c.json({ error: authResponsesMessages.notVerifiedEmail }, 400)
         }
 
-        return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 400)
+        throw new Error("Failed to sign up a new user");
     }
 
     async signInUser(c: Context<never, never, { out: { json: SignInUserInput } }>) {

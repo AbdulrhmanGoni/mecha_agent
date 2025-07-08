@@ -34,7 +34,8 @@ export class AuthService {
 
         if (user) {
             return {
-                existingWithSameSigingMethod: user.signingMethod === userInput.signingMethod
+                userExists: true,
+                notSameSigningMethod: user.signingMethod === userInput.signingMethod
             }
         }
 
