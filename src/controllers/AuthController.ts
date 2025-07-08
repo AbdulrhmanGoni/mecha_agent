@@ -55,7 +55,13 @@ export class AuthController {
     }
 
     async verifyEmailRequest(c: Context<never, never, { out: { query: verifyEmailRequestInput } }>) {
-        const { email } = c.req.valid("query");
+        const { email, checkExistance } = c.req.valid("query");
+
+        if (checkExistance) {
+            const emailExists = await this.authService.checkEmailExistance(email)
+            return c.json({ result: emailExists });
+        }
+
         const { otpSent, signature } = await this.authService.generateAndSendOTP(email)
         if (otpSent) {
             return c.json({ result: signature });

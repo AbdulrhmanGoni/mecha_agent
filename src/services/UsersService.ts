@@ -54,6 +54,15 @@ export class UsersService {
         return null
     }
 
+    async checkUserExistance(userEmail: string) {
+        const { rows } = await this.databaseService.query<User>({
+            text: `SELECT email FROM users WHERE email = $1`,
+            args: [userEmail],
+        });
+
+        return !!rows[0]
+    }
+
     async getUserData(email: string) {
         const { rows } = await this.databaseService.query<User>({
             text: `

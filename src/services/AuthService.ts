@@ -46,6 +46,12 @@ export class AuthService {
         }
     }
 
+    async checkEmailExistance(email: string) {
+        const userExists = await this.usersService.checkUserExistance(email);
+
+        return userExists
+    }
+
     async signInUser(userInput: SignInUserInput) {
         const user = await this.usersService.getByEmail(userInput.email);
 
