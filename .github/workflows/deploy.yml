@@ -3,10 +3,10 @@ on:
   push:
     branches: main
     paths:
-      - src/
-      - html-mails-templates/
-      - scripts/bundleHtmlMailsTemplates.ts
-      - deno.*
+      - "src/**"
+      - "html-mails-templates/**"
+      - "scripts/bundleHtmlMailsTemplates.ts"
+      - "deno.*"
 
 jobs:
   deploy:
