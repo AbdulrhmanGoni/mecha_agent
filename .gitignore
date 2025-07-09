@@ -1,4 +1,3 @@
-deno.lock
 .env**
 !.env.example
 .vscode
