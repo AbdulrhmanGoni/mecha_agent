@@ -43,7 +43,17 @@ type VerifyEmailResponseInput = {
     purpose: ValidationPurpose;
 }
 
-type verifyEmailRequestInput = Pick<VerifyEmailResponseInput, "email">
+type verifyEmailRequestInput = { checkExistance: boolean } & Pick<VerifyEmailResponseInput, "email">
+
+type ChangePasswordInput = {
+    currentPassword: string;
+    newPassword: string;
+}
+
+type ResetPasswordInput = {
+    email: User["email"];
+    newPassword: string;
+}
 
 type SendMailOptions = {
     to: string[],
