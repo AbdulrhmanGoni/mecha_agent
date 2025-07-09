@@ -6,6 +6,7 @@ import verifyEmailResponseInputValidator from "../validation/auth/verifyEmailRes
 import verifyEmailRequestInputValidator from "../validation/auth/verifyEmailRequestInputValidator.ts";
 import { GuardService } from "../services/GuardService.ts";
 import changePasswordInputValidator from "../validation/auth/changePasswordInputValidator.ts";
+import resetPasswordInputValidator from "../validation/auth/resetPasswordInputValidator.ts";
 
 export default function authRoutesBuilder(
     authController: AuthController,
@@ -41,6 +42,12 @@ export default function authRoutesBuilder(
         guardService.guardRoute({ sudoOnly: true }),
         changePasswordInputValidator,
         authController.changePassword.bind(authController)
+    );
+
+    authRoutes.post(
+        '/reset-password',
+        resetPasswordInputValidator,
+        authController.resetPassword.bind(authController)
     );
 
     return authRoutes;

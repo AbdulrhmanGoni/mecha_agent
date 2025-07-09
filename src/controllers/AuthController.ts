@@ -101,5 +101,25 @@ export class AuthController {
 
         throw new Error(authResponsesMessages.unexpectedChangePasswordError)
     }
+
+    async resetPassword(c: Context<never, never, { out: { json: ResetPasswordInput } }>) {
+        const { email, newPassword } = c.req.valid("json");
+
+        const { success, notVerifiedEmail, wrongSigningMethod } = await this.authService.resetPassword(email, newPassword)
+
+        if (success) {
+            return c.json({ result: authResponsesMessages.passwordResetSuccessfully });
+        }
+
+        if (notVerifiedEmail) {
+            return c.json({ error: authResponsesMessages.notVerifiedEmail }, 400)
+        }
+
+        if (wrongSigningMethod) {
+            return c.json({ error: authResponsesMessages.passwordCantBeChanged }, 400)
+        }
+
+        throw new Error(authResponsesMessages.resetPasswordFailed)
+    }
 }
 

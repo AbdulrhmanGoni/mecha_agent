@@ -165,4 +165,29 @@ export class AuthService {
 
         return { success: false }
     }
+
+    async resetPassword(userEmail: string, newPassword: string) {
+        if (!verifiedEmails.has(formVerifiedEmailRecord(userEmail, "reset-password"))) {
+            return {
+                success: false,
+                notVerifiedEmail: true
+            }
+        }
+
+        const user = await this.usersService.getByEmail(userEmail);
+
+        if (user) {
+            if (user.signingMethod !== "credentials") {
+                return {
+                    success: false,
+                    wrongSigningMethod: true
+                }
+            }
+
+            const passwordReset = await this.usersService.changePassword(userEmail, newPassword)
+            return { success: passwordReset }
+        }
+
+        return { success: false }
+    }
 }

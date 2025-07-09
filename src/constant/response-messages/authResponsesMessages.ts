@@ -11,6 +11,9 @@ const authResponsesMessages = {
     wrongCurrentPassword: "Your current password doesn't match the one you entered",
     passwordCantBeChanged: "You can't change your password because you didn't signed up with email and password",
     unexpectedChangePasswordError: "Unexpected error during 'Change Password' process",
+
+    passwordResetSuccessfully: "Your password has been reset successfully, You can now sign in.",
+    resetPasswordFailed: "We couldn't reset your password",
 }
 
 export default authResponsesMessages
