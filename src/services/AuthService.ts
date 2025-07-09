@@ -5,28 +5,26 @@ import generateOTP from "../helpers/generateOTP.ts";
 import createOneTimePasswordMail from "../helpers/createOneTimePasswordMail.ts";
 import randomString from "../helpers/randomString.ts";
 
-const OTPs = new Map<string, OneTimePasswordsStore>();
-const verifiedEmails: VerifiedEmailsStore = new Set();
-
-function formVerifiedEmailRecord(email: string, validFor: ValidationPurpose): VerifiedEmailRecord {
-    return `${email}_${validFor}`
+function formVerifiedEmailRecord(email: string, validFor: ValidationPurpose): Deno.KvKey {
+    return ["verified-emails", validFor, email]
 }
 
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
         private readonly mailsSenderService: MailsSenderService,
+        private readonly kvStore: Deno.Kv,
     ) { }
 
     otpVerificationPeriodInMs = 1000 * 60 * 3;
 
     async signUpUser(userInput: SignUpUserInput) {
-        if (
-            userInput.signingMethod === "credentials" &&
-            !verifiedEmails.has(formVerifiedEmailRecord(userInput.email, "sign-up"))
-        ) {
-            return {
-                notVerifiedEmail: true
+        if (userInput.signingMethod === "credentials") {
+            const verifiedEmailRecord = await this.kvStore.get<boolean>(formVerifiedEmailRecord(userInput.email, "sign-up"))
+            if (!verifiedEmailRecord.value) {
+                return {
+                    notVerifiedEmail: true
+                }
             }
         }
 
@@ -101,10 +99,11 @@ export class AuthService {
 
         if (mailSent) {
             const signature = randomString(10);
-            OTPs.set(email, { otp, signature })
-            setTimeout(() => {
-                OTPs.delete(email)
-            }, this.otpVerificationPeriodInMs)
+            await this.kvStore.set(
+                ["OTPs", email],
+                { otp, signature },
+                { expireIn: this.otpVerificationPeriodInMs }
+            )
 
             return {
                 otpSent: mailSent,
@@ -116,20 +115,18 @@ export class AuthService {
         return { otpSent: mailSent }
     }
 
-    verifyOTP({ email, otp, signature, purpose }: VerifyEmailResponseInput) {
-        const otpStore = OTPs.get(email);
+    async verifyOTP({ email, otp, signature, purpose }: VerifyEmailResponseInput) {
+        const otpRecordKey: Deno.KvKey = ["OTPs", email]
+        const { value } = await this.kvStore.get<OneTimePasswordRecord>(otpRecordKey);
 
-        if (otp === otpStore?.otp && signature === otpStore?.signature) {
+        if (otp === value?.otp && signature === value?.signature) {
             const verifiedEmailRecord = formVerifiedEmailRecord(email, purpose);
+            const { ok } = await this.kvStore.atomic()
+                .set(verifiedEmailRecord, true, { expireIn: this.otpVerificationPeriodInMs })
+                .delete(otpRecordKey)
+                .commit()
 
-            OTPs.delete(email);
-            verifiedEmails.add(verifiedEmailRecord)
-
-            setTimeout(() => {
-                verifiedEmails.delete(verifiedEmailRecord)
-            }, this.otpVerificationPeriodInMs)
-
-            return true
+            return ok
         }
 
         return false
@@ -167,7 +164,8 @@ export class AuthService {
     }
 
     async resetPassword(userEmail: string, newPassword: string) {
-        if (!verifiedEmails.has(formVerifiedEmailRecord(userEmail, "reset-password"))) {
+        const verifiedEmailRecord = await this.kvStore.get<boolean>(formVerifiedEmailRecord(userEmail, "reset-password"))
+        if (!verifiedEmailRecord.value) {
             return {
                 success: false,
                 notVerifiedEmail: true

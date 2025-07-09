@@ -27,11 +27,7 @@ type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {
 
 type ValidationPurpose = "sign-up" | "reset-password"
 
-type VerifiedEmailRecord = `${string}_${ValidationPurpose}`
-
-type VerifiedEmailsStore = Set<VerifiedEmailRecord>
-
-type OneTimePasswordsStore = {
+type OneTimePasswordRecord = {
     otp: string;
     signature: string;
 }

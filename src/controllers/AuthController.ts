@@ -70,10 +70,10 @@ export class AuthController {
         return c.json({ error: authResponsesMessages.failedToSendOTP }, 400);
     }
 
-    verifyEmailResponse(c: Context<never, never, { out: { query: VerifyEmailResponseInput } }>) {
+    async verifyEmailResponse(c: Context<never, never, { out: { query: VerifyEmailResponseInput } }>) {
         const input = c.req.valid("query");
 
-        const verified = this.authService.verifyOTP(input)
+        const verified = await this.authService.verifyOTP(input)
         if (verified) {
             return c.json({ result: true });
         }
