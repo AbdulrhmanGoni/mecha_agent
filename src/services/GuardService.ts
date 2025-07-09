@@ -2,9 +2,11 @@ import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
+import { sudoPermission } from "../constant/permissions.ts";
 
 type GuardRouteOptions = {
-    permissions?: Permission[],
+    permissions?: Permission[];
+    sudoOnly?: boolean;
 }
 
 export class GuardService {
@@ -13,7 +15,7 @@ export class GuardService {
         private readonly databaseService: DatabaseService,
     ) { }
 
-    guardRoute({ permissions }: GuardRouteOptions) {
+    guardRoute({ permissions, sudoOnly }: GuardRouteOptions) {
         return bearerAuth({
             verifyToken: async (token, c) => {
                 const { payload, errorMessage } = await this.jwtService.verifyJwt(token);
@@ -31,7 +33,14 @@ export class GuardService {
                         c.set("apiKeyId", payload.apiKeyId);
                     }
 
-                    const hasPermission = !!(permissions?.every((permission) => (
+                    const isSudo = payload.permissions.includes(sudoPermission);
+
+                    if (sudoOnly) {
+                        c.set("userEmail", payload.email)
+                        return isSudo
+                    }
+
+                    const hasPermission = isSudo || !!(permissions?.every((permission) => (
                         payload.permissions?.includes(permission)
                     )))
 
