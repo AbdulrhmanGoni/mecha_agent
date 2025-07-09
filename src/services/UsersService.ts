@@ -184,11 +184,20 @@ export class UsersService {
     async changePassword(email: string, newPassword: string) {
         const hashedPassword = await PasswordHasher.hash(newPassword);
 
-        const { rowCount } = await this.databaseService.query<User>({
+        const { rowCount } = await this.databaseService.query({
             text: `UPDATE users SET password = $2 WHERE email = $1`,
             args: [email, hashedPassword],
         });
 
         return !!rowCount
+    }
+
+    async delete(email: string) {
+        const { rowCount: userDeleted } = await this.databaseService.query({
+            text: `DELETE FROM users WHERE email = $1`,
+            args: [email],
+        });
+
+        return !!userDeleted
     }
 }
