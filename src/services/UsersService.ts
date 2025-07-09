@@ -180,4 +180,15 @@ export class UsersService {
 
         return false
     }
+
+    async changePassword(email: string, newPassword: string) {
+        const hashedPassword = await PasswordHasher.hash(newPassword);
+
+        const { rowCount } = await this.databaseService.query<User>({
+            text: `UPDATE users SET password = $2 WHERE email = $1`,
+            args: [email, hashedPassword],
+        });
+
+        return !!rowCount
+    }
 }

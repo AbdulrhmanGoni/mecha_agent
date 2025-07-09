@@ -134,4 +134,35 @@ export class AuthService {
 
         return false
     }
+
+    async changePassword(userEmail: string, changePasswordInput: ChangePasswordInput) {
+        const user = await this.usersService.getByEmail(userEmail);
+
+        if (user) {
+            if (user.signingMethod !== "credentials") {
+                return {
+                    success: false,
+                    wrongSigningMethod: true
+                }
+            }
+
+            const isMatched = await PasswordHasher.verify(
+                changePasswordInput.currentPassword,
+                user.password,
+            );
+
+            if (isMatched) {
+                const passwordChanged = await this.usersService.changePassword(userEmail, changePasswordInput.newPassword)
+
+                return { success: passwordChanged }
+            } else {
+                return {
+                    success: false,
+                    wrongPassword: true,
+                }
+            }
+        }
+
+        return { success: false }
+    }
 }

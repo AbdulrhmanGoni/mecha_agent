@@ -57,6 +57,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
 
     const authRoutes = authRoutesBuilder(
         dependencies.controllers.authController,
+        dependencies.services.guardService,
     );
 
     const agentsRoutes = agentsRoutesBuilder(

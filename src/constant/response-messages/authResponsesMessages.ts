@@ -6,6 +6,11 @@ const authResponsesMessages = {
     notVerifiedEmail: "Your email is not verified, Ask for an OTP to verify your email",
     failedToSendOTP: "We couldn't send the OTP to your email, Are you this is a valid email?",
     failedToVerifyOTP: "The OTP you entered is invalid or expired, Double check and try again or request another OTP",
+
+    passwordChangedSuccessfully: "Your password has been  changed successfully",
+    wrongCurrentPassword: "Your current password doesn't match the one you entered",
+    passwordCantBeChanged: "You can't change your password because you didn't signed up with email and password",
+    unexpectedChangePasswordError: "Unexpected error during 'Change Password' process",
 }
 
 export default authResponsesMessages

@@ -80,5 +80,26 @@ export class AuthController {
 
         return c.json({ error: authResponsesMessages.failedToVerifyOTP }, 400);
     }
+
+    async changePassword(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: ChangePasswordInput } }>) {
+        const input = c.req.valid("json");
+        const userEmail = c.get("userEmail");
+
+        const { success, wrongSigningMethod, wrongPassword } = await this.authService.changePassword(userEmail, input);
+
+        if (success) {
+            return c.json({ result: authResponsesMessages.passwordChangedSuccessfully });
+        }
+
+        if (wrongPassword) {
+            return c.json({ error: authResponsesMessages.wrongCurrentPassword }, 400);
+        }
+
+        if (wrongSigningMethod) {
+            return c.json({ error: authResponsesMessages.passwordCantBeChanged }, 400);
+        }
+
+        throw new Error(authResponsesMessages.unexpectedChangePasswordError)
+    }
 }
 

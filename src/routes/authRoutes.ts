@@ -4,9 +4,12 @@ import signInValidator from "../validation/auth/signInValidator.ts";
 import signUpValidator from "../validation/auth/signUpValidator.ts";
 import verifyEmailResponseInputValidator from "../validation/auth/verifyEmailResponseInputValidator.ts";
 import verifyEmailRequestInputValidator from "../validation/auth/verifyEmailRequestInputValidator.ts";
+import { GuardService } from "../services/GuardService.ts";
+import changePasswordInputValidator from "../validation/auth/changePasswordInputValidator.ts";
 
 export default function authRoutesBuilder(
     authController: AuthController,
+    guardService: GuardService,
 ) {
     const authRoutes = new Hono();
 
@@ -31,6 +34,13 @@ export default function authRoutesBuilder(
         '/verify-email',
         verifyEmailResponseInputValidator,
         authController.verifyEmailResponse.bind(authController)
+    );
+
+    authRoutes.post(
+        '/change-password',
+        guardService.guardRoute({ sudoOnly: true }),
+        changePasswordInputValidator,
+        authController.changePassword.bind(authController)
     );
 
     return authRoutes;
