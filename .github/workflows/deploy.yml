@@ -2,8 +2,11 @@ name: Deploy
 on:
   push:
     branches: main
-  pull_request:
-    branches: main
+    paths:
+      - src/
+      - html-mails-templates/
+      - scripts/bundleHtmlMailsTemplates.ts
+      - deno.*
 
 jobs:
   deploy:
@@ -29,7 +32,7 @@ jobs:
           node-version: lts/*
 
       - name: Install step
-        run: deno install -e src/server.ts
+        run: deno install -e src/server.ts --frozen=true
 
       - name: Prepare environment variables fo the next bundler
         run: echo "CLIENT_URL=${{ vars.CLIENT_URL }}" >> .env
