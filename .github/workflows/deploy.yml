@@ -7,6 +7,7 @@ on:
       - "html-mails-templates/**"
       - "scripts/bundleHtmlMailsTemplates.ts"
       - "deno.*"
+      - "db/**"
 
 jobs:
   deploy:
