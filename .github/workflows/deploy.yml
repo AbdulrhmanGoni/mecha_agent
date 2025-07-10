@@ -40,9 +40,15 @@ jobs:
       - name: Bundle HTML mails templates
         run: deno task bundle-html-mails-templates:prod
 
+      - name: Install the database migration tool (dbmate)
+        run: deno install npm:dbmate
+
+      - name: Sync database schema with latest changes
+        run: deno -E --allow-run dbmate --url "${{ secrets.DB_URL }}" up
+
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "mecha-agent"
           entrypoint: "src/server.ts"
-          exclude: docker,scripts,tests,html-mails-templates
+          exclude: docker,scripts,tests,html-mails-templates,db

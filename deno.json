@@ -20,6 +20,7 @@
   "imports": {
     "@minify-html/deno": "jsr:@minify-html/deno@^0.16.4",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
+    "dbmate": "npm:dbmate@^2.27.0",
     "juice": "npm:juice@^11.0.1",
     "@types/nodemailer": "npm:@types/nodemailer@^6.4.17",
     "node-mailjet": "npm:node-mailjet@^6.0.8",

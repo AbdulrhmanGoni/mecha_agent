@@ -32,6 +32,7 @@
     "npm:@types/node@*": "22.5.4",
     "npm:@types/nodemailer@^6.4.17": "6.4.17",
     "npm:cheerio@*": "1.1.0",
+    "npm:dbmate@^2.27.0": "2.27.0",
     "npm:hono@*": "4.7.1",
     "npm:juice@^11.0.1": "11.0.1",
     "npm:minio@8.0.4": "8.0.4",
@@ -157,6 +158,41 @@
     }
   },
   "npm": {
+    "@dbmate/darwin-arm64@2.27.0": {
+      "integrity": "sha512-txh4TEmRPmdlBxqI6fXKEBOZxY2cXmlt0wuefjKcYHMkCpTeCzMXg35hcM9f32PmkPo2q7+eXTNE1f6uYx0oRA==",
+      "os": ["darwin"],
+      "cpu": ["arm64"]
+    },
+    "@dbmate/darwin-x64@2.27.0": {
+      "integrity": "sha512-3VcnKeFle4K6f+AtlM+luL1d+Gi4q0sVaTiUqj5VkBiENmQTTl/zuYOdW+qGMmY2gyiRFvri6zdGpGgp4952sQ==",
+      "os": ["darwin"],
+      "cpu": ["x64"]
+    },
+    "@dbmate/linux-arm64@2.27.0": {
+      "integrity": "sha512-XfHBNSsri+7xH+XiGBOLTLkapoaEBRjqguo7K5mKatGYpDATI2yMTBBaUyqyW0n3GpRhsCauJZsUJrOmZYqobw==",
+      "os": ["linux"],
+      "cpu": ["arm64"]
+    },
+    "@dbmate/linux-arm@2.27.0": {
+      "integrity": "sha512-MsMBHRmfUfwEUQ/zOPBjv925YnpMrqPZCuUoh0FvYyQjAh8RlZxUAS5l7ZVOiOr+aBqcCk4T2M9AFvPyKUze2g==",
+      "os": ["linux"],
+      "cpu": ["arm"]
+    },
+    "@dbmate/linux-ia32@2.27.0": {
+      "integrity": "sha512-W8E7ik82Fd/8gaGCm6RVdXae9XzBnpPMSMXhuSCb0pPgHkTSkgV/SKRAjxwIMJ0VCsdakPRLNEVDxf4BASWk0A==",
+      "os": ["linux"],
+      "cpu": ["ia32"]
+    },
+    "@dbmate/linux-x64@2.27.0": {
+      "integrity": "sha512-hItgTv+VX51Jag/r8OxFhorxHII1lgFwZOMOxYvQMpDde2QjKUjRm+GoY4UqZ+OUoqunUj/LMFnDkEVmT/ZfGg==",
+      "os": ["linux"],
+      "cpu": ["x64"]
+    },
+    "@dbmate/win32-x64@2.27.0": {
+      "integrity": "sha512-idhE2dbkkAjgGl+NJxNX0O5Xa6NTjmMp7vN9b74F5VHX/mFocqQJ/0gmg0QcFqGeTIUXorc0cvQzedPMkxpWIQ==",
+      "os": ["win32"],
+      "cpu": ["x64"]
+    },
     "@fastify/busboy@2.1.1": {
       "integrity": "sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA=="
     },
@@ -713,6 +749,19 @@
     },
     "css-what@6.2.2": {
       "integrity": "sha512-u/O3vwbptzhMs3L1fQE82ZSLHQQfto5gyZzwteVIEyeaY5Fc7R4dapF/BvRoSYFeqfBk4m0V1Vafq5Pjv25wvA=="
+    },
+    "dbmate@2.27.0": {
+      "integrity": "sha512-Gga0U5ePzDBtqM26d1B2x5B3htl6uS0Gms+1GXbYKOYe44JArk8bcJpuRW97TLeAW36xLZRjBlXbQ0VY+y0PIg==",
+      "optionalDependencies": [
+        "@dbmate/darwin-arm64",
+        "@dbmate/darwin-x64",
+        "@dbmate/linux-arm",
+        "@dbmate/linux-arm64",
+        "@dbmate/linux-ia32",
+        "@dbmate/linux-x64",
+        "@dbmate/win32-x64"
+      ],
+      "bin": true
     },
     "debug@4.4.0": {
       "integrity": "sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==",
@@ -1730,6 +1779,7 @@
       "npm:@google/genai@*",
       "npm:@sentry/deno@^9.29.0",
       "npm:@types/nodemailer@^6.4.17",
+      "npm:dbmate@^2.27.0",
       "npm:juice@^11.0.1",
       "npm:minio@8.0.4",
       "npm:node-mailjet@^6.0.8",
