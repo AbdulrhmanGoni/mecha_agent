@@ -40,7 +40,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const databaseService = new DatabaseService(dependencies.databaseClient);
 
     const objectStorageService = new ObjectStorageService(dependencies.minioClient);
-    await objectStorageService.init();
 
     const instructionsService = new InstructionsService(vectorDatabaseService);
 

@@ -11,7 +11,7 @@ function parseEnvironmentVariables<
     return schema.parse(vars);
 };
 
-const envSchema = z.object({
+export const envSchema = z.object({
     ENVIRONMENT: z.enum(["testing", "production", "development"]),
 
     GEMINI_API_KEY: z.string().optional(),
