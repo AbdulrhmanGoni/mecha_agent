@@ -2,53 +2,15 @@ import { QdrantClient } from "npm:@qdrant/js-client-rest";
 import { Schemas } from "npm:@qdrant/js-client-rest";
 import { EmbeddingService } from "./EmbeddingService.ts";
 import embedInstructionFormat from "../helpers/embedInstructionFormat.ts";
+import { datasetsCollection } from "../constant/vectorDB.ts";
 
 export class VectorDatabaseService {
-    private readonly datasetsCollection = "datasets";
+    private readonly datasetsCollection = datasetsCollection;
 
     constructor(
         private readonly dbClient: QdrantClient,
         private readonly embeddingService: EmbeddingService,
     ) { }
-
-    async init() {
-        await this.createDatasetsCollection()
-    }
-
-    private async createDatasetsCollection() {
-        const collectionExists = await this.dbClient.collectionExists(this.datasetsCollection);
-        if (!collectionExists.exists) {
-            await this.dbClient.createCollection(this.datasetsCollection, {
-                vectors: {
-                    size: this.embeddingService.embeddingDimensions,
-                    distance: "Cosine",
-                    on_disk: true,
-                },
-                on_disk_payload: true,
-                hnsw_config: {
-                    m: 0,
-                    payload_m: 16,
-                    on_disk: true,
-                }
-            });
-
-            await this.dbClient.createPayloadIndex(this.datasetsCollection, {
-                field_name: "datasetId",
-                field_schema: {
-                    type: "keyword",
-                    is_tenant: true,
-                },
-            })
-
-            await this.dbClient.createPayloadIndex(this.datasetsCollection, {
-                field_name: "userEmail",
-                field_schema: {
-                    type: "keyword",
-                    is_tenant: true,
-                },
-            })
-        }
-    }
 
     async insert(
         { datasetId, instructions, userEmail }: { datasetId: string, userEmail: string, instructions: NewInstructionInput[] }

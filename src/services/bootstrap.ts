@@ -35,7 +35,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const embeddingService = new EmbeddingService(dependencies.embeddingClient);
 
     const vectorDatabaseService = new VectorDatabaseService(dependencies.vectorDatabaseClient, embeddingService);
-    await vectorDatabaseService.init();
 
     const databaseService = new DatabaseService(dependencies.databaseClient);
 
