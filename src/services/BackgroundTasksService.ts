@@ -22,7 +22,7 @@ export class BackgroundTasksService {
                 case "delete_dataset_instructions":
                     this.taskPerformenceLogger(
                         msg.task,
-                        this.instructionsService.clear(msg.payload.datasetId, msg.payload.userEmail)
+                        this.instructionsService.clearDatasetInstructions(msg.payload.datasetId, msg.payload.userEmail)
                     );
                     break;
 
@@ -63,7 +63,7 @@ export class BackgroundTasksService {
         console.log(`"${task}" task started 🚀`);
         const taskStartTime = performance.now();
         taskPromise.finally(() => {
-            console.log(`"${task}" task completed in ${performanceInSeconds(taskStartTime)}s ✅`)
+            console.log(`"${task}" task completed in ${performanceInSeconds(taskStartTime)} ✅`)
         });
     }
 }

@@ -188,23 +188,22 @@ export class VectorDatabaseService {
         )
     }
 
-    async clear(datasetId: string, userEmail: string) {
+    private async clear(options: { userEmail: string, datasetId?: string }) {
+        const filter = Object
+            .entries(options)
+            .map(([key, value]) => ({ key, match: { value } }))
+
         return await this.dbClient.delete(
             this.datasetsCollection,
-            {
-                filter: {
-                    must: [
-                        {
-                            key: "datasetId",
-                            match: { value: datasetId },
-                        },
-                        {
-                            key: "userEmail",
-                            match: { value: userEmail },
-                        }
-                    ],
-                }
-            }
+            { filter: { must: filter } }
         )
+    }
+
+    async clearDatasetInstructions(datasetId: string, userEmail: string) {
+        return await this.clear({ userEmail, datasetId });
+    }
+
+    async clearUserInstructions(userEmail: string) {
+        return await this.clear({ userEmail });
     }
 }

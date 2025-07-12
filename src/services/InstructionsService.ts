@@ -36,7 +36,11 @@ export class InstructionsService {
         return result.status === "completed";
     }
 
-    async clear(datasetId: string, userEmail: string) {
-        return await this.vectorDatabaseService.clear(datasetId, userEmail)
+    async clearDatasetInstructions(datasetId: string, userEmail: string) {
+        return await this.vectorDatabaseService.clearDatasetInstructions(datasetId, userEmail)
+    }
+
+    async clearUserInstructions(userEmail: string) {
+        return await this.vectorDatabaseService.clearUserInstructions(userEmail)
     }
 }
