@@ -24,9 +24,9 @@ type SSEEvent = "dataset-status";
 type SSESubscriber = Record<string, { subscriberChannel: ReadableStreamDefaultController, subscriberId: string }>
 
 type BackgroundTaskMessage =
-    { task: "delete-expired-anonymous-chats" }
+    { task: "delete_expired_anonymous_chats" }
     |
-    { task: "reset-users-inferences-rate-limits" }
+    { task: "reset_users_inferences_rate_limits" }
     |
     {
         task: "delete_dataset_instructions";

@@ -1,6 +1,7 @@
 import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { InstructionsService } from "./InstructionsService.ts";
+import performanceInSeconds from "../helpers/performanceInSeconds.ts";
 
 export class BackgroundTasksService {
     constructor(
@@ -10,16 +11,19 @@ export class BackgroundTasksService {
     ) {
         this.kvStoreClient.listenQueue((msg: BackgroundTaskMessage) => {
             switch (msg.task) {
-                case "delete-expired-anonymous-chats":
-                    this.cleanExpiredAnonymousChats()
+                case "delete_expired_anonymous_chats":
+                    this.taskPerformenceLogger(msg.task, this.cleanExpiredAnonymousChats())
                     break;
 
-                case "reset-users-inferences-rate-limits":
-                    this.resetUsersInferencesRateLimits()
+                case "reset_users_inferences_rate_limits":
+                    this.taskPerformenceLogger(msg.task, this.resetUsersInferencesRateLimits());
                     break;
 
                 case "delete_dataset_instructions":
-                    this.instructionsService.clear(msg.payload.datasetId, msg.payload.userEmail)
+                    this.taskPerformenceLogger(
+                        msg.task,
+                        this.instructionsService.clear(msg.payload.datasetId, msg.payload.userEmail)
+                    );
                     break;
 
                 default:
@@ -29,8 +33,8 @@ export class BackgroundTasksService {
         });
     }
 
-    private cleanExpiredAnonymousChats() {
-        this.databaseService.query(
+    private async cleanExpiredAnonymousChats() {
+        await this.databaseService.query(
             `DELETE FROM anonymous_chats WHERE (started_at + INTERVAL '1 day') < NOW()`
         ).then(({ rowCount }) => {
             console.log("'delete-expired-anonymous-chats' task done, deleted rows:", rowCount)
@@ -54,12 +58,20 @@ export class BackgroundTasksService {
             await this.kvStoreClient.set(["last-week-inferences", userEmail], [Number(todayValue), 0, 0, 0, 0, 0, 0])
         }
     }
+
+    private taskPerformenceLogger(task: string, taskPromise: Promise<unknown>) {
+        console.log(`"${task}" task started 🚀`);
+        const taskStartTime = performance.now();
+        taskPromise.finally(() => {
+            console.log(`"${task}" task completed in ${performanceInSeconds(taskStartTime)}s ✅`)
+        });
+    }
 }
 
 Deno.cron("Delete expired anonymous chats", "0 0 * * *", () => {
-    kvStoreClient.enqueue({ task: "delete-expired-anonymous-chats" });
+    kvStoreClient.enqueue({ task: "delete_expired_anonymous_chats" });
 });
 
 Deno.cron("Reset users inferences rate limits", "0 0 * * *", () => {
-    kvStoreClient.enqueue({ task: "reset-users-inferences-rate-limits" });
+    kvStoreClient.enqueue({ task: "reset_users_inferences_rate_limits" });
 });

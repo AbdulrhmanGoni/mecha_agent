@@ -3,10 +3,7 @@ import bootstrapControllers from "./controllers/bootstrap.ts";
 import bootstrapRoutes from "./routes/bootstrap.ts";
 import { bootstrapConfigurations } from "./configurations/bootstrap.ts";
 import bootstrapMiddlewares from "./middlewares/bootstrap.ts";
-
-function performanceInSeconds(startingPoint: number): string {
-    return ((performance.now() - startingPoint) / 1000).toFixed(3) + "s";
-}
+import performanceInSeconds from "./helpers/performanceInSeconds.ts";
 
 export default async function bootstrapApp() {
     console.log("Bootstrapping configurations...");
