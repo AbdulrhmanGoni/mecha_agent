@@ -32,6 +32,7 @@
     "npm:@types/node@*": "22.5.4",
     "npm:@types/nodemailer@^6.4.17": "6.4.17",
     "npm:cheerio@*": "1.1.0",
+    "npm:dbmate@2.27.0": "2.27.0",
     "npm:dbmate@^2.27.0": "2.27.0",
     "npm:hono@*": "4.7.1",
     "npm:juice@^11.0.1": "11.0.1",
