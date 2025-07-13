@@ -61,7 +61,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const sseService = new SSEService();
 
-    const agentsService = new AgentsService(databaseService, objectStorageService);
+    const agentsService = new AgentsService(databaseService, objectStorageService, dependencies.kvStoreClient);
 
     const datasetsService = new DatasetsService(
         databaseService,
@@ -79,6 +79,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         dependencies.kvStoreClient,
         databaseService,
         instructionsService,
+        objectStorageService,
     )
 
     return {

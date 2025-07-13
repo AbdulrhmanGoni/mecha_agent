@@ -2,12 +2,14 @@ import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { InstructionsService } from "./InstructionsService.ts";
 import performanceInSeconds from "../helpers/performanceInSeconds.ts";
+import { ObjectStorageService } from "./ObjectStorageService.ts";
 
 export class BackgroundTasksService {
     constructor(
         private readonly kvStoreClient: Deno.Kv,
         private readonly databaseService: DatabaseService,
         private readonly instructionsService: InstructionsService,
+        private readonly objectStorageService: ObjectStorageService,
     ) {
         this.kvStoreClient.listenQueue((msg: BackgroundTaskMessage) => {
             switch (msg.task) {
@@ -24,6 +26,10 @@ export class BackgroundTasksService {
                         msg.task,
                         this.instructionsService.clearDatasetInstructions(msg.payload.datasetId, msg.payload.userEmail)
                     );
+                    break;
+
+                case "delete_agents_avatars_from_S3":
+                    this.taskPerformenceLogger(msg.task, this.deleteAgentsAvatarsFromS3());
                     break;
 
                 default:
@@ -46,6 +52,17 @@ export class BackgroundTasksService {
             this.setLastWeekInferencesRecording(record.key[1] as string, record.value)
             await this.kvStoreClient.set(record.key, new Deno.KvU64(0n))
         }
+    }
+
+    private async deleteAgentsAvatarsFromS3() {
+        const { rows } = await this.databaseService.query<{ id: string }>(
+            `DELETE FROM deleted_agents_avatars RETURNING id`
+        )
+
+        await this.objectStorageService.deleteFiles(
+            this.objectStorageService.buckets.agentsAvatars,
+            rows.map(row => row.id)
+        )
     }
 
     private async setLastWeekInferencesRecording(userEmail: string, todayValue: bigint) {

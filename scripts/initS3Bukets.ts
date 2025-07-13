@@ -25,8 +25,7 @@ const minioClient = new MinioClient({
     secretKey: parsedEnvVariables.OBJECT_STORAGE_PASSWORD,
 })
 
-for (const bucketKey in s3Buckets) {
-    const bucketName = s3Buckets[bucketKey];
+for (const bucketName in Object.values(s3Buckets)) {
     const avatarBucketExists = await minioClient.bucketExists(bucketName);
     if (!avatarBucketExists) {
         await minioClient.makeBucket(bucketName);

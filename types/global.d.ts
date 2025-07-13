@@ -32,3 +32,5 @@ type BackgroundTaskMessage =
         task: "delete_dataset_instructions";
         payload: { userEmail: string, datasetId: string }
     }
+    |
+    { task: "delete_agents_avatars_from_S3" }

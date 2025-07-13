@@ -18,6 +18,7 @@ export class AgentsService {
     constructor(
         private databaseService: DatabaseService,
         private objectStorageService: ObjectStorageService,
+        private kvStore: Deno.Kv,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
@@ -116,55 +117,42 @@ export class AgentsService {
     }
 
     async delete(agentId: string, userEmail: string) {
-        const { rows: [agent] } = await this.databaseService.query<Pick<Agent, "avatar" | "datasetId" | "isPublished"> | null>({
-            text: "SELECT avatar, dataset_id, is_published FROM agents WHERE id = $1 AND user_email = $2;",
-            args: [agentId, userEmail],
-            camelCase: true,
-        })
-
-        if (!agent) {
-            return null
-        }
-
         const transaction = this.databaseService.createTransaction("deleting_agent")
         await transaction.begin();
 
-        const result = await transaction.queryObject<Agent>({
-            text: "DELETE FROM agents WHERE id = $1 AND user_email = $2;",
+        const { rowCount: deleted, rows: [deletedAgent] } = await transaction.queryObject<Pick<Agent, "isPublished" | "avatar">>({
+            text: "DELETE FROM agents WHERE id = $1 AND user_email = $2 RETURNING is_published, avatar;",
             args: [agentId, userEmail],
         })
 
-        if (result.rowCount !== 1) {
+        if (!deleted) {
             await transaction.rollback();
             return false
         }
 
-        const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
+        const { rowCount: updateUserResult } = await transaction.queryObject<Pick<User, "email">>({
             text: `
             UPDATE users SET agents_count = agents_count - 1, published_agents = published_agents - $2 
             WHERE email = $1
             `,
-            args: [userEmail, agent.isPublished ? 1 : 0],
+            args: [userEmail, deletedAgent.isPublished ? 1 : 0],
         });
 
-        if (updateUserResult.rowCount !== 1) {
+        if (!updateUserResult) {
             await transaction.rollback();
             return false
         }
 
-        if (agent.avatar) {
-            try {
-                await this.objectStorageService.deleteFile(
-                    this.objectStorageService.buckets.agentsAvatars,
-                    agent.avatar
-                )
-            } catch {
-                await transaction.rollback();
-                return false
-            }
+        await transaction.commit();
+
+        if (deletedAgent.avatar) {
+            const aSecond = 1000
+            this.kvStore.enqueue({ task: "delete_agents_avatars_from_S3" }, {
+                delay: aSecond * 15,
+                backoffSchedule: [aSecond * 5, aSecond * 10, aSecond * 15],
+            });
         }
 
-        await transaction.commit();
         return true
     }
 
