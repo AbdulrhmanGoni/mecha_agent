@@ -48,7 +48,7 @@ services:
       - development-network
 
   dev_ollama:
-    image: ollama/ollama:0.5.11
+    image: ollama/ollama
     container_name: dev_ollama_container
     volumes:
       - ollama_data:/root/.ollama

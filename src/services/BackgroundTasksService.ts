@@ -40,11 +40,7 @@ export class BackgroundTasksService {
     }
 
     private async cleanExpiredAnonymousChats() {
-        await this.databaseService.query(
-            `DELETE FROM anonymous_chats WHERE (started_at + INTERVAL '1 day') < NOW()`
-        ).then(({ rowCount }) => {
-            console.log("'delete-expired-anonymous-chats' task done, deleted rows:", rowCount)
-        })
+        await this.databaseService.query(`DELETE FROM anonymous_chats WHERE (started_at + INTERVAL '1 day') < NOW()`)
     }
 
     private async resetUsersInferencesRateLimits() {
@@ -66,13 +62,14 @@ export class BackgroundTasksService {
     }
 
     private async setLastWeekInferencesRecording(userEmail: string, todayValue: bigint) {
-        const record = await this.kvStoreClient.get<number[]>(["last-week-inferences", userEmail])
+        const inferencesRecordKey = ["last-week-inferences", userEmail]
+        const record = await this.kvStoreClient.get<number[]>(inferencesRecordKey)
         if (record.value) {
             record.value.pop()
             record.value.unshift(Number(todayValue))
-            await this.kvStoreClient.set(["last-week-inferences", userEmail], record.value)
+            await this.kvStoreClient.set(inferencesRecordKey, record.value)
         } else {
-            await this.kvStoreClient.set(["last-week-inferences", userEmail], [Number(todayValue), 0, 0, 0, 0, 0, 0])
+            await this.kvStoreClient.set(inferencesRecordKey, [Number(todayValue), 0, 0, 0, 0, 0, 0])
         }
     }
 
