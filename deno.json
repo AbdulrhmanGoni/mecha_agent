@@ -1,7 +1,7 @@
 {
   "tasks": {
     "start:dev": {
-      "command": "deno run --allow-run -E -R --env-file=docker/.env.development scripts/startDevelopment.ts",
+      "command": "docker compose --env-file=docker/.env.development -f docker/docker-compose-dev.yml up -d",
       "dependencies": [
         "bundle-html-mails-templates:dev"
       ]
@@ -15,7 +15,8 @@
     "test:integration": "deno run --allow-run tests/scripts/runTests.ts integration",
     "test:e2e": "deno run --allow-run tests/scripts/runTests.ts e2e",
     "build:test": "docker compose -f docker/docker-compose-test.yml build testing_server",
-    "build:dev": "docker compose -f docker/docker-compose-dev.yml build dev_server"
+    "build:dev": "docker compose -f docker/docker-compose-dev.yml build dev_server",
+    "pull-models:dev": "deno run --allow-run -E --env-file=docker/.env.development scripts/downloadModels.ts"
   },
   "imports": {
     "@minify-html/deno": "jsr:@minify-html/deno@^0.16.4",
