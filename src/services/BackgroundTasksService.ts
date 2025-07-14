@@ -32,6 +32,10 @@ export class BackgroundTasksService {
                     this.taskPerformenceLogger(msg.task, this.deleteAgentsAvatarsFromS3());
                     break;
 
+                case "delete_user_legacy":
+                    this.taskPerformenceLogger(msg.task, this.deleteUserLegacy(msg.payload.userEmail));
+                    break;
+
                 default:
                     console.warn(new Date().toISOString(), `Unknown message enqueued: ${msg}`)
                     break;
@@ -71,6 +75,15 @@ export class BackgroundTasksService {
         } else {
             await this.kvStoreClient.set(inferencesRecordKey, [Number(todayValue), 0, 0, 0, 0, 0, 0])
         }
+    }
+
+    private async deleteUserLegacy(userEmail: string) {
+        await this.instructionsService.clearUserInstructions(userEmail);
+        await this.kvStoreClient.delete(["last-week-inferences", userEmail]);
+        for await (const record of this.kvStoreClient.list({ prefix: ["inferences", userEmail] })) {
+            record.value && await this.kvStoreClient.delete(record.key);
+        }
+        await this.deleteAgentsAvatarsFromS3()
     }
 
     private taskPerformenceLogger(task: string, taskPromise: Promise<unknown>) {

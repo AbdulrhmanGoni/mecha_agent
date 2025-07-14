@@ -198,6 +198,25 @@ export class UsersService {
             args: [email],
         });
 
-        return !!userDeleted
+        if (userDeleted) {
+            const aSecond = 1000;
+            const aMinute = aSecond * 60;
+            const enqueueingResult = await this.kvStore.enqueue(
+                { task: "delete_user_legacy", payload: { userEmail: email } },
+                {
+                    keysIfUndelivered: [["delete_user_legacy", email, Date.now()]],
+                    backoffSchedule: [aSecond * 10, aMinute, aMinute * 5, aMinute * 15],
+                    delay: aSecond * 30,
+                },
+            );
+
+            if (enqueueingResult.ok) {
+                return true;
+            }
+
+            throw new Error(`Failed to enqueue user deletion task for '${email}'`);
+        }
+
+        return false
     }
 }
