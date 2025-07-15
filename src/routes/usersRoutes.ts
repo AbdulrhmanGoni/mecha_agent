@@ -21,5 +21,10 @@ export default function usersRoutesBuilder(
         usersController.updateUserData.bind(usersController)
     );
 
+    authRoutes.delete('/',
+        guardService.guardRoute({ sudoOnly: true }),
+        usersController.deleteAccount.bind(usersController)
+    );
+
     return authRoutes;
 };

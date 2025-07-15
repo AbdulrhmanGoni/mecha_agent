@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { UsersService } from "../services/UsersService.ts";
 import authResponsesMessages from "../constant/response-messages/authResponsesMessages.ts";
 import usersResponsesMessages from "../constant/response-messages/usersResponsesMessages.ts";
+import { HTTPException } from "hono/http-exception";
 
 export class UsersController {
     constructor(
@@ -33,5 +34,16 @@ export class UsersController {
         }
 
         return c.json({ error: usersResponsesMessages.failedUpdate }, 400)
+    }
+
+    async deleteAccount(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+        const result = await this.usersService.delete(userEmail);
+
+        if (result) {
+            return c.json({ result: true })
+        }
+
+        throw new HTTPException(400, { message: usersResponsesMessages.unexpectedDeleteAccountError })
     }
 }
