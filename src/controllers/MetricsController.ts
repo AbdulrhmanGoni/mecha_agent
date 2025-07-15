@@ -23,13 +23,13 @@ export class MetricsController {
         }
     };
 
-    async exposeTrafficMetrics(_c: Context) {
+    async exposeTrafficMetrics(c: Context) {
         const {
             metrics,
             latencies,
         } = await this.getTrafficMetrics()
 
-        return new Response(
+        return c.body(
             (
                 metrics.length ?
                     "# HELP total_http_requests Total number of HTTP requests\n" +
@@ -41,7 +41,8 @@ export class MetricsController {
             `${latencies
                 .map((l) => `http_requests_latencies_bucket{le="${String(l.key[1]) === "Infinity" ? "+Inf" : String(l.key[1])}"} ${l.value || 0}`)
                 .join("\n")
-            }`
+            }`,
+            { headers: { "Content-Type": "text/plain; version=0.0.4" }, status: 200 }
         )
     }
 }
