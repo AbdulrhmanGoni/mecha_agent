@@ -97,6 +97,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
 
     const metricsRoutes = metricsRoutesBuilder(
         dependencies.controllers.metricsController,
+        dependencies.services.guardService,
     );
 
     const subscriptionsRoutes = subscriptionsRoutesBuilder(

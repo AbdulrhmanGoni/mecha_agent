@@ -55,6 +55,8 @@ export const envSchema = z.object({
     MAIL_SENDER_USER: z.string(),
     MAIL_SENDER_PASS: z.string(),
     MAIL_SENDER_KEY: z.string().optional(),
+
+    METRICS_SCRAPPER_TOKEN: z.string().optional(),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);

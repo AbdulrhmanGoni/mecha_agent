@@ -3,6 +3,9 @@ import { JwtService } from "./JwtService.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
 import { sudoPermission } from "../constant/permissions.ts";
+import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
+import { Context } from "node:vm";
+import { Next } from "hono/types";
 
 type GuardRouteOptions = {
     permissions?: Permission[];
@@ -13,7 +16,13 @@ export class GuardService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly databaseService: DatabaseService,
-    ) { }
+    ) {
+        if (parsedEnvVariables.ENVIRONMENT === "production") {
+            if (!parsedEnvVariables.METRICS_SCRAPPER_TOKEN) {
+                throw new Error("METRICS_SCRAPPER_TOKEN is not set in production environment");
+            }
+        }
+    }
 
     guardRoute({ permissions, sudoOnly }: GuardRouteOptions) {
         return bearerAuth({
@@ -71,5 +80,22 @@ export class GuardService {
         });
 
         return apiKey ? apiKey.status === "Active" : null;
+    }
+
+    guardMetricsRoute() {
+        if (parsedEnvVariables.ENVIRONMENT === "production") {
+            return bearerAuth({
+                verifyToken: (token) => {
+                    return token === parsedEnvVariables.METRICS_SCRAPPER_TOKEN
+                },
+                noAuthenticationHeaderMessage: { error: "Authentication header is missing" },
+                invalidAuthenticationHeaderMessage: { error: "Invalid authentication header" },
+                invalidTokenMessage: (c) => (
+                    { error: c.get("auth-error-message") || "You are unauthorized" }
+                ),
+            })
+        }
+
+        return (_c: Context, next: Next) => next()
     }
 }
