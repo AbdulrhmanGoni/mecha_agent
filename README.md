@@ -204,11 +204,11 @@ as the following: :point_down:
   deno task test:unit
   ```
 
-  > [!NOTE]
-  > If you want to run only unit tests, There is no need to run
-  > `deno task test:setup` command to set up the whole backend system in docker
-  > containers, You can directly run `deno task test:unit` whenever you want
-  > because i made unit tests run directly on the host machine (your machine).
+> [!NOTE]
+> If you want to run only unit tests, There is no need to run
+> `deno task test:setup` command to set up the whole backend system in docker
+> containers, You can directly run `deno task test:unit` whenever you want
+> because i made unit tests run directly on the host machine (your machine).
 
 > [!IMPORTANT]
 > If you changed something outside `/src` and `/tests` directories, you may need
