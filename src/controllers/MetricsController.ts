@@ -41,7 +41,7 @@ export class MetricsController {
             `${latencies
                 .map((l) => `http_requests_latencies_bucket{le="${String(l.key[1]) === "Infinity" ? "+Inf" : String(l.key[1])}"} ${l.value || 0}`)
                 .join("\n")
-            }`,
+            }\n`,
             { headers: { "Content-Type": "text/plain; version=0.0.4" }, status: 200 }
         )
     }
