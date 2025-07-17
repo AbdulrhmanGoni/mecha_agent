@@ -5,40 +5,60 @@ import chatsResponsesMessages from "../constant/response-messages/chatsResponses
 export class ChatsController {
     constructor(private chatsService: ChatsService) { }
 
-    async startChat(c: Context<{ Variables: { userEmail: string } }>) {
+    async startChat(c: Context<{ Variables: { userEmail: string, noInference: boolean } }>) {
         const agentId = c.req.query("agentId") as string;
         const isAnonymous = c.req.query("anonymous") === "yes";
         const userEmail = c.get("userEmail");
         const body = await c.req.json();
 
-        const result = await this.chatsService.startChat({
+        const { response, chatId, noDataset, noInstructions } = await this.chatsService.startChat({
             agentId,
             prompt: body.prompt,
             userEmail,
             isAnonymous,
         });
 
-        if (typeof result === "string") {
-            return c.body(result)
+        if (noDataset || noInstructions) {
+            c.set("noInference", true)
         }
 
-        return c.body(result.chatResponse, 200, { chatId: result.chatId });
+        if (noDataset) {
+            return c.body(chatsResponsesMessages.noDataset);
+        }
+
+        if (noInstructions) {
+            return c.body(chatsResponsesMessages.dontKnow);
+        }
+
+        return c.body(response, 200, { chatId: chatId || "" });
     }
 
-    async continueChat(c: Context<{ Variables: { userEmail: string } }>) {
+    async continueChat(c: Context<{ Variables: { userEmail: string, noInference: boolean } }>) {
         const chatId = c.req.param("chatId");
         const agentId = c.req.query("agentId") as string;
         const isAnonymous = c.req.query("anonymous") === "yes";
         const userEmail = c.get("userEmail");
         const body = await c.req.json();
 
-        const response = await this.chatsService.continueChat({
+        const { response, noDataset, noInstructions } = await this.chatsService.continueChat({
             agentId,
             prompt: body.prompt,
             chatId,
             userEmail,
             isAnonymous,
         });
+
+        if (noDataset || noInstructions) {
+            c.set("noInference", true)
+        }
+
+        if (noDataset) {
+            return c.body(chatsResponsesMessages.noDataset);
+        }
+
+        if (noInstructions) {
+            return c.body(chatsResponsesMessages.dontKnow);
+        }
 
         return c.body(response, 200);
     }

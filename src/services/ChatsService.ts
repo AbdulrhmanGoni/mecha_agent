@@ -1,7 +1,6 @@
 import { DatabaseService } from "./DatabaseService.ts";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
-import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import contextTemplate from "../helpers/contextTemplate.ts";
 import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
 
@@ -12,7 +11,10 @@ export class ChatsService {
         private readonly llmService: LLMService,
     ) { }
 
-    async fetchInstructions({ agentId, prompt, userEmail, isAnonymous }: Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">) {
+    async fetchInstructions(
+        { agentId, prompt, userEmail, isAnonymous }:
+            Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">
+    ) {
         const { rows: [agentRow] } = await this.databaseService.query<Agent | null>({
             text: 'SELECT * FROM agents WHERE id = $1 AND user_email = $2 AND ($3 = false OR is_published = true)',
             args: [agentId, userEmail, !!isAnonymous],
@@ -20,7 +22,10 @@ export class ChatsService {
         })
 
         if (!agentRow?.datasetId) {
-            return chatsResponsesMessages.noDataset
+            return {
+                instructions: null,
+                agent: agentRow,
+            }
         }
 
         const searchResult = await this.vectorDatabaseService.search(agentRow.datasetId, userEmail, {
@@ -30,10 +35,6 @@ export class ChatsService {
             forLLM: true,
         });
 
-        if (!searchResult.length) {
-            return agentRow.dontKnowResponse || chatsResponsesMessages.dontKnow
-        }
-
         return {
             instructions: searchResult,
             agent: agentRow,
@@ -41,9 +42,21 @@ export class ChatsService {
     }
 
     async chat(
-        { agent, instructions, chatMessages, onResponseComplete }:
-            Pick<ChatRelatedTypes, "chatMessages" | "onResponseComplete"> & { instructions: Instruction[], agent: Agent }
+        { userEmail, prompt, agentId, newMessage, onResponseComplete, isAnonymous, chatId }:
+            Pick<ChatRelatedTypes, "userEmail" | "prompt" | "agentId" | "newMessage" | "onResponseComplete" | "isAnonymous" | "chatId">
     ) {
+        const { agent, instructions } = await this.fetchInstructions({ agentId, prompt, userEmail, isAnonymous });
+
+        if (!agent || !instructions || !instructions.length) {
+            return {
+                response: null,
+                noDataset: !instructions,
+                noInstructions: !instructions?.length,
+            }
+        }
+
+        const chatHistory = chatId ? await this.getChatMessages({ agentId, chatId, userEmail, isAnonymous }) : [];
+
         const systemMessage = systemMessageTemplate(agent);
         const context = contextTemplate(instructions);
 
@@ -53,24 +66,19 @@ export class ChatsService {
                     role: "system",
                     content: systemMessage + "\n\n" + context,
                 },
-                ...chatMessages,
+                ...chatHistory,
+                newMessage,
             ],
             { onResponseComplete }
         )
 
-        return llmResponse
+        return { response: llmResponse, chatId }
     }
 
-    async startChat(
+    startChat(
         { agentId, prompt, userEmail, isAnonymous }:
             Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">
     ) {
-        const result = await this.fetchInstructions({ agentId, prompt, userEmail, isAnonymous });
-
-        if (typeof result === "string") {
-            return result
-        }
-
         const chatId = crypto.randomUUID();
 
         const newMessage = {
@@ -78,10 +86,13 @@ export class ChatsService {
             content: prompt,
         }
 
-        const chatResponse = await this.chat({
-            agent: result.agent,
-            instructions: result.instructions,
-            chatMessages: [newMessage],
+        return this.chat({
+            userEmail,
+            isAnonymous,
+            agentId,
+            chatId,
+            prompt,
+            newMessage,
             onResponseComplete: async (fullResponseText) => {
                 const chatHistory = [
                     newMessage,
@@ -99,34 +110,24 @@ export class ChatsService {
                 })
             }
         })
-
-        return {
-            chatId,
-            chatResponse
-        }
     }
 
-    async continueChat(
+    continueChat(
         { chatId, prompt, agentId, userEmail, isAnonymous }:
             Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "chatId" | "isAnonymous">
     ) {
-        const result = await this.fetchInstructions({ agentId, prompt, userEmail, isAnonymous });
-
-        if (typeof result === "string") {
-            return result
-        }
-
         const newMessage = {
             role: "user",
             content: prompt,
         }
 
-        const chatHistory = await this.getChatMessages({ agentId, chatId, userEmail, isAnonymous });
-
         return this.chat({
-            agent: result.agent,
-            instructions: result.instructions,
-            chatMessages: [...chatHistory, newMessage],
+            newMessage,
+            userEmail,
+            isAnonymous,
+            agentId,
+            chatId,
+            prompt,
             onResponseComplete: async (fullResponseText) => {
                 const newMessages = [
                     newMessage,

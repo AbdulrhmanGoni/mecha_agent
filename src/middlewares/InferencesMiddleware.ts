@@ -9,7 +9,7 @@ export class InferencesMiddleware {
         private databaseClient: PostgresClient,
     ) { }
 
-    async trackInferences(c: Context<{ Variables: { userEmail: string, apiKeyId: string } }, never, never>, next: Next) {
+    async trackInferences(c: Context<{ Variables: { userEmail: string, apiKeyId: string, noInference: boolean } }, never, never>, next: Next) {
         const userEmail = c.get("userEmail");
 
         let inferences: Deno.KvEntry<bigint> | null = null;
@@ -27,6 +27,10 @@ export class InferencesMiddleware {
         }
 
         await next();
+
+        if (c.get("noInference")) {
+            return
+        }
 
         if (c.res.status > 299 && c.res.status < 200) {
             return
