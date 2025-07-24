@@ -46,7 +46,7 @@ export default function signInTests({ db }: { db: PostgresClient }) {
             expect(res.error).toMatch(/Required/g);
         });
 
-        it("Should succeed to sign in because of the correct cridentials", async () => {
+        it("Should succeed to sign in because of the correct credentials", async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials });
 
             const request = new MechaTester(testingUserCredentials.email);

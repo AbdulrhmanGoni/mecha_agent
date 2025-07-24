@@ -69,7 +69,7 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
             expect(res.error).toMatch(/Required/g);
         });
 
-        it("Should succeed to sign up because of the correct cridentials", async () => {
+        it("Should succeed to sign up because of the correct credentials", async () => {
             const request = new MechaTester(testingUserCredentials.email);
 
             const response = await request.post(endpoint)
