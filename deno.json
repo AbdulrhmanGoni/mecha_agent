@@ -34,6 +34,7 @@
     "@std/testing/bdd": "jsr:@std/testing/bdd",
     "@std/expect": "jsr:@std/expect",
     "hono": "jsr:@hono/hono",
+    "qdrant": "npm:@qdrant/js-client-rest",
     "ollama": "npm:ollama@^0.5.13",
     "@google/genai": "npm:@google/genai",
     "stripe": "npm:stripe",

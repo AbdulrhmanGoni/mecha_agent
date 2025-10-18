@@ -1,5 +1,5 @@
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
 import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import insertUserIntoDB from "./insertUserIntoDB.ts";
 import insertAgentsIntoDB from "./insertAgentsIntoDB.ts";

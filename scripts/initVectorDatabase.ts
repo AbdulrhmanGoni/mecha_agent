@@ -1,4 +1,4 @@
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
 import { datasetsCollection, embeddingDimensions } from "../src/constant/vectorDB.ts";
 import { envSchema } from "../src/configurations/parseEnvironmentVariables.ts";
 import { z } from "zod";

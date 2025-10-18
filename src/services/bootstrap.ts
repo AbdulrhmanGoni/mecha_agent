@@ -1,4 +1,4 @@
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
 import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import { EmbeddingService } from "./EmbeddingService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";

@@ -1,4 +1,4 @@
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import { Client as MinioClient } from "minio/dist/esm/minio.mjs";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";

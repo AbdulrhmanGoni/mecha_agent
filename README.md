@@ -114,19 +114,19 @@ Now each component of the backend system should be up and running inside a
 docker container on your machine like this :point_down:
 
 ```
-dev_server_container is running on port http://localhost:10000
+dev_server_container is running on http://localhost:10000
 
-dev_database_container is running on port http://localhost:5432
+dev_database_container is running on http://localhost:5432
 
 dev_ollama_container doesn't listen to any port
 
-dev_vector_database_container is running on port http://localhost:6333
+dev_vector_database_container is running on http://localhost:6333
 
-dev_prometheus_container is running on port http://localhost:9090
+dev_prometheus_container is running on http://localhost:9090
 
-dev_grafana_container is running on port http://localhost:4444
+dev_grafana_container is running on http://localhost:4444
 
-dev_object_storage_container is running on port http://localhost:9001
+dev_object_storage_container is running on http://localhost:9001
 ```
 
 Lastly, You need to run the following command to download the Large Language

@@ -8,7 +8,7 @@ import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import { getRandomMockNewAgentInput } from "../../mock/data/mockAgents.ts";
 import { uuidMatcher } from "../../helpers/uuidMatcher.ts";
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
 import { getMockDatasetFile, mockDatasetForAgents } from "../../mock/data/mockDataset.ts";
 
 export default function createDatasetTests(
