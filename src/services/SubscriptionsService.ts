@@ -1,173 +1,73 @@
-import { DatabaseService } from "./DatabaseService.ts";
+import { StripePaymentGatewayClient } from "../configurations/stripePaymentGatewayClient.ts";
+import Stripe from "stripe";
 
 export class SubscriptionsService {
     constructor(
-        private paymentGatewayClientInterface: PaymentGatewayClientInterface,
-        private databaseService: DatabaseService,
+        private stripePaymentGatewayClient: StripePaymentGatewayClient,
         private kvStoreClient: Deno.Kv,
     ) { }
 
     async createSubscriptionSession(userEmail: string, plan: Plan) {
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "currentPlan">>({
-            text: "SELECT current_plan FROM users WHERE email = $1",
-            args: [userEmail],
-            camelCase: true,
-        });
-
-        if (user.currentPlan === plan.planName) {
-            return {
-                success: false,
-                samePlan: true,
-            }
-        }
-
-        const session = await this.paymentGatewayClientInterface.createSubscriptionSession(
-            userEmail,
+        const stripeCustomerId = await this.stripePaymentGatewayClient.getCustomerId(userEmail);
+        const session = await this.stripePaymentGatewayClient.createSubscriptionSession(
+            stripeCustomerId,
             plan,
         )
 
         return {
             success: true,
             session,
+            samePlan: false,
         }
     }
 
-    async verifyCheckoutSessionExistence(sessionId: string) {
-        return await this.paymentGatewayClientInterface.verifyCheckoutSessionExistence(sessionId);
-    }
-
-    async createSubscription(
-        { userEmail, customerId, subscriptionId, plan }:
-            { userEmail: string, customerId: string, subscriptionId: string, plan: Plan["planName"] }
-    ) {
-        const session = this.databaseService.createTransaction("subscription_creation");
-        await session.begin();
-
-        const { rowCount } = await session.queryObject<{ id: string }>({
-            text: `
-                INSERT INTO subscriptions(customer_id, subscription_id, user_email, plan) 
-                VALUES($1, $2, $3, $4)
-            `,
-            args: [customerId, subscriptionId, userEmail, plan],
-        });
-
-        if (rowCount) {
-            const { rowCount } = await session.queryObject({
-                text: 'UPDATE users SET subscription_id = $2, current_plan = $3 WHERE email = $1',
-                args: [userEmail, subscriptionId, plan],
-            });
-
-            if (rowCount) {
-                await session.commit()
-                for await (const record of this.kvStoreClient.list({ prefix: ["inferences", userEmail] })) {
-                    await this.kvStoreClient.delete(record.key);
-                }
-                return true
+    async onCheckoutSuccess(userEmail: string, sessionId: string) {
+        if (await this.stripePaymentGatewayClient.verifyCheckoutSession(sessionId)) {
+            const { value } = await this.kvStoreClient.get<string>(["stripe", "customers", userEmail]);
+            if (value) {
+                await this.stripePaymentGatewayClient.syncCustomerSubscription(value);
             }
+            return true
         }
-
-        await session.rollback()
         return false
     }
 
-    async deactivateSubscription(userEmail: string) {
-        const session = this.databaseService.createTransaction("subscription_deactivation");
-        await session.begin();
-
-        const { rows: [user] } = await session.queryObject<Pick<User, "subscriptionId"> | undefined>({
-            text: "UPDATE subscriptions SET status = 'inactive' WHERE user_email = $1 RETURNING subscription_id;",
-            args: [userEmail],
-            camelCase: true,
-        })
-
-        if (user?.subscriptionId) {
-            const subscriptionDeactivated = await this.paymentGatewayClientInterface.deactivateSubscription(user.subscriptionId);
-            if (subscriptionDeactivated) {
-                session.commit();
-                return true
-            } else {
-                session.rollback();
+    async getUserSubscriptionData(userEmail: string) {
+        const customerId = await this.kvStoreClient.get<string>(["stripe", "customers", userEmail])
+        if (customerId.value) {
+            const subscription = await this.kvStoreClient.get<CustomerSubscription>(["stripe", "subscriptions", customerId.value])
+            if (subscription.value && subscription.value.status != "none") {
+                return subscription.value
             }
         }
+        return null
+    }
 
+    async deactivateSubscription(userEmail: string) {
+        const subscription = await this.getUserSubscriptionData(userEmail)
+        if (subscription) {
+            return await this.stripePaymentGatewayClient.updateSubscriptionCancelationAtEnd(
+                subscription.subscriptionId!, true
+            );
+        }
         return false
     }
 
     async activateSubscription(userEmail: string) {
-        const session = this.databaseService.createTransaction("subscription_activation");
-        await session.begin();
-
-        const { rows: [user] } = await session.queryObject<Pick<User, "subscriptionId"> | undefined>({
-            text: "UPDATE subscriptions SET status = 'active' WHERE user_email = $1 RETURNING subscription_id;",
-            args: [userEmail],
-            camelCase: true,
-        })
-
-        if (user?.subscriptionId) {
-            const subscriptionActivated = await this.paymentGatewayClientInterface.activateSubscription(user.subscriptionId);
-            if (subscriptionActivated) {
-                session.commit();
-                return true
-            } else {
-                session.rollback();
-            }
+        const subscription = await this.getUserSubscriptionData(userEmail)
+        if (subscription) {
+            return await this.stripePaymentGatewayClient.updateSubscriptionCancelationAtEnd(
+                subscription.subscriptionId!, false
+            );
         }
-
         return false
     }
 
-    async deleteSubscription(customerId: string) {
-        const session = this.databaseService.createTransaction("subscription_deletion");
-        await session.begin();
-
-        const { rows: [subscription] } = await session.queryObject<Pick<Subscription, "userEmail" | "plan">>({
-            text: 'SELECT user_email, plan FROM subscriptions WHERE customer_id = $1',
-            args: [customerId],
-            camelCase: true,
-        });
-
-        if (!subscription) {
-            await session.rollback()
-            return false
-        }
-
-        const publishedAgentsEdit = "published_agents = CASE WHEN published_agents > 0 THEN 1 ELSE 0 END"
-        const { rowCount: deletedUsers } = await session.queryObject({
-            text: `UPDATE users SET subscription_id = $2, current_plan = $3, ${publishedAgentsEdit} WHERE email = $1`,
-            args: [subscription.userEmail, null, "Free"],
-        });
-        if (!deletedUsers) {
-            await session.rollback()
-            return false
-        }
-
-        const { rowCount } = await session.queryObject({
-            text: `
-            UPDATE agents SET is_published = false WHERE user_email = $1 AND id NOT IN
-            (SELECT id from agents WHERE user_email = $1 AND is_published = true ORDER BY created_at LIMIT 1)
-            `,
-            args: [subscription.userEmail],
-        });
-        if (!rowCount) {
-            await session.rollback()
-            return false
-        }
-
-        const { rowCount: deletedSubscriptions } = await session.queryObject({
-            text: 'DELETE FROM subscriptions WHERE customer_id = $1',
-            args: [customerId],
-        });
-        if (!deletedSubscriptions) {
-            await session.rollback()
-            return false
-        }
-
-        await this.kvStoreClient.delete(["inferences", subscription.userEmail, subscription.plan]);
-        await session.commit();
-        return true;
+    verifyWebhookSigning(body: string, signature: string) {
+        return this.stripePaymentGatewayClient.verifyWebhookSigning(body, signature)
     }
 
-    verifyWebhookSigning(body: string, signature: string) {
-        return this.paymentGatewayClientInterface.verifyWebhookSigning(body, signature)
+    stripeWebhookEventProcessing(event: Stripe.Event) {
+        return this.stripePaymentGatewayClient.processEvent(event)
     }
 }

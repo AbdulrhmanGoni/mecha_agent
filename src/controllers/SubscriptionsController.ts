@@ -46,14 +46,11 @@ export class SubscriptionsController {
         throw new HTTPException(400, { message: subscriptionsResponsesMessages.failedSessionCreation })
     }
 
-    async verifyCheckoutSessionExistence(c: Context<{ Variables: { userEmail: string } }>) {
-        const sessionId = c.req.query("id");
-        if (!sessionId) {
-            throw new HTTPException(400, { message: subscriptionsResponsesMessages.noSessionId })
-        }
-
-        const isSessionExisting = await this.subscriptionsService.verifyCheckoutSessionExistence(sessionId);
-        return c.json({ result: isSessionExisting });
+    async onCheckoutSuccess(c: Context<{ Variables: { userEmail: string } }>) {
+        const userEmail = c.get("userEmail");
+        const sessionId = c.req.query("id") as string;
+        const result = await this.subscriptionsService.onCheckoutSuccess(userEmail, sessionId);
+        return c.json({ result });
     }
 
     async deactivateSubscription(c: Context<{ Variables: { userEmail: string } }>) {
@@ -84,52 +81,7 @@ export class SubscriptionsController {
 
         try {
             const event = await this.subscriptionsService.verifyWebhookSigning(await req.text(), signature);
-            switch (event.type) {
-                case 'invoice.payment_succeeded': {
-                    const subscriptionId = event.data.object.lines.data[0]?.parent?.subscription_item_details?.subscription
-                    const customerId = event.data.object.customer
-                    const userEmail = event.data.object.customer_email
-                    const plan = event.data.object.lines.data[0].metadata.plan
-
-                    if (userEmail && customerId && subscriptionId && plan) {
-                        await this.subscriptionsService.createSubscription({
-                            userEmail,
-                            customerId: customerId.toString(),
-                            subscriptionId,
-                            plan: plan as Plan["planName"],
-                        })
-                    } else {
-                        throw new Error(
-                            "Stripe event missing required fields:\n" +
-                            `Event id: "${event.id}"\n` +
-                            `User email: "${userEmail}"\n` +
-                            `Customer id: "${customerId}"\n` +
-                            `Subscription id: "${subscriptionId}"\n` +
-                            `Plan: "${plan}"`
-                        );
-                    }
-                    break;
-                }
-
-                case 'invoice.payment_failed': {
-                    const customerId = event.data.object.customer
-                    if (customerId) {
-                        await this.subscriptionsService.deleteSubscription(customerId.toString());
-                    }
-                    break;
-                }
-
-                case 'customer.subscription.deleted': {
-                    const customerId = event.data.object.customer
-                    if (customerId) {
-                        this.subscriptionsService.deleteSubscription(customerId.toString());
-                    }
-                    break;
-                }
-
-                default: console.warn('Unhandled stripe event:', event.type)
-            }
-
+            await this.subscriptionsService.stripeWebhookEventProcessing(event)
             return c.text('Received', 200);
         } catch (err) {
             throw new Error("Webhook signature verification failed: " + (err as Error).message);

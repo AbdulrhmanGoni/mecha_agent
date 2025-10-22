@@ -21,9 +21,9 @@ export default function subscriptionsRoutesBuilder(
     // );
 
     // subscriptionsRoutes.get(
-    //     '/sessions/verify-session',
+    //     '/sessions/successful-checkout',
     //     guardService.guardRoute({ permissions: [readPermission] }),
-    //     subscriptionsController.verifyCheckoutSessionExistence.bind(subscriptionsController)
+    //     subscriptionsController.onCheckoutSuccess.bind(subscriptionsController)
     // );
 
     // subscriptionsRoutes.post(

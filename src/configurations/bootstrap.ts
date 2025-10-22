@@ -33,7 +33,7 @@ export async function bootstrapConfigurations() {
         database: parsedEnvVariables.DB_NAME,
     });
 
-    const paymentGatewayClientInterface = await bootstrapPaymentGatewayClient();
+    const stripePaymentGatewayClient = bootstrapPaymentGatewayClient();
 
     await databaseClient.connect();
 
@@ -44,6 +44,6 @@ export async function bootstrapConfigurations() {
         embeddingClient,
         minioClient,
         kvStoreClient,
-        paymentGatewayClientInterface,
+        stripePaymentGatewayClient,
     }
 };

@@ -20,6 +20,7 @@ import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 import { BackgroundTasksService } from "./BackgroundTasksService.ts";
 import { MailsSenderService } from "./MailsSenderService.ts";
+import { StripePaymentGatewayClient } from "../configurations/stripePaymentGatewayClient.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -28,7 +29,7 @@ type ServicesDependencies = {
     llmClient: LLMClientInterface;
     minioClient: MinioClient;
     kvStoreClient: Deno.Kv;
-    paymentGatewayClientInterface: PaymentGatewayClientInterface;
+    stripePaymentGatewayClient: StripePaymentGatewayClient;
 }
 
 export async function bootstrapServices(dependencies: ServicesDependencies) {
@@ -43,6 +44,11 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const instructionsService = new InstructionsService(vectorDatabaseService);
 
     const llmService = new LLMService(dependencies.llmClient);
+
+    const subscriptionsService = new SubscriptionsService(
+        dependencies.stripePaymentGatewayClient,
+        dependencies.kvStoreClient,
+    );
 
     const jwtService = new JwtService();
     await jwtService.init();
@@ -66,12 +72,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const datasetsService = new DatasetsService(
         databaseService,
         instructionsService,
-        dependencies.kvStoreClient,
-    );
-
-    const subscriptionsService = new SubscriptionsService(
-        dependencies.paymentGatewayClientInterface,
-        databaseService,
         dependencies.kvStoreClient,
     );
 
