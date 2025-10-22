@@ -53,7 +53,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const jwtService = new JwtService();
     await jwtService.init();
 
-    const usersService = new UsersService(databaseService, objectStorageService, kvStoreClient);
+    const usersService = new UsersService(databaseService, objectStorageService, kvStoreClient, subscriptionsService);
 
     const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
 
@@ -67,7 +67,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const sseService = new SSEService();
 
-    const agentsService = new AgentsService(databaseService, objectStorageService, dependencies.kvStoreClient);
+    const agentsService = new AgentsService(databaseService, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 
     const datasetsService = new DatasetsService(
         databaseService,

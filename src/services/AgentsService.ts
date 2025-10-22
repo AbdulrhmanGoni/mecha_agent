@@ -2,6 +2,7 @@ import { plans } from "../constant/plans.ts";
 import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
+import { SubscriptionsService } from "./SubscriptionsService.ts";
 
 const agentRowFieldsNamesMap: Record<string, string> = {
     agentName: "agent_name",
@@ -19,6 +20,7 @@ export class AgentsService {
         private databaseService: DatabaseService,
         private objectStorageService: ObjectStorageService,
         private kvStore: Deno.Kv,
+        private readonly subscriptionsService: SubscriptionsService,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
@@ -262,8 +264,15 @@ export class AgentsService {
     }
 
     async publishAgent(agentId: string, userEmail: string) {
+        const userSubscription = await this.subscriptionsService.getUserSubscriptionData(userEmail)
+        if (!userSubscription) {
+            return {
+                success: false,
+            }
+        }
+
         const { rows: [user] } = await this.databaseService.query<Pick<User, "publishedAgents" | "currentPlan"> | null>({
-            text: 'SELECT published_agents, current_plan FROM users WHERE email = $1',
+            text: 'SELECT published_agents FROM users WHERE email = $1',
             camelCase: true,
             args: [userEmail],
         });
@@ -274,7 +283,7 @@ export class AgentsService {
             }
         }
 
-        const plan = plans.find((p) => p.planName === user.currentPlan) || plans[0]
+        const plan = plans.find((p) => p.planName == userSubscription.planName) || plans[0]
 
         if (!(user.publishedAgents < plan.maxPublishedAgentsCount)) {
             return {
