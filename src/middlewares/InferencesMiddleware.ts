@@ -1,27 +1,23 @@
 import { Context, Next } from "hono";
-import { Client as PostgresClient } from "deno.land/x/postgres";
 import chatsResponsesMessages from "../constant/response-messages/chatsResponsesMessages.ts";
 import { plans } from "../constant/plans.ts";
+import { SubscriptionsService } from "../services/SubscriptionsService.ts";
 
 export class InferencesMiddleware {
     constructor(
         private kvStoreClient: Deno.Kv,
-        private databaseClient: PostgresClient,
+        private subscriptionsService: SubscriptionsService
     ) { }
 
     async trackInferences(c: Context<{ Variables: { userEmail: string, apiKeyId: string, noInference: boolean } }, never, never>, next: Next) {
         const userEmail = c.get("userEmail");
 
-        let inferences: Deno.KvEntry<bigint> | null = null;
-        const iterator = this.kvStoreClient.list<bigint>({ prefix: ["inferences", userEmail] }, { limit: 1 });
-        for await (const userIncerencesRecord of iterator) {
-            inferences = userIncerencesRecord
-        }
+        const inferencesRecord = await this.kvStoreClient.get<bigint>(["inferences", userEmail]);
+        if (inferencesRecord.value) {
+            const subscription = await this.subscriptionsService.getUserSubscriptionData(userEmail);
+            const userPlan = plans.find((p) => p.planName === subscription?.planName) || plans[0];
 
-        if (inferences) {
-            const userPlan = plans.find((p) => p.planName === inferences.key[2]) || plans[0];
-
-            if (inferences.value >= userPlan.maxInferencesPerDay) {
+            if (inferencesRecord.value >= userPlan.maxInferencesPerDay) {
                 return c.json({ error: chatsResponsesMessages.inferencesLimitReached }, 429)
             }
         }
@@ -36,22 +32,9 @@ export class InferencesMiddleware {
             return
         }
 
-        if (inferences) {
-            await this.kvStoreClient
-                .atomic()
-                .sum(inferences.key, 1n)
-                .commit();
-        } else {
-            const { rows: [user] } = await this.databaseClient.queryObject<Pick<User, "currentPlan">>({
-                text: `SELECT current_plan FROM users WHERE email = $1`,
-                args: [userEmail],
-                camelCase: true
-            })
-
-            await this.kvStoreClient
-                .atomic()
-                .sum(["inferences", userEmail, user.currentPlan], 1n)
-                .commit();
-        }
+        await this.kvStoreClient
+            .atomic()
+            .sum(inferencesRecord.key, 1n)
+            .commit();
     };
 }

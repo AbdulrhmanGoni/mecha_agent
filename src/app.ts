@@ -22,6 +22,9 @@ export default async function bootstrapApp() {
         configs: {
             kvStoreClient: configurations.kvStoreClient,
             databaseClient: configurations.databaseClient,
+        },
+        services: {
+            subscriptionsService: services.subscriptionsService
         }
     });
     console.log(`Middlewares bootstrapped in ${performanceInSeconds(middlewaresStart)}`);
