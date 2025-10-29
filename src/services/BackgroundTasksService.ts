@@ -80,9 +80,7 @@ export class BackgroundTasksService {
     private async deleteUserLegacy(userEmail: string) {
         await this.instructionsService.clearUserInstructions(userEmail);
         await this.kvStoreClient.delete(["last-week-inferences", userEmail]);
-        for await (const record of this.kvStoreClient.list({ prefix: ["inferences", userEmail] })) {
-            record.value && await this.kvStoreClient.delete(record.key);
-        }
+        await this.kvStoreClient.delete(["inferences", userEmail]);
         await this.deleteAgentsAvatarsFromS3()
     }
 
