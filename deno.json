@@ -20,6 +20,7 @@
     "pull-models:dev": "deno run --allow-run -E --env-file=docker/.env.development scripts/downloadModels.ts"
   },
   "imports": {
+    "@denokv-gui-client/bridge-server": "jsr:@denokv-gui-client/bridge-server@^2.2.10",
     "@minify-html/deno": "jsr:@minify-html/deno@^0.16.4",
     "@std/encoding": "jsr:@std/encoding@^1.0.10",
     "dbmate": "npm:dbmate@^2.27.0",
