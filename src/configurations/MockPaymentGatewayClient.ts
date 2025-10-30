@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { StripePaymentGatewayClient } from "../../../src/configurations/stripePaymentGatewayClient.ts";
+import { StripePaymentGatewayClient } from "./stripePaymentGatewayClient.ts";
 
 export class MockPaymentGatewayClient extends StripePaymentGatewayClient {
     constructor(private _stripe: Stripe, private _kv: Deno.Kv) {

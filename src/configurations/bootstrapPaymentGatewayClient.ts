@@ -1,4 +1,4 @@
-import { MockPaymentGatewayClient } from "../../tests/mock/configs/MockPaymentGatewayClient.ts";
+import { MockPaymentGatewayClient } from "./MockPaymentGatewayClient.ts";
 import { kvStoreClient } from "./denoKvStoreClient.ts";
 // import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 // import { StripePaymentGatewayClient } from "./stripePaymentGatewayClient.ts";
