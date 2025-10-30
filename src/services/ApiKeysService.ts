@@ -26,7 +26,7 @@ export class ApiKeysService {
                 apiKeyId,
                 jwtKey.jwt,
                 keyName,
-                jwtKey.expirationDate,
+                jwtKey.expirationDate ?? null,
                 params.permissions,
                 params.userEmail
             ],

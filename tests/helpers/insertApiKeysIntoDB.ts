@@ -21,7 +21,7 @@ export default async function insertApiKeysIntoDB(
     const valuse = keys.flatMap((key) => [
         randomString(key.keyName.length + 10),
         key.keyName,
-        new Date(new Date().setDate(new Date().getDate() + key.maxAgeInDays)),
+        null,
         key.permissions,
         key.userEmail,
         key.status || "Active",

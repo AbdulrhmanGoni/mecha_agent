@@ -6,7 +6,7 @@ import schemaParser from "../../helpers/schemaParser.ts";
 const createApiKeyInputSchema = z.object({
     keyName: z.string(),
     permissions: z.array(z.enum(apiKeysPermissions)).nonempty("Specify at least one permission"),
-    maxAgeInDays: z.number(),
+    maxAgeInDays: z.number().optional(),
 }).strict()
 
 const createApiKeyInputValidator = validator('json', (value, c) => {

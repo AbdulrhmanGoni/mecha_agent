@@ -20,9 +20,9 @@ export class JwtService {
     }
 
     async generateJwt(options: CreateJWTParams, additionalPayload?: Record<string, string>) {
-        const expirationDate = genDateAfterNDays(options.maxAgeInDays);
+        const expirationDate = options.maxAgeInDays ? genDateAfterNDays(options.maxAgeInDays) : undefined;
         const payload: Payload = {
-            exp: getNumericDate(expirationDate),
+            exp: expirationDate && getNumericDate(expirationDate),
             permissions: options.permissions,
             email: options.userEmail,
             ...additionalPayload

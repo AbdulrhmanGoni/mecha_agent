@@ -5,7 +5,7 @@ type WithOptionalFields<Obj, Keys extends keyof Obj> = Omit<Obj, Keys> & Partial
 type Permission = import("../src/constant/permissions.ts").Permission
 
 type CreateJWTParams = {
-    maxAgeInDays: number;
+    maxAgeInDays?: number;
     permissions: Permission[];
     userEmail: User["email"];
 }
