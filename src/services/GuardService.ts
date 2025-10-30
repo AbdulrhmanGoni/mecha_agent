@@ -4,7 +4,7 @@ import { DatabaseService } from "./DatabaseService.ts";
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
 import { sudoPermission } from "../constant/permissions.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
-import { Context } from "node:vm";
+import { Context } from "hono";
 import { Next } from "hono/types";
 
 type GuardRouteOptions = {

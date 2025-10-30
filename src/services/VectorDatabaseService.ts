@@ -1,5 +1,5 @@
-import { QdrantClient } from "npm:@qdrant/js-client-rest";
-import { Schemas } from "npm:@qdrant/js-client-rest";
+import { QdrantClient } from "qdrant";
+import { Schemas } from "qdrant";
 import { EmbeddingService } from "./EmbeddingService.ts";
 import embedInstructionFormat from "../helpers/embedInstructionFormat.ts";
 import { datasetsCollection } from "../constant/vectorDB.ts";
