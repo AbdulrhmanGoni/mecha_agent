@@ -79,8 +79,17 @@ export class BackgroundTasksService {
 
     private async deleteUserLegacy(userEmail: string) {
         await this.instructionsService.clearUserInstructions(userEmail);
-        await this.kvStoreClient.delete(["last-week-inferences", userEmail]);
-        await this.kvStoreClient.delete(["inferences", userEmail]);
+        const dOp = this.kvStoreClient.atomic()
+            .delete(["last-week-inferences", userEmail])
+            .delete(["inferences", userEmail])
+
+        const customerRecord = await this.kvStoreClient.get<string>(["stripe", "customers", userEmail])
+        if (customerRecord.value) {
+            dOp.delete(["stripe", "customers", userEmail])
+                .delete(["stripe", "subscriptions", customerRecord.value])
+        }
+
+        await dOp.commit()
         await this.deleteAgentsAvatarsFromS3()
     }
 
