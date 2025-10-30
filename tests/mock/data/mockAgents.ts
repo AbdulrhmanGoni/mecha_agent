@@ -10,6 +10,7 @@ const mockAgents: Agent[] = [
         responseSyntax: "markdown",
         avatar: "f56113aa-5172-4199-82ff-4f64d2941952.webp",
         greetingMessage: "Hello, How can i help you?",
+        isPublished: true,
         datasetId: "5068e70e-1c1a-4f67-9b8e-164cbe33faa5",
         userEmail: "exampleuser@gamin"
     },
@@ -23,6 +24,7 @@ const mockAgents: Agent[] = [
         responseSyntax: "markdown",
         avatar: "892f0aff-0135-48fd-8f16-8fee90293663.png",
         greetingMessage: "Hello, How can i help you?",
+        isPublished: true,
         datasetId: "c3606e51-aba3-43dc-9d91-51a880f32706",
         userEmail: "exampleuser@gmail.com"
     },
@@ -36,6 +38,7 @@ const mockAgents: Agent[] = [
         responseSyntax: "markdown",
         avatar: "740f99ee-cf3a-4acb-abe9-ef061dd35f94.webp",
         greetingMessage: "Hi, What can i help with?",
+        isPublished: true,
         datasetId: null,
         userEmail: "exampleuser@gamin"
     }
@@ -52,6 +55,7 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         systemInstructions,
         dontKnowResponse,
         responseSyntax,
+        isPublished,
         greetingMessage,
     } = getRandomMockAgent()
 
@@ -61,6 +65,7 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         systemInstructions,
         dontKnowResponse,
         responseSyntax,
+        isPublished,
         greetingMessage,
     }
 }

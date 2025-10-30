@@ -10,7 +10,7 @@ export function mockDatasetForAgents(agent: Pick<Agent, "agentName" | "id">) {
 
 export function getMockDatasetFile() {
     const instructionsFileText = mockInstructions
-        .map(({ prompt, response, systemMessage }) => JSON.stringify({ prompt, response, systemMessage }))
+        .map(({ prompt, response }) => JSON.stringify({ prompt, response }))
         .join("\n")
 
     return new Blob([instructionsFileText], { type: "application/jsonl" })
