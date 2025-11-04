@@ -25,7 +25,7 @@ type ChatHistory = {
 type ChatRelatedTypes = {
     prompt: string;
     agentId: string;
-    chatId?: string;
+    chatId: string;
     newMessage: ChatMessage;
     chatMessages: ChatMessage[];
     onResponseComplete: (fullResponseText: string) => Promise<void>;
