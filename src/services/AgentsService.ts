@@ -255,6 +255,13 @@ export class AgentsService {
         })
 
         if (!!userUpdated && !!agentUpdated) {
+            const publishedAgentRecordKey = ["published_agent_owner", agentId]
+            if (isPublished) {
+                await this.kvStore.delete(publishedAgentRecordKey)
+            } else {
+                await this.kvStore.set(publishedAgentRecordKey, userEmail)
+            }
+
             await transaction.commit()
             return true
         }

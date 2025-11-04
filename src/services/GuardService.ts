@@ -16,6 +16,7 @@ export class GuardService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly databaseService: DatabaseService,
+        private readonly kv: Deno.Kv,
     ) {
         if (parsedEnvVariables.ENVIRONMENT === "production") {
             if (!parsedEnvVariables.METRICS_SCRAPPER_TOKEN) {
@@ -97,5 +98,16 @@ export class GuardService {
         }
 
         return (_c: Context, next: Next) => next()
+    }
+
+    async publicAgentCheck(c: Context, next: Next) {
+        const agentId = c.req.query("agentId") as string;
+        const record = await this.kv.get<string>(["published_agent_owner", agentId])
+        if (!record.value) {
+            return c.json({ error: "Agent not found" })
+        }
+
+        c.set("userEmail", record.value)
+        await next()
     }
 }

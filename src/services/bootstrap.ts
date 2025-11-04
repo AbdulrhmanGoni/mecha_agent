@@ -16,7 +16,6 @@ import { ChatsService } from "./ChatsService.ts";
 import { DatasetsService } from "./DatasetsService.ts";
 import { SSEService } from "./SSEService.ts";
 import { UsersService } from "./UsersService.ts";
-import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 import { BackgroundTasksService } from "./BackgroundTasksService.ts";
 import { MailsSenderService } from "./MailsSenderService.ts";
@@ -53,7 +52,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const jwtService = new JwtService();
     await jwtService.init();
 
-    const usersService = new UsersService(databaseService, objectStorageService, kvStoreClient, subscriptionsService);
+    const usersService = new UsersService(databaseService, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 
     const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
 
@@ -63,7 +62,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const authService = new AuthService(usersService, mailsSenderService, dependencies.kvStoreClient);
 
-    const guardService = new GuardService(jwtService, databaseService);
+    const guardService = new GuardService(jwtService, databaseService, dependencies.kvStoreClient);
 
     const sseService = new SSEService();
 

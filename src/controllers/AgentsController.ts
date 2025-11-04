@@ -20,12 +20,23 @@ export class AgentsController {
     async getOne(c: Context<{ Variables: { userEmail: string } }>) {
         const agentId = c.req.param("agentId");
         const userEmail = c.get("userEmail");
-        const isPublishedAgent = c.req.query("published") === "yes";
+        const isPublishedAgent = c.req.query("published") == "yes";
 
         const result =
             isPublishedAgent ?
                 await this.agentsService.getPublishedAgent(agentId) :
                 await this.agentsService.getOne(agentId, userEmail);
+
+        if (result) {
+            return c.json({ result }, 200);
+        }
+
+        return c.json({ error: AgentsResponseMessages.notFoundAgent }, 404);
+    }
+
+    async getPublishedAgent(c: Context<{ Variables: { userEmail: string } }>) {
+        const agentId = c.req.param("agentId");
+        const result = await this.agentsService.getPublishedAgent(agentId)
 
         if (result) {
             return c.json({ result }, 200);

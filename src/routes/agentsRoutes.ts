@@ -23,6 +23,11 @@ export default function agentsRoutesBuilder(
         agentsController.getOne.bind(agentsController)
     );
 
+    agentsRoutes.get(
+        '/public/:agentId',
+        agentsController.getPublishedAgent.bind(agentsController)
+    );
+
     agentsRoutes.post(
         '/:agentId/publish',
         guardService.guardRoute({ permissions: [readPermission, writePermission, inferencePermission] }),
