@@ -1,7 +1,6 @@
 import { DatabaseService } from "./DatabaseService.ts";
 import { PasswordHasher } from "../helpers/passwordHasher.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
-import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
 import { plans } from "../constant/plans.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 
@@ -106,20 +105,18 @@ export class UsersService {
     }
 
     async update(email: string, updateData: UpdateUserData) {
-        const { newAvatar, removeAvatar, ...updateUserData } = updateData
-        let newAvatarId: string = ""
-
+        const { removeAvatar, ...updateUserData } = updateData
+        let oldAvatar: string | undefined;
         if (removeAvatar) {
+            const { rows: [user] } = await this.databaseService.query<User>({
+                text: "SELECT avatar FROM users WHERE user_email = $1",
+                args: [email],
+            })
+            oldAvatar = user.avatar
             Object.assign(updateUserData, { avatar: null });
         }
 
-        if (newAvatar?.size && newAvatar?.name) {
-            const fileExtention = mimeTypeToFileExtentionMap[newAvatar.type];
-            newAvatarId = `${crypto.randomUUID()}.${fileExtention}`;
-            Object.assign(updateUserData, { avatar: newAvatarId });
-        }
-
-        type UpdateDataFormat = [string, (string | Date)[]]
+        type UpdateDataFormat = [string, (string | Date | null)[]]
         const [fields, values] = Object
             .entries(updateUserData)
             .reduce<UpdateDataFormat>(([fields, values], [field, value], i, arr) => {
@@ -129,50 +126,27 @@ export class UsersService {
                         `${userRowFieldsNamesMap[field] || field} = $${i + 2}` +
                         `${i === arr.length - 1 ? "" : ", "}`
                     ),
-                    [...values, value || ""]
+                    [...values, value ?? null]
                 ]
             }, ["", []])
 
         const transaction = this.databaseService.createTransaction("update_user_data")
         await transaction.begin();
 
-        const { rowCount, rows: [{ avatar: oldAvatar }] } = await transaction.queryObject<User>({
-            text: `UPDATE users SET ${fields} WHERE email = $1 RETURNING avatar`,
+        const { rowCount } = await transaction.queryObject<User>({
+            text: `UPDATE users SET ${fields} WHERE email = $1;`,
             args: [email, ...values],
         });
 
         if (rowCount) {
-            let uploadFileFailed = false;
-
-            if (newAvatar && newAvatarId) {
-                uploadFileFailed = await this.objectStorage.uploadFile(
-                    this.objectStorage.buckets.usersAvatars,
-                    newAvatar,
-                    {
-                        id: newAvatarId,
-                        metaData: { "user-email": email }
-                    }
-                )
-                    .then(() => false)
-                    .catch(() => true)
+            if (removeAvatar && oldAvatar) {
+                this.objectStorage.deleteFiles(oldAvatar);
             }
-
-            if (oldAvatar && (removeAvatar || newAvatar)) {
-                await this.objectStorage.deleteFile(
-                    this.objectStorage.buckets.usersAvatars,
-                    oldAvatar,
-                )
-            }
-
-            if (!uploadFileFailed) {
-                await transaction.commit();
-
-                return true
-            }
+            await transaction.commit();
+            return true
         }
 
         await transaction.rollback();
-
         return false
     }
 

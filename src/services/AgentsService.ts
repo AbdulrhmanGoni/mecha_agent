@@ -1,5 +1,4 @@
 import { plans } from "../constant/plans.ts";
-import { mimeTypeToFileExtentionMap } from "../constant/supportedFileTypes.ts";
 import { DatabaseService } from "./DatabaseService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
@@ -24,41 +23,34 @@ export class AgentsService {
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
-        const { avatar, ...agentData } = newAgent
-
-        let avatarId = null;
-
-        if (avatar) {
-            const fileExtention = mimeTypeToFileExtentionMap[avatar.type];
-            avatarId = `${crypto.randomUUID()}.${fileExtention}`;
-        }
-
-        type CreationDataFormat = [string, string, (string | boolean | null)[]];
-
-        const [fields, placeholders, values] = Object
-            .entries({ ...agentData, userEmail, avatar: avatarId })
-            .reduce<CreationDataFormat>(([fields, placeholders, values], [field, value], i, arr) => {
-                return [
-                    (
-                        fields +
-                        `${agentRowFieldsNamesMap[field] || field}` +
-                        `${i === arr.length - 1 ? "" : ", "}`
-                    ),
-                    (
-                        `${placeholders}$${i + 1}` +
-                        `${i === arr.length - 1 ? "" : ", "}`
-                    ),
-                    [...values, value ?? null]
-                ]
-            }, ["", "", []])
-
         const transaction = this.databaseService.createTransaction("creating_agent")
         await transaction.begin();
 
-        const result = await transaction.queryObject(`
-            INSERT INTO agents (${fields})
-            VALUES (${placeholders});
-        `, values).catch(() => null);
+        const result = await transaction.queryObject({
+            text: `
+                INSERT INTO agents(
+                    agent_name, 
+                    description, 
+                    avatar, 
+                    system_instructions, 
+                    dont_know_response, 
+                    response_syntax, 
+                    greeting_message,
+                    user_email
+                )
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+            `,
+            args: [
+                newAgent.agentName,
+                newAgent.description,
+                newAgent.avatar,
+                newAgent.systemInstructions,
+                newAgent.dontKnowResponse,
+                newAgent.responseSyntax,
+                newAgent.greetingMessage,
+                userEmail
+            ]
+        })
 
         const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
             text: 'UPDATE users SET agents_count = agents_count + 1 WHERE email = $1',
@@ -66,24 +58,11 @@ export class AgentsService {
         });
 
         if (result?.rowCount && updateUserResult.rowCount) {
-            if (newAgent.avatar && avatarId) {
-                try {
-                    await this.objectStorageService.uploadFile(
-                        this.objectStorageService.buckets.agentsAvatars,
-                        newAgent.avatar,
-                        { id: avatarId, metaData: { "user-email": userEmail } }
-                    );
-                } catch {
-                    await transaction.rollback();
-                    return false
-                }
-            }
-
             await transaction.commit();
             return true
         }
 
-        await transaction.rollback().catch(() => null);
+        await transaction.rollback()
         return false
     }
 
@@ -148,10 +127,10 @@ export class AgentsService {
         await transaction.commit();
 
         if (deletedAgent.avatar) {
-            const aSecond = 1000
+            const second = 1000
             this.kvStore.enqueue({ task: "delete_agents_avatars_from_S3" }, {
-                delay: aSecond * 15,
-                backoffSchedule: [aSecond * 5, aSecond * 10, aSecond * 15],
+                delay: second * 7,
+                backoffSchedule: [second * 10, second * 60, second * 60 * 60],
             });
         }
 
@@ -159,28 +138,21 @@ export class AgentsService {
     }
 
     async update(agentId: string, userEmail: string, updateData: UpdateAgentFormData) {
-        const { rows: [agent] } = await this.databaseService.query<Agent | null>({
-            text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
-            args: [agentId, userEmail],
-        })
-
-        if (!agent) {
-            return null
-        }
-
-        const { avatar: newAgentAvatart, removeAvatar, ...restUpdateData } = updateData;
-
-        let avatarId = null;
-
-        if (newAgentAvatart) {
-            const fileExtention = mimeTypeToFileExtentionMap[newAgentAvatart.type];
-            avatarId = `${crypto.randomUUID()}.${fileExtention}`;
+        const { removeAvatar, ...restUpdateData } = updateData;
+        let oldAvatar: string | undefined;
+        if (removeAvatar) {
+            const { rows: [agent] } = await this.databaseService.query<Agent>({
+                text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
+                args: [agentId, userEmail],
+            })
+            oldAvatar = agent.avatar
+            Object.assign(restUpdateData, { avatar: null });
         }
 
         type UpdateDataFormat = [string, (string | boolean | null)[]]
 
         const [fields, values] = Object
-            .entries(newAgentAvatart || removeAvatar ? { ...restUpdateData, avatar: avatarId } : restUpdateData)
+            .entries(restUpdateData)
             .reduce<UpdateDataFormat>(([fields, values], [field, value], i, arr) => {
                 return [
                     (
@@ -195,35 +167,22 @@ export class AgentsService {
         const transaction = this.databaseService.createTransaction("updating_agent")
         await transaction.begin();
 
-        const result = await transaction.queryObject<Agent>({
+        const updateResult = await transaction.queryObject<Agent>({
             text: `UPDATE agents SET ${fields} WHERE id = $1 AND user_email = $2;`,
             args: [agentId, userEmail, ...values],
         })
 
-        try {
-            if (result.rowCount) {
-                if (newAgentAvatart && avatarId) {
-                    await this.objectStorageService.uploadFile(
-                        this.objectStorageService.buckets.agentsAvatars,
-                        newAgentAvatart,
-                        { id: avatarId, metaData: { "user-email": userEmail } }
-                    );
+        if (updateResult.rowCount) {
+            if (removeAvatar && oldAvatar) {
+                if (oldAvatar) {
+                    this.objectStorageService.deleteFiles(oldAvatar);
                 }
-
-                if (agent.avatar && (newAgentAvatart || removeAvatar)) {
-                    await this.objectStorageService.deleteFile(
-                        this.objectStorageService.buckets.agentsAvatars,
-                        agent.avatar
-                    )
-                }
-
-                await transaction.commit();
-                return true
             }
-        } catch {
-            await transaction.rollback()
+            await transaction.commit();
+            return true
         }
 
+        await transaction.rollback()
         return false
     }
 

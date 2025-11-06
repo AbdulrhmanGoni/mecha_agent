@@ -6,7 +6,7 @@ type SignInUserInput = {
 
 type SignUpUserInput = SignInUserInput & {
     username: string;
-    avatar?: string | null;
+    avatar?: string;
 }
 
 type User = SignUpUserInput & {
@@ -20,8 +20,7 @@ type User = SignUpUserInput & {
     subscriptionId: string;
 }
 
-type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username"> & {
-    newAvatar: File;
+type UpdateUserData = Partial<Pick<User, "lastSignIn" | "username" | "avatar"> & {
     removeAvatar: boolean;
 }>
 

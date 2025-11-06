@@ -10,7 +10,7 @@ const createAgentInputSchema = z.object({
     greetingMessage: agentSchema.shape.greetingMessage.default(defaultGreetingMessage),
 }).strict()
 
-const createAgentInputValidator = validator('form', (value, c) => {
+const createAgentInputValidator = validator('json', (value, c) => {
     return schemaParser<typeof createAgentInputSchema.shape, ParsedFormValue | ParsedFormValue[]>(
         c,
         createAgentInputSchema,

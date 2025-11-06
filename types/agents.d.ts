@@ -1,21 +1,19 @@
-type Agent = {
-    id: string;
+type CreateAgentFormData = {
     agentName: string;
     description: string;
     avatar?: string;
-    userEmail: string;
-    datasetId?: string | null;
     systemInstructions?: string;
     dontKnowResponse?: string;
     responseSyntax?: import("../src/constant/agents.ts").ResponseSyntax;
     greetingMessage?: string;
+}
+type Agent = {
+    id: string;
+    userEmail: string;
+    datasetId?: string | null;
     isPublished: boolean;
     createdAt: Date;
-}
-
-type CreateAgentFormData = Omit<Agent, "id" | "userEmail" | "avatar" | "createdAt" | "datasetId"> & {
-    avatar?: File
-}
+} & CreateAgentFormData
 
 type UpdateAgentFormData = Partial<CreateAgentFormData> & {
     removeAvatar?: boolean

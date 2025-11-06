@@ -15,7 +15,7 @@ const updateAgentInputSchema = z.object({
     removeAvatar: z.coerce.boolean().optional(),
 }).strict()
 
-const updateAgentInputValidator = validator('form', (value, c) => {
+const updateAgentInputValidator = validator('json', (value, c) => {
     return schemaParser<typeof updateAgentInputSchema.shape, ParsedFormValue | ParsedFormValue[]>(
         c,
         updateAgentInputSchema,
