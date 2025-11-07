@@ -5,7 +5,6 @@ import { ApiKeysController } from "./ApiKeysController.ts";
 import { AuthController } from "./AuthController.ts";
 import { ChatsController } from "./ChatsController.ts"
 import { InstructionsController } from "./InstructionsController.ts";
-import { MediaController } from "./MediaController.ts";
 import { DatasetsController } from "./DatasetsController.ts";
 import { SSEController } from "./SSEController.ts";
 import { AgentsService } from "../services/AgentsService.ts";
@@ -57,10 +56,6 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         dependencies.services.chatsService
     );
 
-    const mediaController = new MediaController(
-        dependencies.services.objectStorageService
-    );
-
     const apiKeysController = new ApiKeysController(
         dependencies.services.apiKeysService
     );
@@ -85,7 +80,6 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         instructionsController,
         agentsController,
         datasetsController,
-        mediaController,
         apiKeysController,
         authController,
         sseController,

@@ -10,8 +10,6 @@ import authRoutesBuilder from "./authRoutes.ts";
 import agentsRoutesBuilder from "./agentsRoutes.ts";
 import datasetsRoutesBuilder from "./datasetsRoutes.ts";
 import { AgentsController } from "../controllers/AgentsController.ts";
-import mediaRoutesBuilder from "./mediaRoutes.ts";
-import { MediaController } from "../controllers/MediaController.ts";
 import { DatasetsController } from "../controllers/DatasetsController.ts";
 import { GuardService } from "../services/GuardService.ts";
 import sseRoutesBuilder from "./sseRoutes.ts";
@@ -35,7 +33,6 @@ type RoutesDependencies = {
         apiKeysController: ApiKeysController;
         chatsController: ChatsController;
         authController: AuthController;
-        mediaController: MediaController;
         sseController: SSEController;
         metricsController: MetricsController;
         subscriptionsController: SubscriptionsController;
@@ -72,11 +69,6 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
 
     const apiKeysRoutes = apiKeysRoutesBuilder(
         dependencies.controllers.apiKeysController,
-        dependencies.services.guardService
-    );
-
-    const mediaRoutes = mediaRoutesBuilder(
-        dependencies.controllers.mediaController,
         dependencies.services.guardService
     );
 
@@ -118,7 +110,6 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/agents', agentsRoutes);
     api.route('/instructions', instructionsRoutes);
     api.route('/api-keys', apiKeysRoutes);
-    api.route('/media', mediaRoutes);
     api.route('/chats', chatsRoutes);
     api.route('/datasets', datasetsRoutes);
     api.route('/subscriptions', subscriptionsRoutes);
