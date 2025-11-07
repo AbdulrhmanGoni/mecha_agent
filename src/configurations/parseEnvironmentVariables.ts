@@ -29,11 +29,7 @@ export const envSchema = z.object({
     VECTOR_DB_HOST: z.string(),
     VECTOR_DB_API_KEY: z.string().optional(),
 
-    OBJECT_STORAGE_DB_PORT: z.coerce.number().optional(),
-    OBJECT_STORAGE_DB_HOST: z.string(),
-    OBJECT_STORAGE_USERNAME: z.string(),
-    OBJECT_STORAGE_PASSWORD: z.string(),
-    OBJECT_STORAGE_SSL: z.string().optional(),
+    OBJECT_STORAGE_ACCESS_TOKEN: z.string().optional(),
 
     OLLAMA_HOST: z.string().optional(),
 

@@ -59,9 +59,7 @@ export class BackgroundTasksService {
             `DELETE FROM deleted_agents_avatars RETURNING id`
         )
 
-        await this.objectStorageService.deleteFiles(
-            this.objectStorageService.buckets.agentsAvatars,
-            rows.map(row => row.id)
+        await this.objectStorageService.deleteFiles(rows.map(row => row.id)
         )
     }
 

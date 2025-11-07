@@ -1,6 +1,6 @@
 import { QdrantClient } from "qdrant";
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import { Client as MinioClient } from "minio/dist/esm/minio.mjs";
+import { UTApi } from "uploadthing/server";
 import parsedEnvVariables from "./parseEnvironmentVariables.ts";
 import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 import { bootstrapLLMClient } from "./bootstrapLLMClient.ts";
@@ -11,12 +11,8 @@ export async function bootstrapConfigurations() {
     const llmClient = await bootstrapLLMClient()
     const embeddingClient = await bootstrapEmbeddingClient()
 
-    const minioClient = new MinioClient({
-        endPoint: parsedEnvVariables.OBJECT_STORAGE_DB_HOST,
-        port: parsedEnvVariables.OBJECT_STORAGE_DB_PORT,
-        useSSL: parsedEnvVariables.OBJECT_STORAGE_SSL === "true",
-        accessKey: parsedEnvVariables.OBJECT_STORAGE_USERNAME,
-        secretKey: parsedEnvVariables.OBJECT_STORAGE_PASSWORD,
+    const utApi = new UTApi({
+        token: parsedEnvVariables.OBJECT_STORAGE_ACCESS_TOKEN
     })
 
     const vectorDatabaseClient = new QdrantClient({
@@ -42,7 +38,7 @@ export async function bootstrapConfigurations() {
         databaseClient,
         llmClient,
         embeddingClient,
-        minioClient,
+        utApi,
         kvStoreClient,
         stripePaymentGatewayClient,
     }

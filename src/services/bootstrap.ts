@@ -20,13 +20,14 @@ import { SubscriptionsService } from "./SubscriptionsService.ts";
 import { BackgroundTasksService } from "./BackgroundTasksService.ts";
 import { MailsSenderService } from "./MailsSenderService.ts";
 import { StripePaymentGatewayClient } from "../configurations/stripePaymentGatewayClient.ts";
+import { UTApi } from "uploadthing/server";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
     databaseClient: PostgresClient;
     embeddingClient: EmbeddingClientInterface;
     llmClient: LLMClientInterface;
-    minioClient: MinioClient;
+    utApi: UTApi;
     kvStoreClient: Deno.Kv;
     stripePaymentGatewayClient: StripePaymentGatewayClient;
 }
@@ -38,7 +39,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const databaseService = new DatabaseService(dependencies.databaseClient);
 
-    const objectStorageService = new ObjectStorageService(dependencies.minioClient);
+    const objectStorageService = new ObjectStorageService(dependencies.utApi);
 
     const instructionsService = new InstructionsService(vectorDatabaseService);
 

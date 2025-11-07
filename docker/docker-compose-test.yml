@@ -6,7 +6,7 @@ services:
     container_name: testing_server_container
     ports:
       - 10001:10001
-    command: deno run -N -E -R -W --watch --unstable-kv --unstable-cron src/server.ts
+    command: deno run -N -E -R -W --allow-sys --allow-ffi --watch --unstable-kv --unstable-cron src/server.ts
     image: mecha_agent_server:test
     volumes:
       - ../src:/assistant-server/src:ro
@@ -19,7 +19,6 @@ services:
     depends_on:
       - testing_database
       - testing_vector_database
-      - testing-object-storage
 
   testing_database:
     image: postgres:17.3
@@ -40,20 +39,6 @@ services:
     ports:
       - 10003:6333
       - 10033:6334
-    networks:
-      - testing-network
-    restart: always
-
-  testing-object-storage:
-    image: minio/minio
-    container_name: testing_object_storage_container
-    command: server /data --console-address ":9001"
-    environment:
-      - MINIO_ROOT_USER=${OBJECT_STORAGE_USERNAME}
-      - MINIO_ROOT_PASSWORD=${OBJECT_STORAGE_PASSWORD}
-    ports:
-      - 10004:9000
-      - 10044:9001
     networks:
       - testing-network
     restart: always
