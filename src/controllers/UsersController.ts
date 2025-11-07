@@ -20,8 +20,8 @@ export class UsersController {
         return c.json({ error: authResponsesMessages.noUser }, 404)
     }
 
-    async updateUserData(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: UpdateUserData } }>) {
-        const updateData = c.req.valid("form");
+    async updateUserData(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateUserData } }>) {
+        const updateData = c.req.valid("json");
         const userEmail = c.get("userEmail");
 
         if (!Object.keys(updateData).length) {

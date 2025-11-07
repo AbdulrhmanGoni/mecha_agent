@@ -16,7 +16,7 @@ const updateAgentInputSchema = z.object({
 }).strict()
 
 const updateAgentInputValidator = validator('json', (value, c) => {
-    return schemaParser<typeof updateAgentInputSchema.shape, ParsedFormValue | ParsedFormValue[]>(
+    return schemaParser<typeof updateAgentInputSchema.shape, string | boolean>(
         c,
         updateAgentInputSchema,
         value

@@ -5,8 +5,8 @@ import AgentsResponseMessages from "../constant/response-messages/agentsResponse
 export class AgentsController {
     constructor(private agentsService: AgentsService) { }
 
-    async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: CreateAgentFormData } }>) {
-        const formData = c.req.valid("form");
+    async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: CreateAgentFormData } }>) {
+        const formData = c.req.valid("json");
         const userEmail = c.get("userEmail");
         const result = await this.agentsService.create(userEmail, formData);
 
@@ -129,9 +129,9 @@ export class AgentsController {
         return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 400);
     }
 
-    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: UpdateAgentFormData } }>) {
+    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateAgentFormData } }>) {
         const agentId = c.req.param("agentId") as string;
-        const updateData = c.req.valid("form");
+        const updateData = c.req.valid("json");
         const userEmail = c.get("userEmail");
 
         if (!Object.keys(updateData).length) {

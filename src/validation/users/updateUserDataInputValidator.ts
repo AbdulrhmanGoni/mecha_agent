@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { validator } from 'hono/validator';
 import schemaParser from "../../helpers/schemaParser.ts";
-import { ParsedFormValue } from "hono/types";
 
 const updateUserDataInputSchema = z.object({
     username: z.string().min(3).max(70).optional(),
@@ -9,8 +8,8 @@ const updateUserDataInputSchema = z.object({
     removeAvatar: z.coerce.boolean().optional(),
 }).strict()
 
-const updateUserDataInputValidator = validator('form', (value, c) => {
-    return schemaParser<typeof updateUserDataInputSchema.shape, ParsedFormValue | ParsedFormValue[]>(
+const updateUserDataInputValidator = validator('json', (value, c) => {
+    return schemaParser<typeof updateUserDataInputSchema.shape, string | boolean>(
         c,
         updateUserDataInputSchema,
         value
