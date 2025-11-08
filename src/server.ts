@@ -1,10 +1,6 @@
-import * as Sentry from "sentry";
+import "./sentry.ts";
 import bootstrapApp from "./app.ts";
 import parsedEnvVariables from "./configurations/parseEnvironmentVariables.ts";
-
-Sentry.init({
-    dsn: parsedEnvVariables.SENTRY_DSN,
-});
 
 const appStart = performance.now();
 console.log("Application starting...");

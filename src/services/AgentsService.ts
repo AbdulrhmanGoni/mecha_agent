@@ -174,7 +174,7 @@ export class AgentsService {
 
         if (updateResult.rowCount) {
             if (oldAvatar) {
-                this.objectStorageService.deleteFiles(oldAvatar);
+                this.objectStorageService.deleteAvatars(oldAvatar);
             }
             await transaction.commit();
             return true

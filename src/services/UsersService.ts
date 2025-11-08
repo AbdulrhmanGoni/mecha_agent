@@ -140,7 +140,7 @@ export class UsersService {
 
         if (rowCount) {
             if (oldAvatar) {
-                this.objectStorage.deleteFiles(oldAvatar);
+                this.objectStorage.deleteAvatars(oldAvatar);
             }
             await transaction.commit();
             return true
