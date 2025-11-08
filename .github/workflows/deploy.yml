@@ -33,7 +33,7 @@ jobs:
           node-version: lts/*
 
       - name: Install step
-        run: deno install -e src/server.ts --frozen=true
+        run: deno install -e src/server.ts
 
       - name: Prepare environment variables fo the next bundler
         run: echo "CLIENT_URL=${{ vars.CLIENT_URL }}" >> .env
