@@ -140,13 +140,13 @@ export class AgentsService {
     async update(agentId: string, userEmail: string, updateData: UpdateAgentFormData) {
         const { removeAvatar, ...restUpdateData } = updateData;
         let oldAvatar: string | undefined;
-        if (removeAvatar) {
+        if (removeAvatar || restUpdateData.avatar) {
             const { rows: [agent] } = await this.databaseService.query<Agent>({
                 text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
                 args: [agentId, userEmail],
             })
             oldAvatar = agent.avatar
-            Object.assign(restUpdateData, { avatar: null });
+            removeAvatar && Object.assign(restUpdateData, { avatar: null });
         }
 
         type UpdateDataFormat = [string, (string | boolean | null)[]]
@@ -173,10 +173,8 @@ export class AgentsService {
         })
 
         if (updateResult.rowCount) {
-            if (removeAvatar && oldAvatar) {
-                if (oldAvatar) {
-                    this.objectStorageService.deleteFiles(oldAvatar);
-                }
+            if (oldAvatar) {
+                this.objectStorageService.deleteFiles(oldAvatar);
             }
             await transaction.commit();
             return true

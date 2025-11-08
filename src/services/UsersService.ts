@@ -107,13 +107,13 @@ export class UsersService {
     async update(email: string, updateData: UpdateUserData) {
         const { removeAvatar, ...updateUserData } = updateData
         let oldAvatar: string | undefined;
-        if (removeAvatar) {
+        if (removeAvatar || updateUserData.avatar) {
             const { rows: [user] } = await this.databaseService.query<User>({
                 text: "SELECT avatar FROM users WHERE user_email = $1",
                 args: [email],
             })
             oldAvatar = user.avatar
-            Object.assign(updateUserData, { avatar: null });
+            removeAvatar && Object.assign(updateUserData, { avatar: null });
         }
 
         type UpdateDataFormat = [string, (string | Date | null)[]]
@@ -139,7 +139,7 @@ export class UsersService {
         });
 
         if (rowCount) {
-            if (removeAvatar && oldAvatar) {
+            if (oldAvatar) {
                 this.objectStorage.deleteFiles(oldAvatar);
             }
             await transaction.commit();
