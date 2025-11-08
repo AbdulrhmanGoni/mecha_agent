@@ -3,6 +3,7 @@ import { DatabaseService } from "./DatabaseService.ts";
 import { InstructionsService } from "./InstructionsService.ts";
 import performanceInSeconds from "../helpers/performanceInSeconds.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
+import sentryClient from "../sentry.ts";
 
 export class BackgroundTasksService {
     constructor(
@@ -100,9 +101,21 @@ export class BackgroundTasksService {
     private taskPerformenceLogger(task: string, taskPromise: Promise<unknown>) {
         console.log(`"${task}" task started 🚀`);
         const taskStartTime = performance.now();
-        taskPromise.finally(() => {
-            console.log(`"${task}" task completed in ${performanceInSeconds(taskStartTime)} ✅`)
-        });
+        taskPromise
+            .then(() => {
+                console.log(`"${task}" task completed successfully in ${performanceInSeconds(taskStartTime)} ✅`);
+            })
+            .catch((error) => {
+                console.log(`"${task}" task failed to complete ❌`);
+                sentryClient.captureException(error, {
+                    data: {
+                        backgroundTask: {
+                            name: task,
+                            message: `Error occurred during execution of background task "${task}".`
+                        }
+                    }
+                });
+            })
     }
 }
 
