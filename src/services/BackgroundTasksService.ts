@@ -56,11 +56,17 @@ export class BackgroundTasksService {
 
     private async deleteAgentsAvatarsFromS3() {
         const { rows } = await this.databaseService.query<{ id: string }>(
-            `DELETE FROM deleted_agents_avatars RETURNING id`
+            'SELECT id FROM deleted_agents_avatars'
         )
 
-        await this.objectStorageService.deleteFiles(rows.map(row => row.id)
-        )
+        const avatars = rows.map(row => row.id)
+
+        const success = await this.objectStorageService.deleteAvatars(avatars)
+        if (success) {
+            this.databaseService.query(
+                'DELETE FROM deleted_agents_avatars WHERE id = ANY($1)', [avatars]
+            )
+        }
     }
 
     private async setLastWeekInferencesRecording(userEmail: string, todayValue: bigint) {
