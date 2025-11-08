@@ -28,8 +28,8 @@ export class BackgroundTasksService {
                     );
                     break;
 
-                case "delete_agents_avatars_from_S3":
-                    this.taskPerformenceLogger(msg.task, this.deleteAgentsAvatarsFromS3());
+                case "delete_avatars_from_object_storage":
+                    this.taskPerformenceLogger(msg.task, this.deleteAvatarsFromObjectStorage());
                     break;
 
                 case "delete_user_legacy":
@@ -54,7 +54,7 @@ export class BackgroundTasksService {
         }
     }
 
-    private async deleteAgentsAvatarsFromS3() {
+    private async deleteAvatarsFromObjectStorage() {
         const { rows } = await this.databaseService.query<{ id: string }>(
             'SELECT id FROM deleted_agents_avatars'
         )
@@ -94,7 +94,7 @@ export class BackgroundTasksService {
         }
 
         await dOp.commit()
-        await this.deleteAgentsAvatarsFromS3()
+        await this.deleteAvatarsFromObjectStorage()
     }
 
     private taskPerformenceLogger(task: string, taskPromise: Promise<unknown>) {

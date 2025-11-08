@@ -33,7 +33,7 @@ type BackgroundTaskMessage =
         payload: { userEmail: string, datasetId: string }
     }
     |
-    { task: "delete_agents_avatars_from_S3" }
+    { task: "delete_avatars_from_object_storage" }
     |
     {
         task: "delete_user_legacy";

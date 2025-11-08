@@ -128,7 +128,7 @@ export class AgentsService {
 
         if (deletedAgent.avatar) {
             const second = 1000
-            this.kvStore.enqueue({ task: "delete_agents_avatars_from_S3" }, {
+            this.kvStore.enqueue({ task: "delete_avatars_from_object_storage" }, {
                 delay: second * 7,
                 backoffSchedule: [second * 10, second * 60, second * 60 * 60],
             });
