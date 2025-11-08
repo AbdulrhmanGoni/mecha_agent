@@ -64,13 +64,12 @@ system which are:
 - `denoland/deno`
 - `postgres:17.3`
 - `qdrant/qdrant:v1.13.3`
-- `minio/minio`
 - `ollama/ollama`
 - `prom/prometheus:v3.2.1`
 - `grafana/grafana:11.6.0`
 
 ```
-docker pull denoland/deno postgres:17.3 qdrant/qdrant:v1.13.3 ollama/ollama minio/minio prom/prometheus:v3.2.1 grafana/grafana:11.6.0
+docker pull denoland/deno postgres:17.3 qdrant/qdrant:v1.13.3 ollama/ollama prom/prometheus:v3.2.1 grafana/grafana:11.6.0
 ```
 
 ##### Set up Environment Variables :ledger:
@@ -103,7 +102,7 @@ Build the image of the project by running the following command
 deno task build:dev
 ```
 
-And them run the following command to start the backend system of **MechaAgent**
+And them run the following command to start the backend system of **Mecha Agent**
 platform in development mode
 
 ```
@@ -125,8 +124,6 @@ dev_vector_database_container is running on http://localhost:6333
 dev_prometheus_container is running on http://localhost:9090
 
 dev_grafana_container is running on http://localhost:4444
-
-dev_object_storage_container is running on http://localhost:9001
 ```
 
 Lastly, You need to run the following command to download the Large Language

@@ -17,7 +17,7 @@
     "test:e2e": "deno run --allow-run tests/scripts/runTests.ts e2e",
     "build:test": "docker compose -f docker/docker-compose-test.yml build testing_server",
     "build:dev": "docker compose -f docker/docker-compose-dev.yml build dev_server",
-    "pull-models:dev": "deno run --allow-run -E --env-file=docker/.env.development scripts/downloadModels.ts"
+    "pull-models:dev": "deno run --allow-run -E --env-file=docker/.env.development scripts/pullModels.ts"
   },
   "imports": {
     "@denokv-gui-client/bridge-server": "jsr:@denokv-gui-client/bridge-server@^2.2.10",
