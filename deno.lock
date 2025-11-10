@@ -1,7 +1,7 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@denokv-gui-client/bridge-server@^2.2.10": "2.2.10",
+    "jsr:@denokv-gui-client/bridge-server@^3.0.1": "3.0.1",
     "jsr:@denorg/scrypt@4.4.4": "4.4.4",
     "jsr:@hono/hono@*": "4.6.8",
     "jsr:@minify-html/deno@~0.16.4": "0.16.4",
@@ -26,13 +26,13 @@
     "jsr:@stdext/crypto@*": "0.1.0",
     "npm:@deno/kv@0.12": "0.12.0",
     "npm:@google/genai@*": "1.8.0_zod@3.25.69",
-    "npm:@hono/node-server@^1.17.1": "1.19.4_hono@4.9.9",
+    "npm:@hono/node-server@^1.17.1": "1.19.6_hono@4.10.4",
     "npm:@qdrant/js-client-rest@*": "1.12.0_typescript@5.6.3",
     "npm:@sentry/deno@^9.29.0": "9.34.0",
     "npm:@types/nodemailer@^6.4.17": "6.4.17",
     "npm:cheerio@*": "1.1.0",
     "npm:dbmate@^2.28.0": "2.28.0",
-    "npm:hono@^4.8.2": "4.9.9",
+    "npm:hono@^4.8.2": "4.10.4",
     "npm:juice@^11.0.1": "11.0.1",
     "npm:node-mailjet@^6.0.8": "6.0.8",
     "npm:nodemailer@*": "7.0.4",
@@ -44,8 +44,8 @@
     "npm:zod@*": "3.25.69"
   },
   "jsr": {
-    "@denokv-gui-client/bridge-server@2.2.10": {
-      "integrity": "a0566a1514de44e6c5e3ee9728fb42274451ac53607305e309639f70392e6b6b",
+    "@denokv-gui-client/bridge-server@3.0.1": {
+      "integrity": "436a8a1ef1deac493f006369fd4d0696733230883a9eb1c830cbbe7ff1d24833",
       "dependencies": [
         "npm:@deno/kv",
         "npm:@hono/node-server",
@@ -245,8 +245,8 @@
         "zod-to-json-schema"
       ]
     },
-    "@hono/node-server@1.19.4_hono@4.9.9": {
-      "integrity": "sha512-AWKQZ/YkHUBSHeL/5Ld8FWgUs6wFf4TxGYxqp9wLZxRdFuHBpXmgOq+CuDoL4vllkZLzovCf5HBJnypiy3EtHA==",
+    "@hono/node-server@1.19.6_hono@4.10.4": {
+      "integrity": "sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==",
       "dependencies": [
         "hono"
       ]
@@ -675,8 +675,8 @@
         "function-bind"
       ]
     },
-    "hono@4.9.9": {
-      "integrity": "sha512-Hxw4wT6zjJGZJdkJzAx9PyBdf7ZpxaTSA0NfxqjLghwMrLBX8p33hJBzoETRakF3UJu6OdNQBZAlNSkGqKFukw=="
+    "hono@4.10.4": {
+      "integrity": "sha512-YG/fo7zlU3KwrBL5vDpWKisLYiM+nVstBQqfr7gCPbSYURnNEP9BDxEMz8KfsDR9JX0lJWDRNc6nXX31v7ZEyg=="
     },
     "htmlparser2@10.0.0": {
       "integrity": "sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==",
@@ -1192,7 +1192,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@denokv-gui-client/bridge-server@^2.2.10",
+      "jsr:@denokv-gui-client/bridge-server@^3.0.1",
       "jsr:@hono/hono@*",
       "jsr:@minify-html/deno@~0.16.4",
       "jsr:@std/assert@1",
