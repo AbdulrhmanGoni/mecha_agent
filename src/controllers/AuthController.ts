@@ -22,7 +22,7 @@ export class AuthController {
             }
 
             if (result.notSameSigningMethod) {
-                return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 400)
+                return c.json({ error: authResponsesMessages.userSignedUpWithAnotherMethod }, 400)
             }
 
             return c.json({ error: authResponsesMessages.userAlreadyExisting }, 400)
@@ -44,7 +44,7 @@ export class AuthController {
         }
 
         if (result.wrongSigningMethod) {
-            return c.json({ error: authResponsesMessages.userSignedInWithAnotherMethod }, 401);
+            return c.json({ error: authResponsesMessages.userSignedUpWithAnotherMethod }, 401);
         }
 
         if (result.noUser) {
