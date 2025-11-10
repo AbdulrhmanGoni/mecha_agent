@@ -96,10 +96,16 @@ cp docker/.env.example docker/.env.development
 
 ##### Build and run the server :rocket:
 
-Build the image of the project by running the following command
+Build the image of the server by running the following command
 
 ```
 deno task build:dev
+```
+
+Run the database schema migration to setup the schema of the development database
+
+```
+deno task dbmate:dev up
 ```
 
 And them run the following command to start the backend system of **Mecha Agent**
@@ -154,7 +160,7 @@ To shut down the backend system run :point_down:
 deno task stop:dev # Stops and deletes all running containers of the backend system
 ```
 
-##### Tests :test_tube:
+#### Tests :test_tube:
 
 All tests are written in Behavior-Driven Development (BDD) style using
 `@std/testing/bdd` module form the
@@ -170,6 +176,12 @@ To Build the testing image run this command
 
 ```
 deno task build:test
+```
+
+And then run the database schema migration to setup the schema of the testing database
+
+```
+deno task dbmate:test up
 ```
 
 Then you have to get the backend system up running in testing environment by
