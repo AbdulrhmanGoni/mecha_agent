@@ -12,10 +12,7 @@ export default function createAgentTests({ db }: { db: PostgresClient }) {
 
     describe(`Testing 'POST ${endpoint}' endpoint`, () => {
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM agents; 
-                DELETE FROM users
-            `;
+            await db.queryObject`DELETE FROM users;`;
         });
 
         it("Should fail to create the agent because the missing required fields", async () => {

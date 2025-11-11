@@ -13,10 +13,7 @@ export default function deleteAgent({ db }: { db: PostgresClient }) {
 
     describe(`Testing 'DELETE ${endpoint}' endpoint`, () => {
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM agents; 
-                DELETE FROM users
-            `;
+            await db.queryObject`DELETE FROM users;`;
         })
 
         it("Should also fail to delete the agent error because the agent does not exist", async () => {

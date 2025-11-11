@@ -2,7 +2,7 @@ import { afterAll, describe, it } from "@std/testing/bdd";
 import { expect } from "@std/expect";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import { MechaTester } from "../../helpers/mechaTester.ts";
-import { fakeUserEmail, testingUserCredentials } from "../../mock/data/mockUsers.ts";
+import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import mockAgents from "../../mock/data/mockAgents.ts";
@@ -13,10 +13,10 @@ export default function getAllAgents({ db }: { db: PostgresClient }) {
 
     describe("Testing `GET /api/agents` endpoint", () => {
         afterAll(async () => {
-            await db.queryObject`DELETE FROM agents; DELETE FROM users`;
+            await db.queryObject`DELETE FROM users;`;
         })
 
-        it("Should also get an empty array because the existing user has no agents", async () => {
+        it("Should get an empty array because the existing user has no agents", async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials })
 
             const request = new MechaTester(testingUserCredentials.email);

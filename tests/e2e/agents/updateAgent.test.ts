@@ -8,7 +8,6 @@ import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import { randomUUID } from "node:crypto";
-import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
 
 export default function updateAgentTests(
     { db }: { db: PostgresClient }
@@ -18,8 +17,8 @@ export default function updateAgentTests(
     describe(`Testing 'PATCH ${endpoint}' endpoint`, () => {
         afterAll(async () => {
             await db.queryObject`
-                DELETE FROM agents;
-                DELETE FROM users
+                DELETE FROM users;
+                DELETE FROM deleted_agents_avatars;
             `;
         })
 

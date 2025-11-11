@@ -5,7 +5,6 @@ import { Client as PostgresClient } from "deno.land/x/postgres";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import usersResponsesMessages from "../../../src/constant/response-messages/usersResponsesMessages.ts";
-import { uuidMatcher } from "../../helpers/uuidMatcher.ts";
 
 export default function updateUserDataTests({ db }: { db: PostgresClient }) {
     const endpoint = "/api/users";
@@ -16,7 +15,10 @@ export default function updateUserDataTests({ db }: { db: PostgresClient }) {
         })
 
         afterAll(async () => {
-            await db.queryObject`DELETE FROM users`;
+            await db.queryObject`
+                DELETE FROM users;
+                DELETE FROM deleted_agents_avatars;
+            `;
         })
 
         it("Should fail to update user data because the update data payload is empty", async () => {
