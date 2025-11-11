@@ -109,7 +109,7 @@ export class UsersService {
         let oldAvatar: string | undefined;
         if (removeAvatar || updateUserData.avatar) {
             const { rows: [user] } = await this.databaseService.query<User>({
-                text: "SELECT avatar FROM users WHERE user_email = $1",
+                text: "SELECT avatar FROM users WHERE email = $1",
                 args: [email],
             })
             oldAvatar = user.avatar
