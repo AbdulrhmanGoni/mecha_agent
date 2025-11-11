@@ -229,11 +229,6 @@ export class AgentsService {
 
     async publishAgent(agentId: string, userEmail: string) {
         const userSubscription = await this.subscriptionsService.getUserSubscriptionData(userEmail)
-        if (!userSubscription) {
-            return {
-                success: false,
-            }
-        }
 
         const { rows: [user] } = await this.databaseService.query<Pick<User, "publishedAgents" | "currentPlan"> | null>({
             text: 'SELECT published_agents FROM users WHERE email = $1',
@@ -247,7 +242,7 @@ export class AgentsService {
             }
         }
 
-        const plan = plans.find((p) => p.planName == userSubscription.planName) || plans[0]
+        const plan = plans.find((p) => p.planName == userSubscription?.planName) || plans[0]
 
         if (!(user.publishedAgents < plan.maxPublishedAgentsCount)) {
             return {
