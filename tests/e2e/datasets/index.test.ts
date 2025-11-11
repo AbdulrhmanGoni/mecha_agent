@@ -7,19 +7,14 @@ export default function datasetsRouteTests(app: TestingAppConfigs) {
     describe("Testing datasets API route", () => {
         createDatasetTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient,
-            vectorDB: app.configurations.vectorDatabaseClient,
         });
 
         updateDatasetTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient,
-            vectorDB: app.configurations.vectorDatabaseClient,
         });
 
         deleteDatasetTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient,
             vectorDB: app.configurations.vectorDatabaseClient,
         });
     })

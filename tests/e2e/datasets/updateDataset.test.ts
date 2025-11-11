@@ -3,64 +3,24 @@ import { expect } from "@std/expect";
 import { MechaTester } from "../../helpers/mechaTester.ts";
 import { Client as PostgresClient } from "deno.land/x/postgres";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
-import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
-import { getRandomMockNewAgentInput } from "../../mock/data/mockAgents.ts";
-import { QdrantClient } from "qdrant";
-import createTestingDatasetForAgent from "../../helpers/createTestingDatasetForAgent.ts";
 import datasetsResponsesMessages from "../../../src/constant/response-messages/datasetsResponsesMessages.ts";
+import createTestingDataset from "../../helpers/createTestingDataset.ts";
+import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 
-export default function updateDatasetTests(
-    { db, objectStorage, vectorDB }:
-        { db: PostgresClient, objectStorage: MinioClient, vectorDB: QdrantClient }
-) {
+export default function updateDatasetTests({ db }: { db: PostgresClient }) {
     const endpoint = "/api/datasets/:datasetId";
-    const datasetsToDelete: string[] = [];
 
     describe(`Testing 'PATCH ${endpoint}' endpoint`, () => {
         let datasetId = "";
 
         beforeAll(async () => {
-            const { newDatasetId } = await createTestingDatasetForAgent({
-                db,
-                agent: getRandomMockNewAgentInput(),
-                user: testingUserCredentials,
-                objectStorage,
-                vectorDB,
-            });
-
-            datasetsToDelete.push(newDatasetId);
-            datasetId = newDatasetId;
+            await insertUserIntoDB({ db, user: testingUserCredentials });
+            const newDataset = await createTestingDataset(db);
+            datasetId = newDataset.id;
         })
 
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM agents; 
-                DELETE FROM users
-            `;
-
-            if (datasetsToDelete.length) {
-                await objectStorage.removeObjects(
-                    "datasets",
-                    datasetsToDelete.map((datasetId) => ({ name: datasetId }))
-                );
-
-                await new Promise<void>((resolve) => {
-                    setTimeout(async () => {
-                        await vectorDB.delete("datasets", {
-                            wait: true,
-                            filter: {
-                                must: [
-                                    {
-                                        key: "userEmail",
-                                        match: { value: testingUserCredentials.email },
-                                    },
-                                ]
-                            },
-                        })
-                        resolve()
-                    }, 75)
-                })
-            }
+            await db.queryObject`DELETE FROM users`
         })
 
         it("Should fail to update the dataset because it does not exist", async () => {
@@ -96,12 +56,9 @@ export default function updateDatasetTests(
         })
 
         it("Should succeed to update the title of the dataset", async () => {
+            const updateData = { title: "Updated Title" };
+
             const tester = new MechaTester(testingUserCredentials.email)
-
-            const updateData = {
-                title: "Updated Title"
-            }
-
             const response = await tester
                 .patch(endpoint.replace(":datasetId", datasetId))
                 .headers({ "Content-Type": "application/json" })
@@ -109,7 +66,6 @@ export default function updateDatasetTests(
                 .send();
 
             const { result } = await response.json<{ result: string }>();
-
             expect(result).toBe(datasetsResponsesMessages.successfulUpdate);
 
             const { rows: [updatedDataset] } = await db.queryObject<{ title: string }>(
