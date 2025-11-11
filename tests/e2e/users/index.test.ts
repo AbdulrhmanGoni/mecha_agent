@@ -10,7 +10,6 @@ export default function usersRouteTests(app: TestingAppConfigs) {
 
         updateUserDataTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient
         });
     })
 };

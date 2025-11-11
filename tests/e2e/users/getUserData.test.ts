@@ -36,8 +36,14 @@ export default function getUserDataTests({ db }: { db: PostgresClient }) {
                 email: testingUserCredentials.email,
                 avatar: null,
                 signingMethod: testingUserCredentials.signingMethod,
-                createdAt: expect.any(String),
                 lastSignIn: expect.any(String),
+                apiKeysCount: 0,
+                agentsCount: 0,
+                publishedAgents: 0,
+                datasetsCount: 0,
+                subscription: null,
+                todayInference: { current: 0, max: 50 },
+                lastWeekInferences: []
             });
         });
     });

@@ -5,34 +5,25 @@ import { Client as PostgresClient } from "deno.land/x/postgres";
 import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertUserIntoDB from "../../helpers/insertUserIntoDB.ts";
 import usersResponsesMessages from "../../../src/constant/response-messages/usersResponsesMessages.ts";
-import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 import { uuidMatcher } from "../../helpers/uuidMatcher.ts";
 
-export default function updateUserDataTests({ db, objectStorage }: { db: PostgresClient, objectStorage: MinioClient }) {
+export default function updateUserDataTests({ db }: { db: PostgresClient }) {
     const endpoint = "/api/users";
 
     describe(`Testing 'PATCH ${endpoint}' route`, () => {
-        const avatarsToDelete: string[] = []
-
         beforeAll(async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials })
         })
 
         afterAll(async () => {
             await db.queryObject`DELETE FROM users`;
-
-            if (avatarsToDelete.length) {
-                await objectStorage.removeObjects(
-                    "users-avatars",
-                    avatarsToDelete.map((avatarId) => ({ name: avatarId }))
-                )
-            }
         })
 
         it("Should fail to update user data because the update data payload is empty", async () => {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint)
-                .body(new FormData())
+                .json({})
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -43,11 +34,12 @@ export default function updateUserDataTests({ db, objectStorage }: { db: Postgre
         it("Should succeed to update the name of the user", async () => {
             const request = new MechaTester(testingUserCredentials.email);
 
-            const updateFormData = new FormData();
-            updateFormData.set("username", "New usaername");
-
+            const updateFormData = {
+                username: "New usaername"
+            }
             const response = await request.patch(endpoint)
-                .body(updateFormData)
+                .json(updateFormData)
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()
@@ -59,23 +51,16 @@ export default function updateUserDataTests({ db, objectStorage }: { db: Postgre
                 [testingUserCredentials.email]
             )
 
-            expect(updatedUser.username).toBe(updateFormData.get("username"));
+            expect(updatedUser.username).toBe(updateFormData.username);
         });
 
         it("Should succeed to update user's avatar", async () => {
+            const avatarFileURL = "http://fake-avatar.png"
+
             const request = new MechaTester(testingUserCredentials.email);
-
-            const avatarFileURL = import.meta.resolve("../../mock/media/fake-avatar.png")
-            const avatarFile = new Blob(
-                [Deno.readFileSync(avatarFileURL.replace("file://", ""))],
-                { type: "image/png" }
-            );
-
-            const updateFormData = new FormData();
-            updateFormData.set("newAvatar", avatarFile);
-
             const response = await request.patch(endpoint)
-                .body(updateFormData)
+                .json({ avatar: avatarFileURL })
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()
@@ -87,25 +72,14 @@ export default function updateUserDataTests({ db, objectStorage }: { db: Postgre
                 [testingUserCredentials.email]
             )
 
-            if (updatedUser.avatar) avatarsToDelete.push(updatedUser.avatar);
-
-            expect(updatedUser.avatar.split(".")[0]).toMatch(uuidMatcher);
+            expect(updatedUser.avatar).toBe(avatarFileURL);
         });
 
         it("Should succeed to remove user's avatar", async () => {
-            const { rows: [userBeforeUpdate] } = await db.queryObject<{ avatar: string }>(
-                `SELECT avatar FROM users WHERE email = $1`,
-                [testingUserCredentials.email]
-            )
-            expect(userBeforeUpdate.avatar.split(".")[0]).toMatch(uuidMatcher);
-
             const request = new MechaTester(testingUserCredentials.email);
-
-            const updateFormData = new FormData();
-            updateFormData.set("removeAvatar", "true");
-
             const response = await request.patch(endpoint)
-                .body(updateFormData)
+                .json({ removeAvatar: true })
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()
