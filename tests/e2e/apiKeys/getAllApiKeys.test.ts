@@ -13,10 +13,7 @@ export default function getAllApiKeysTests({ db }: { db: PostgresClient }) {
 
     describe(`Testing 'GET ${endpoint}' route`, () => {
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM api_keys; 
-                DELETE FROM users;
-            `;
+            await db.queryObject`DELETE FROM users;`;
         });
 
         it("Should fail to get any keys because the user doesn't exist", async () => {
@@ -52,7 +49,7 @@ export default function getAllApiKeysTests({ db }: { db: PostgresClient }) {
                 id: expect.stringMatching(uuidMatcher),
                 key: expect.any(String),
                 keyName: newApiKeyInput.keyName,
-                expirationDate: expect.any(String),
+                expirationDate: null,
                 permissions: expect.arrayContaining(newApiKeyInput.permissions),
                 status: "Active",
                 createdAt: expect.any(String),

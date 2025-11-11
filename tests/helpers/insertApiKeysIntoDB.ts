@@ -5,17 +5,10 @@ export default async function insertApiKeysIntoDB(
     { db, keys }: { db: PostgresClient, keys: (CreateApiKeyInput & { status?: ApiKeyStatus })[] }
 ) {
     const fields = `key, key_name, expiration_date, permissions, user_email, status`;
-    const fieldsCount = fields.split(",").length
+    const fieldsCount = fields.split(",")
 
     const placeholders = keys.map((_, i) => (
-        `(
-        $${i * fieldsCount + 1},
-        $${i * fieldsCount + 2},
-        $${i * fieldsCount + 3},
-        $${i * fieldsCount + 4},
-        $${i * fieldsCount + 5},
-        $${i * fieldsCount + 6}
-        )`
+        `(${fieldsCount.map((_, j) => `$${i * fieldsCount.length + (j + 1)}`).join(",")})`
     )).join(", ")
 
     const valuse = keys.flatMap((key) => [
@@ -34,4 +27,3 @@ export default async function insertApiKeysIntoDB(
 
     return rows
 };
-

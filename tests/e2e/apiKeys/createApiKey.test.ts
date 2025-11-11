@@ -12,10 +12,7 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
 
     describe(`Testing 'POST ${endpoint}' route`, () => {
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM api_keys; 
-                DELETE FROM users;
-            `;
+            await db.queryObject`DELETE FROM users;`;
         })
 
         it("Should fail to create the key because the user doesn't exist", async () => {
@@ -30,7 +27,7 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
             expect(res.error).toEqual(expect.any(String));
         });
 
-        it("Should succeed to create the key", async () => {
+        it("Should succeed to create the key with expiration date", async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials })
 
             const request = new MechaTester(testingUserCredentials.email);
@@ -47,6 +44,33 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
                 keyName: newApiKeyInput.keyName,
                 expirationDate: expect.any(String),
                 permissions: expect.arrayContaining(newApiKeyInput.permissions),
+                status: "Active",
+                createdAt: expect.any(String),
+                userEmail: testingUserCredentials.email
+            });
+        });
+
+        it("Should succeed to create the key with no expiration date", async () => {
+            const newApiKeyWithNoExpiration = {
+                keyName: "another new api key",
+                maxAgeInDays: undefined,
+                permissions: ["read", "inference"],
+            }
+
+            const request = new MechaTester(testingUserCredentials.email);
+            const response = await request.post(endpoint)
+                .headers({ "Content-Type": "application/json" })
+                .json(newApiKeyWithNoExpiration)
+                .send()
+
+            const res = await response.json<{ result: ApiKeyRecord }>();
+
+            expect(res.result).toMatchObject({
+                id: expect.stringMatching(uuidMatcher),
+                key: expect.any(String),
+                keyName: newApiKeyWithNoExpiration.keyName,
+                expirationDate: null,
+                permissions: expect.arrayContaining(newApiKeyWithNoExpiration.permissions),
                 status: "Active",
                 createdAt: expect.any(String),
                 userEmail: testingUserCredentials.email

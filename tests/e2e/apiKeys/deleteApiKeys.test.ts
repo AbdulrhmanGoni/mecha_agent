@@ -14,10 +14,7 @@ export default function deleteApiKeyTests({ db }: { db: PostgresClient }) {
 
     describe(`Testing 'DELETE ${endpoint}' route`, () => {
         afterAll(async () => {
-            await db.queryObject`
-                DELETE FROM api_keys; 
-                DELETE FROM users;
-            `;
+            await db.queryObject`DELETE FROM users;`;
         })
 
         it("Should fail to delete anything because the user isn't existant", async () => {
