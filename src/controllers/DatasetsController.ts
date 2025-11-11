@@ -5,8 +5,8 @@ import datasetsResponsesMessages from "../constant/response-messages/datasetsRes
 export class DatasetsController {
     constructor(private datasetsService: DatasetsService) { }
 
-    async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: CreateDatasetInput } }>) {
-        const dataset = c.req.valid("form");
+    async create(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: CreateDatasetInput } }>) {
+        const dataset = c.req.valid("json");
         const userEmail = c.get("userEmail");
         const result = await this.datasetsService.create(userEmail, dataset);
 
@@ -52,8 +52,8 @@ export class DatasetsController {
         return c.json({ error: datasetsResponsesMessages.failedDeletion }, 400);
     }
 
-    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { form: UpdateDatasetInput } }>) {
-        const updateData = c.req.valid("form");
+    async update(c: Context<{ Variables: { userEmail: string } }, never, { out: { json: UpdateDatasetInput } }>) {
+        const updateData = c.req.valid("json");
 
         if (!Object.keys(updateData).length) {
             return c.json({ error: datasetsResponsesMessages.noUpdateData }, 400);

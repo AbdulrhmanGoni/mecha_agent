@@ -1,12 +1,11 @@
 import { validator } from 'hono/validator'
 import schemaParser from "../../helpers/schemaParser.ts";
-import { ParsedFormValue } from "hono/types";
 import datasetSchema from "./datasetSchema.ts";
 
 export const createDatasetInputSchema = datasetSchema.strict();
 
-const createDatasetInputValidator = validator('form', (value, c) => {
-    return schemaParser<typeof createDatasetInputSchema.shape, ParsedFormValue | ParsedFormValue[]>(
+const createDatasetInputValidator = validator('json', (value, c) => {
+    return schemaParser<typeof createDatasetInputSchema.shape, string>(
         c,
         createDatasetInputSchema,
         value
