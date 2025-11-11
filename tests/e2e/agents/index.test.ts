@@ -8,7 +8,6 @@ export default function agentsRouteTests(app: TestingAppConfigs) {
     describe("Testing agents API route", () => {
         createAgentTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient,
         });
 
         getAllAgentsTests({
@@ -17,7 +16,6 @@ export default function agentsRouteTests(app: TestingAppConfigs) {
 
         updateAgentTests({
             db: app.configurations.databaseClient,
-            objectStorage: app.configurations.minioClient,
         });
 
         deleteAgentTests({

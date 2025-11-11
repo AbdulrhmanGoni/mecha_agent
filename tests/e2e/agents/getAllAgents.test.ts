@@ -16,16 +16,6 @@ export default function getAllAgents({ db }: { db: PostgresClient }) {
             await db.queryObject`DELETE FROM agents; DELETE FROM users`;
         })
 
-        it("Should get an empty array because there is no a user to get his agents", async () => {
-            const request = new MechaTester(fakeUserEmail);
-
-            const response = await request.get(endpoint).send();
-            const { result } = await response.json<{ result: Agent[] }>();
-
-            expect(result).toBeInstanceOf(Array);
-            expect(result).toHaveLength(0);
-        });
-
         it("Should also get an empty array because the existing user has no agents", async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials })
 

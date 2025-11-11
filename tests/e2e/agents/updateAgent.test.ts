@@ -9,45 +9,33 @@ import { testingUserCredentials } from "../../mock/data/mockUsers.ts";
 import insertAgentsIntoDB from "../../helpers/insertAgentsIntoDB.ts";
 import { randomUUID } from "node:crypto";
 import { uuidLength, uuidMatcher } from "../../helpers/uuidMatcher.ts";
-import { Client as MinioClient } from "minio/dist/esm/minio.d.mts";
 
 export default function updateAgentTests(
-    { db, objectStorage }: { db: PostgresClient, objectStorage: MinioClient }
+    { db }: { db: PostgresClient }
 ) {
     const endpoint = "/api/agents/:id";
 
     describe(`Testing 'PATCH ${endpoint}' endpoint`, () => {
-        const avatarsToDelete: string[] = []
-
         afterAll(async () => {
             await db.queryObject`
                 DELETE FROM agents;
                 DELETE FROM users
             `;
-
-            if (avatarsToDelete.length) {
-                await objectStorage.removeObjects(
-                    "agents-avatars",
-                    avatarsToDelete.map((avatarId) => ({ name: avatarId }))
-                )
-            }
         })
 
         it("Should fail to update the agent because it doesn't exist", async () => {
             await insertUserIntoDB({ db, user: testingUserCredentials })
             const request = new MechaTester(testingUserCredentials.email);
-
-            const updateData = new FormData()
-            updateData.set("agentName", "any random agent name")
             const response = await request.patch(endpoint.replace(":id", randomUUID()))
-                .body(updateData)
+                .json({ agentName: "any random agent name" })
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const status = response.object.status
             const { error } = await response.json<{ error: string }>();
 
-            expect(status).toBe(404);
-            expect(error).toBe(`${AgentsResponseMessages.failedAgentUpdate}, ${AgentsResponseMessages.noAgentOrUser}`)
+            expect(status).toBe(400);
+            expect(error).toBe(AgentsResponseMessages.failedAgentUpdate)
         });
 
         it("Should fail to update the agent because of the empty update payload", async () => {
@@ -66,7 +54,8 @@ export default function updateAgentTests(
 
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
-                .body(new FormData())
+                .json({})
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const status = response.object.status
@@ -95,14 +84,10 @@ export default function updateAgentTests(
                 systemInstructions: "New system instructions"
             }
 
-            const updateAgentFormData = new FormData();
-            Object.entries(updateData).forEach(([key, value]) => {
-                updateAgentFormData.set(key, value)
-            });
-
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
-                .body(updateAgentFormData)
+                .json(updateData)
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>();
@@ -133,18 +118,12 @@ export default function updateAgentTests(
                 }]
             });
 
-            const avatarFileURL = import.meta.resolve("../../mock/media/fake-avatar.png")
-            const avatarFile = new Blob(
-                [Deno.readFileSync(avatarFileURL.replace("file://", ""))],
-                { type: "image/png" }
-            );
-
-            const updateAgentFormData = new FormData();
-            updateAgentFormData.set("avatar", avatarFile)
+            const avatarFileURL = "http://some-fake-avatar.png"
 
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
-                .body(updateAgentFormData)
+                .json({ avatar: avatarFileURL })
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: string }>();
@@ -156,15 +135,10 @@ export default function updateAgentTests(
                 args: [newAgentId, testingUserCredentials.email],
             })
 
-            if (agent.avatar) {
-                avatarsToDelete.push(agent.avatar)
-            }
-
-            expect(agent.avatar?.endsWith(".png")).toBe(true)
-            expect(agent.avatar?.slice(0, uuidLength)).toMatch(uuidMatcher)
+            expect(agent.avatar).toBe(avatarFileURL)
         });
 
-        it("Should fail to update the avatar of the agent because the new avatar is invalid", async () => {
+        it("Should succeed to remove the avatar of the agent", async () => {
             const newAgent = getRandomMockNewAgentInput();
             const newAgentId = randomUUID();
 
@@ -175,27 +149,25 @@ export default function updateAgentTests(
                     agentName: newAgent.agentName,
                     description: newAgent.description,
                     userEmail: testingUserCredentials.email,
+                    avatar: "http://some-fake-avatar.png"
                 }]
             });
 
-            const invalidAvatarFile = new Blob(
-                ["col1, col2 \n val1, val2"],
-                { type: "text/csv" }
-            );
-
-            const updateAgentFormData = new FormData();
-            updateAgentFormData.set("avatar", invalidAvatarFile);
-
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
-                .body(updateAgentFormData)
+                .json({ removeAvatar: true })
+                .headers({ "Content-Type": "application/json" })
                 .send()
 
-            const { error } = await response.json<{ error: string }>();
+            const res = await response.json<{ result: string }>();
+            expect(res.result).toBe(AgentsResponseMessages.successfulAgentUpdate);
 
-            expect(error).toMatch(/Not supported/g);
-            expect(error).toMatch(/avatar/g);
-            expect(error).toMatch(/type/g);
+            const { rows: [agent] } = await db.queryObject<Pick<Agent, "avatar">>({
+                text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2",
+                args: [newAgentId, testingUserCredentials.email],
+            })
+
+            expect(agent.avatar).toBeFalsy()
         });
     })
 }

@@ -19,22 +19,7 @@ export default function deleteAgent({ db }: { db: PostgresClient }) {
             `;
         })
 
-        it("Should fail to delete the agent and return 404 error because there is not a user owns such an agent", async () => {
-            const agent = getRandomMockAgent();
-
-            const request = new MechaTester(fakeUserEmail);
-            const response = await request.delete(endpoint.replace(":id", agent.id)).send()
-
-            const status = response.object.status;
-            const { error } = await response.json<{ error: string }>();
-
-            expect(status).toBe(404);
-            expect(error).toBe(
-                `${AgentsResponseMessages.failedAgentDeletion}: ${AgentsResponseMessages.noAgentOrUser}`
-            );
-        });
-
-        it("Should also fail to delete the agent and return 404 error because there the agent does not exist", async () => {
+        it("Should also fail to delete the agent error because the agent does not exist", async () => {
             const agent = getRandomMockAgent();
 
             await insertUserIntoDB({ db, user: testingUserCredentials })
@@ -45,13 +30,11 @@ export default function deleteAgent({ db }: { db: PostgresClient }) {
             const status = response.object.status;
             const { error } = await response.json<{ error: string }>();
 
-            expect(status).toBe(404);
-            expect(error).toBe(
-                `${AgentsResponseMessages.failedAgentDeletion}: ${AgentsResponseMessages.noAgentOrUser}`
-            );
+            expect(status).toBe(400);
+            expect(error).toBe(AgentsResponseMessages.failedAgentDeletion);
         });
 
-        it("Should succeed to delete the agent and because both user and agent are existing", async () => {
+        it("Should succeed to delete the agent", async () => {
             const agent = getRandomMockAgent();
 
             await insertAgentsIntoDB({

@@ -55,7 +55,6 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         systemInstructions,
         dontKnowResponse,
         responseSyntax,
-        isPublished,
         greetingMessage,
     } = getRandomMockAgent()
 
@@ -65,7 +64,6 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         systemInstructions,
         dontKnowResponse,
         responseSyntax,
-        isPublished,
         greetingMessage,
     }
 }

@@ -2,7 +2,7 @@ import { Client as PostgresClient } from "deno.land/x/postgres";
 
 export default async function insertAgentsIntoDB(
     { db, agents }:
-        { db: PostgresClient, agents: (Pick<Agent, "agentName" | "description" | "userEmail"> & { id?: string })[] }
+        { db: PostgresClient, agents: (Pick<Agent, "agentName" | "description" | "userEmail" | "avatar"> & { id?: string })[] }
 ) {
     const withId = !!agents[0].id
     const fields = `agent_name, description, user_email${withId ? ", id" : ""}`;

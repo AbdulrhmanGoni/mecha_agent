@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { validator } from 'hono/validator';
 import schemaParser from "../../helpers/schemaParser.ts";
-import { ParsedFormValue } from "hono/types";
 import agentSchema from "./agentSchema.ts";
 
 const updateAgentInputSchema = z.object({

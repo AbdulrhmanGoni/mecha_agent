@@ -86,7 +86,7 @@ export class AgentsController {
         const userEmail = c.get("userEmail");
 
         if (!datasetId) {
-            return c.json({ error: AgentsResponseMessages.noDatasetToAssociate }, 400);
+            return c.json({ error: AgentsResponseMessages.noDatasetIdToAssociate }, 400);
         }
 
         if (action != "associate" && action != "unassociate") {
@@ -122,10 +122,6 @@ export class AgentsController {
             return c.json({ result: AgentsResponseMessages.successfulAgentDeletion }, 200);
         }
 
-        if (result === null) {
-            return c.json({ error: `${AgentsResponseMessages.failedAgentDeletion}: ${AgentsResponseMessages.noAgentOrUser}` }, 404);
-        }
-
         return c.json({ error: AgentsResponseMessages.failedAgentDeletion }, 400);
     }
 
@@ -142,13 +138,6 @@ export class AgentsController {
 
         if (result) {
             return c.json({ result: AgentsResponseMessages.successfulAgentUpdate }, 200);
-        }
-
-        if (result === null) {
-            return c.json(
-                { error: `${AgentsResponseMessages.failedAgentUpdate}, ${AgentsResponseMessages.noAgentOrUser}` },
-                404
-            );
         }
 
         return c.json({ error: AgentsResponseMessages.failedAgentUpdate }, 400);

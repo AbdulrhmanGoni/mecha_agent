@@ -5,8 +5,6 @@ const AgentsResponseMessages = {
     successfulPublishAgent: "The agent has been published successfully",
     successfulUnpublishAgent: "The agent has been unpublished successfully",
 
-    noAgentOrUser: "Either the agent or the user doesn't exist",
-
     failedAgentCreation: "Failed to create the agent",
     failedAgentDeletion: "Failed to delete the agent",
     failedAgentUpdate: "Failed to update the agent",
@@ -18,7 +16,7 @@ const AgentsResponseMessages = {
 
     agentsLimitReached: "You have reached the maximum allowed number of published agents",
 
-    noDatasetToAssociate: "No dataset id to associate it with the agent",
+    noDatasetIdToAssociate: "No dataset id to associate it with the agent",
     successfulAssociation: "The dataset was associated with the agent successfully",
     failedAssociation: "The dataset failed to be associated with the agent",
     successfulUnassociation: "The dataset was unassociated with the agent successfully",
