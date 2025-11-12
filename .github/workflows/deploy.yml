@@ -1,14 +1,7 @@
 name: Deploy
 on:
   workflow_dispatch:
-  push:
-    branches: main
-    paths:
-      - "src/**"
-      - "html-mails-templates/**"
-      - "scripts/bundleHtmlMailsTemplates.ts"
-      - "deno.*"
-      - "db/**"
+  workflow_call:
 
 jobs:
   deploy:
@@ -33,10 +26,7 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Install step
-        run: deno install -e src/server.ts
-
-      - name: Prepare environment variables fo the next bundler
+      - name: Prepare environment variables for HTML mails bundler
         run: echo "CLIENT_URL=${{ vars.CLIENT_URL }}" >> .env
 
       - name: Bundle HTML mails templates

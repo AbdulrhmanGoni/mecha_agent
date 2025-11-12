@@ -1,0 +1,51 @@
+name: CI/CD
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/**"
+      - "html-mails-templates/**"
+      - "scripts/bundleHtmlMailsTemplates.ts"
+      - "deno.*"
+      - "db/**"
+      - "tests/**"
+  push:
+    paths:
+      - "src/**"
+      - "html-mails-templates/**"
+      - "scripts/bundleHtmlMailsTemplates.ts"
+      - "deno.*"
+      - "db/**"
+      - "tests/**"
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install the database migration tool (dbmate)
+        run: deno install npm:dbmate
+
+      - name: Set up testing environment
+        run: deno task test:setup
+
+      - name: Set run unit tests
+        run: deno task test:unit
+
+      - name: Set run end-to-end tests
+        run: deno task test:e2e
+
+  call-deploy:
+    name: Call Deploy Workflow
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: tests
+    uses: ./.github/workflows/deploy.yml
