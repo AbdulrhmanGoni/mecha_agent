@@ -2,6 +2,9 @@ name: Deploy
 on:
   workflow_dispatch:
   workflow_call:
+    secrets:
+      DB_URL:
+        required: true
 
 jobs:
   deploy:
@@ -33,7 +36,7 @@ jobs:
         run: deno task bundle-html-mails-templates:prod
 
       - name: Install the database migration tool (dbmate)
-        run: deno install npm:dbmate
+        run: deno add npm:dbmate
 
       - name: Sync database schema with latest changes
         run: deno -E --allow-run dbmate --url "${{ secrets.DB_URL }}" up

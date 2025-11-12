@@ -52,3 +52,5 @@ jobs:
     permissions:
       id-token: write
       contents: read
+    secrets:
+      DB_URL: ${{ secrets.DB_URL }}
