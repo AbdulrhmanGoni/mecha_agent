@@ -33,7 +33,7 @@ jobs:
           deno-version: v2.x
 
       - name: Install the database migration tool (dbmate)
-        run: deno install npm:dbmate
+        run: deno add npm:dbmate
 
       - name: Set up testing environment
         run: deno task test:setup
