@@ -10,7 +10,7 @@ services:
     command: deno run -N -E -R -W --allow-sys --allow-ffi --watch --unstable-kv --unstable-cron src/server.ts
     image: mecha_agent_server:dev
     volumes:
-      - ../src:/assistant-server/src:ro
+      - ../src:/mecha-agent-server/src:ro
       - dev_kv_data:/deno-dir/location_data
     env_file:
       - .env.development

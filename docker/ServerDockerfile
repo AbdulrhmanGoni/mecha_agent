@@ -2,7 +2,7 @@ FROM denoland/deno
 
 EXPOSE 10000
 
-WORKDIR /assistant-server
+WORKDIR /mecha-agent-server
 
 COPY . .
 

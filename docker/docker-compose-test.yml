@@ -9,9 +9,9 @@ services:
     command: deno run -N -E -R -W --watch --unstable-kv --unstable-cron src/server.ts
     image: mecha_agent_server:test
     volumes:
-      - ../src:/assistant-server/src:ro
-      - ../tests:/assistant-server/tests:ro
-      - ../types:/assistant-server/types:ro
+      - ../src:/mecha-agent-server/src:ro
+      - ../tests:/mecha-agent-server/tests:ro
+      - ../types:/mecha-agent-server/types:ro
     env_file:
       - .env.testing
     networks:
