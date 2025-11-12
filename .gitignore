@@ -1,4 +1,5 @@
 .env**
 !.env.example
+!.env.testing
 .vscode
 **/html-mails-templates/*.min.txt
