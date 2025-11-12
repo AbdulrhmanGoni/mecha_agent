@@ -7,8 +7,7 @@
       ]
     },
     "stop:dev": "docker compose -f docker/docker-compose-dev.yml down",
-    "dbmate:dev": "deno run --allow-run scripts/migration.ts development",
-    "dbmate:test": "deno run --allow-run scripts/migration.ts testing",
+    "migration": "deno run --allow-run -E --env-file=docker/.env.development scripts/migration.ts",
     "bundle-html-mails-templates:dev": "deno run -R -E -W -N --env-file=docker/.env.development scripts/bundleHtmlMailsTemplates.ts",
     "bundle-html-mails-templates:prod": "deno run -R -E -W -N --env-file=.env scripts/bundleHtmlMailsTemplates.ts",
     "test:setup": "deno run --allow-run -E -R --env-file=docker/.env.testing tests/scripts/setUpTestingEnvironment.ts",

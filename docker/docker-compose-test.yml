@@ -6,7 +6,7 @@ services:
     container_name: testing_server_container
     ports:
       - 10001:10001
-    command: deno run -N -E -R -W --allow-sys --allow-ffi --watch --unstable-kv --unstable-cron src/server.ts
+    command: deno run -N -E -R -W --watch --unstable-kv --unstable-cron src/server.ts
     image: mecha_agent_server:test
     volumes:
       - ../src:/assistant-server/src:ro
@@ -19,6 +19,7 @@ services:
     depends_on:
       - testing_database
       - testing_vector_database
+    restart: always
 
   testing_database:
     image: postgres:17.3

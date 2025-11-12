@@ -1,15 +1,5 @@
 import z from "zod";
-
-function parseEnvironmentVariables<
-    T extends z.ZodObject<z.ZodRawShape, z.UnknownKeysParam, z.ZodTypeAny>,
->(schema: T): z.infer<typeof schema> {
-    const vars: Record<string, string | undefined> = {};
-    for (const key in schema.shape) {
-        vars[key] = Deno.env.get(key);
-    }
-
-    return schema.parse(vars);
-};
+import { parseEnvironmentVariables } from "../helpers/parseEnvironmentVariables.ts";
 
 export const envSchema = z.object({
     ENVIRONMENT: z.enum(["testing", "production", "development"]),
@@ -48,8 +38,8 @@ export const envSchema = z.object({
 
     MAIL_SENDER_HOST: z.string().optional(),
     MAIL_SENDER_PORT: z.string().optional(),
-    MAIL_SENDER_USER: z.string(),
-    MAIL_SENDER_PASS: z.string(),
+    MAIL_SENDER_USER: z.string().optional(),
+    MAIL_SENDER_PASS: z.string().optional(),
     MAIL_SENDER_KEY: z.string().optional(),
 
     METRICS_SCRAPPER_TOKEN: z.string().optional(),
