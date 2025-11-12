@@ -105,7 +105,7 @@ deno task build:dev
 Run the database schema migration to setup the schema of the development database
 
 ```
-deno task dbmate:dev up
+deno task migration up
 ```
 
 And them run the following command to start the backend system of **Mecha Agent**
@@ -176,12 +176,6 @@ To Build the testing image run this command
 
 ```
 deno task build:test
-```
-
-And then run the database schema migration to setup the schema of the testing database
-
-```
-deno task dbmate:test up
 ```
 
 Then you have to get the backend system up running in testing environment by
