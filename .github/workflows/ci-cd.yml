@@ -46,7 +46,7 @@ jobs:
 
   call-deploy:
     name: Call Deploy Workflow
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: tests
     uses: ./.github/workflows/deploy.yml
     permissions:
