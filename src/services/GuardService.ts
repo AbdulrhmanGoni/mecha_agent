@@ -104,7 +104,7 @@ export class GuardService {
         const agentId = c.req.query("agentId") as string;
         const record = await this.kv.get<string>(["published_agent_owner", agentId])
         if (!record.value) {
-            return c.json({ error: "Agent not found" })
+            return c.json({ error: "Agent not found" }, 404)
         }
 
         c.set("userEmail", record.value)
