@@ -3,6 +3,7 @@ import createAgentTests from "./createAgent.test.ts";
 import getAllAgentsTests from "./getAllAgents.test.ts";
 import updateAgentTests from "./updateAgent.test.ts";
 import deleteAgentTests from "./deleteAgent.test.ts";
+import associatingAgentWithDataset from "./associatingAgentWithDataset.test.ts";
 
 export default function agentsRouteTests(app: TestingAppConfigs) {
     describe("Testing agents API route", () => {
@@ -20,6 +21,10 @@ export default function agentsRouteTests(app: TestingAppConfigs) {
 
         deleteAgentTests({
             db: app.configurations.databaseClient
+        });
+
+        associatingAgentWithDataset({
+            db: app.configurations.databaseClient,
         });
     })
 };
