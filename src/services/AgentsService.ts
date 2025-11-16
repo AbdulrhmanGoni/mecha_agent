@@ -197,23 +197,23 @@ export class AgentsService {
         return !!agentUpdated
     }
 
-    async updateAgentPublishingState(agentId: string, userEmail: string, isPublished: boolean) {
-        const transaction = this.databaseService.createTransaction(isPublished ? "unpublish_agent" : "publish_agent")
+    async updateAgentPublishingState(agentId: string, userEmail: string, isAlreadyPublished: boolean) {
+        const transaction = this.databaseService.createTransaction(isAlreadyPublished ? "unpublish_agent" : "publish_agent")
         await transaction.begin();
 
         const { rowCount: agentUpdated } = await transaction.queryObject<Agent>({
             text: 'UPDATE agents SET is_published = $3 WHERE id = $1 AND user_email = $2',
-            args: [agentId, userEmail, !isPublished],
+            args: [agentId, userEmail, !isAlreadyPublished],
         })
 
         const { rowCount: userUpdated } = await transaction.queryObject<Agent>({
             text: 'UPDATE users SET published_agents = published_agents + $2 WHERE email = $1',
-            args: [userEmail, isPublished ? -1 : 1],
+            args: [userEmail, isAlreadyPublished ? -1 : 1],
         })
 
         if (!!userUpdated && !!agentUpdated) {
             const publishedAgentRecordKey = ["published_agent_owner", agentId]
-            if (isPublished) {
+            if (isAlreadyPublished) {
                 await this.kvStore.delete(publishedAgentRecordKey)
             } else {
                 await this.kvStore.set(publishedAgentRecordKey, userEmail)
