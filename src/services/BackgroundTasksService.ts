@@ -45,7 +45,7 @@ export class BackgroundTasksService {
     }
 
     private async cleanExpiredAnonymousChats() {
-        await this.databaseService.query(`DELETE FROM anonymous_chats WHERE (started_at + INTERVAL '1 day') < NOW()`)
+        await this.databaseService.query(`DELETE FROM anonymous_chats WHERE (last_interaction + INTERVAL '1 day') < NOW()`)
     }
 
     private async resetUsersInferencesRateLimits() {

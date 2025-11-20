@@ -188,8 +188,8 @@ export class ChatsService {
             Pick<ChatRelatedTypes, "chatId" | "chatMessages" | "userEmail" | "isAnonymous">
     ) {
         const query = isAnonymous ?
-            `UPDATE anonymous_chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`
-            : `UPDATE chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2`
+            'UPDATE anonymous_chats SET last_interaction = NOW(), messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2'
+            : 'UPDATE chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2'
 
         const { rowCount } = await this.databaseService.query({
             text: query,
