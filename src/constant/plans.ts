@@ -4,14 +4,14 @@ export const plans: Plan[] = [
     {
         planName: "Free",
         maxPublishedAgentsCount: 1,
-        maxInferencesPerDay: 50,
+        maxInferencesPerDay: 100,
         subscriptionCostPerMonth: 0,
         priceId: ""
     },
     {
         planName: "Pro",
         maxPublishedAgentsCount: 5,
-        maxInferencesPerDay: 240,
+        maxInferencesPerDay: 500,
         subscriptionCostPerMonth: 4.99,
         priceId: parsedEnvVariables.PRO_SUBSCRIPTION_PRICE_ID as string
     },
