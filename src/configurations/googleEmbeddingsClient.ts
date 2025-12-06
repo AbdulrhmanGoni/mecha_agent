@@ -11,7 +11,10 @@ export class GoogleEmbeddingClient implements EmbeddingClientInterface {
         const response = await this.googleGenAI.models.embedContent({
             model: parsedEnvVariables.EMBEDDING_MODEL_NAME,
             contents: text,
-            config: { taskType: "SEMANTIC_SIMILARITY" },
+            config: {
+                taskType: "SEMANTIC_SIMILARITY",
+                outputDimensionality: this.embeddingDimensions
+            },
         });
 
         if (response.embeddings?.[0].values) {
