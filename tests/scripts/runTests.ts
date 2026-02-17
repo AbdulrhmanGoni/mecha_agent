@@ -8,4 +8,11 @@ const runTestsCommand = new Deno.Command("docker", {
     args: testCommand.split(" ")
 });
 
-await runTestsCommand.spawn().output();
+await runTestsCommand.spawn().output()
+    .then((output) => {
+        if (output.code === 0) {
+            console.log("All e2e tests successfully passed ✅");
+        } else {
+            throw new Error("One or more e2e tests failed ❌");
+        }
+    })

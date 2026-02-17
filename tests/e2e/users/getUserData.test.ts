@@ -42,7 +42,7 @@ export default function getUserDataTests({ db }: { db: PostgresClient }) {
                 publishedAgents: 0,
                 datasetsCount: 0,
                 subscription: null,
-                todayInference: { current: 0, max: 50 },
+                todayInference: { current: 0, max: 100 },
                 lastWeekInferences: []
             });
         });
