@@ -35,7 +35,7 @@
     "djwt/util": "https://deno.land/x/djwt@v3.0.2/util.ts",
     "@std/testing/bdd": "jsr:@std/testing/bdd",
     "@std/expect": "jsr:@std/expect",
-    "hono": "jsr:@hono/hono",
+    "hono": "jsr:@hono/hono@^4.11.9",
     "qdrant": "npm:@qdrant/js-client-rest",
     "ollama": "npm:ollama@^0.5.13",
     "@google/genai": "npm:@google/genai",
