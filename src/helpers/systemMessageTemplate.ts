@@ -1,10 +1,7 @@
-import { responseSyntaxPrompts } from "../constant/agents.ts";
-
 export default function systemMessageTemplate({
     agentName,
     systemInstructions,
     dontKnowResponse,
-    responseSyntax
 }: Agent) {
     return (
         `
@@ -17,7 +14,7 @@ export default function systemMessageTemplate({
             `Just respond "${dontKnowResponse}"` :
             "Respond by stating that you cannot provide a proper answer and briefly explain why (e.g., missing details, unclear intent, or out-of-scope topic)."
         },
-        ${responseSyntax ? responseSyntaxPrompts[responseSyntax] + ", " : ""}
+        Always respond in markdown syntax, 
         ${systemInstructions ? ", " + systemInstructions : ""}
         `
     )

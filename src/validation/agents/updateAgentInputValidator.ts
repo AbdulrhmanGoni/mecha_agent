@@ -10,7 +10,6 @@ const updateAgentInputSchema = z.object({
     systemInstructions: agentSchema.shape.systemInstructions,
     dontKnowResponse: agentSchema.shape.dontKnowResponse,
     greetingMessage: agentSchema.shape.greetingMessage,
-    responseSyntax: agentSchema.shape.responseSyntax,
     removeAvatar: z.coerce.boolean().optional(),
 }).strict()
 

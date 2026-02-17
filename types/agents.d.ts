@@ -4,7 +4,6 @@ type CreateAgentFormData = {
     avatar?: string;
     systemInstructions?: string;
     dontKnowResponse?: string;
-    responseSyntax?: import("../src/constant/agents.ts").ResponseSyntax;
     greetingMessage?: string;
 }
 type Agent = {

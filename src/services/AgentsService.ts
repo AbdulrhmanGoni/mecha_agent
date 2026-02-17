@@ -9,7 +9,6 @@ const agentRowFieldsNamesMap: Record<string, string> = {
     systemInstructions: "system_instructions",
     datasetId: "dataset_id",
     dontKnowResponse: "dont_know_response",
-    responseSyntax: "response_syntax",
     greetingMessage: "greeting_message",
     isPublished: "is_published",
 }
@@ -34,11 +33,10 @@ export class AgentsService {
                     avatar, 
                     system_instructions, 
                     dont_know_response, 
-                    response_syntax, 
                     greeting_message,
                     user_email
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+                VALUES ($1, $2, $3, $4, $5, $6, $7);
             `,
             args: [
                 newAgent.agentName,
@@ -46,7 +44,6 @@ export class AgentsService {
                 newAgent.avatar,
                 newAgent.systemInstructions,
                 newAgent.dontKnowResponse,
-                newAgent.responseSyntax,
                 newAgent.greetingMessage,
                 userEmail
             ]

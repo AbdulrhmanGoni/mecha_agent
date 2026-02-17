@@ -7,7 +7,6 @@ const mockAgents: Agent[] = [
         systemInstructions: "",
         createdAt: new Date("2025-01-24 16:42:12.243918"),
         dontKnowResponse: "",
-        responseSyntax: "markdown",
         avatar: "f56113aa-5172-4199-82ff-4f64d2941952.webp",
         greetingMessage: "Hello, How can i help you?",
         isPublished: true,
@@ -21,7 +20,6 @@ const mockAgents: Agent[] = [
         systemInstructions: "",
         createdAt: new Date("2024-12-23 15:27:22.223696"),
         dontKnowResponse: "",
-        responseSyntax: "markdown",
         avatar: "892f0aff-0135-48fd-8f16-8fee90293663.png",
         greetingMessage: "Hello, How can i help you?",
         isPublished: true,
@@ -35,7 +33,6 @@ const mockAgents: Agent[] = [
         systemInstructions: "",
         createdAt: new Date("2025-01-16 22:04:59.430696"),
         dontKnowResponse: "",
-        responseSyntax: "markdown",
         avatar: "740f99ee-cf3a-4acb-abe9-ef061dd35f94.webp",
         greetingMessage: "Hi, What can i help with?",
         isPublished: true,
@@ -54,7 +51,6 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         description,
         systemInstructions,
         dontKnowResponse,
-        responseSyntax,
         greetingMessage,
     } = getRandomMockAgent()
 
@@ -63,7 +59,6 @@ export function getRandomMockNewAgentInput(): CreateAgentFormData {
         description,
         systemInstructions,
         dontKnowResponse,
-        responseSyntax,
         greetingMessage,
     }
 }
