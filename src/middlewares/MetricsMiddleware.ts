@@ -1,5 +1,6 @@
 import { Context, Next } from "hono";
 import { requestLatencyRanges } from "../constant/requestLatencyRanges.ts";
+import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
 export class MetricsMiddleware {
     constructor(private kvStoreClient: Deno.Kv) { }
@@ -9,8 +10,9 @@ export class MetricsMiddleware {
     async collectTrafficMetrics(c: Context, next: Next) {
         const start = performance.now();
         await next();
-        const end = performance.now();
-        const resTimeSec = Number(((end - start) / 1000))
+        const resTimeSec = parsedEnvVariables.ENVIRONMENT === "development" ?
+            Number((Math.random() * 6).toFixed(1)) :
+            Number(((performance.now() - start) / 1000))
 
         if (this.excludeRoutes.some((path) => c.req.path.startsWith(path))) {
             return
