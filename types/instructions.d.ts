@@ -1,6 +1,5 @@
 type Dataset = {
     id: string;
-    agentId: string;
     userEmail: string;
     title: string;
     description: string;
