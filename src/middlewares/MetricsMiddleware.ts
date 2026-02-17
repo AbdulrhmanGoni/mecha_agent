@@ -7,9 +7,9 @@ export class MetricsMiddleware {
     private excludeRoutes = ["/api/metrics", "/health-check"]
 
     async collectTrafficMetrics(c: Context, next: Next) {
-        const start = Date.now();
+        const start = performance.now();
         await next();
-        const end = Date.now();
+        const end = performance.now();
         const resTimeSec = Number(((end - start) / 1000))
 
         if (this.excludeRoutes.some((path) => c.req.path.startsWith(path))) {
