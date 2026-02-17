@@ -5,5 +5,5 @@ export const kvStoreClient = await Deno.openKv(parsedEnvVariables.ENVIRONMENT ==
 if (parsedEnvVariables.ENVIRONMENT === "development") {
     // For more details, see: https://github.com/AbdulrhmanGoni/denokv-bridge-server
     const { openBridgeServerInDeno } = await import("@denokv-gui-client/bridge-server")
-    openBridgeServerInDeno(kvStoreClient, 8989);
+    openBridgeServerInDeno(kvStoreClient, { port: 8989, authToken: "@denokv-gui-client/bridge-server" });
 }
