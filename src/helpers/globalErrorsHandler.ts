@@ -1,5 +1,6 @@
 import { BlankEnv, HTTPResponseError } from "hono/types";
 import { Context } from "hono";
+import { routePath } from "hono/route";
 import { HTTPException } from "hono/http-exception";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 import * as Sentry from "sentry";
@@ -12,7 +13,7 @@ export default async (err: Error | HTTPResponseError, c: Context<BlankEnv, never
     Promise.resolve().then(() => Sentry.captureException(err, {
         user: { email: (c.var as Record<string, string> | undefined)?.userEmail },
         extra: {
-            route: `${c.req.method} ${c.req.routePath}`,
+            route: `${c.req.method} ${routePath(c)}`,
             fullUrl: c.req.url,
             payload: {
                 json: c.req.valid("json"),

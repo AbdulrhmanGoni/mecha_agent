@@ -1,4 +1,5 @@
 import { Context, Next } from "hono";
+import { routePath } from "hono/route";
 import { requestLatencyRanges } from "../constant/requestLatencyRanges.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 
@@ -31,10 +32,10 @@ export class MetricsMiddleware {
             latencyRange = Infinity
         }
 
-        console.log(c.req.method, c.req.routePath, c.res.status, resTimeSec + "s")
+        console.log(c.req.method, routePath(c), c.res.status, resTimeSec + "s")
         await this.kvStoreClient.
             atomic()
-            .sum(["total_http_requests", c.req.routePath, c.req.method, c.res.status], 1n)
+            .sum(["total_http_requests", routePath(c), c.req.method, c.res.status], 1n)
             .sum(["http_requests_latencies", latencyRange], 1n)
             .commit();
     };
