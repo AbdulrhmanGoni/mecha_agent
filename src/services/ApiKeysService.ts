@@ -1,9 +1,9 @@
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { JwtService } from "./JwtService.ts";
 
 export class ApiKeysService {
     constructor(
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly jwtService: JwtService
     ) { }
 
@@ -12,7 +12,7 @@ export class ApiKeysService {
         const apiKeyId = crypto.randomUUID()
         const jwtKey = await this.jwtService.generateJwt(restParams, { apiKeyId });
 
-        const transaction = this.databaseService.createTransaction("create_api_key");
+        const transaction = this.dbClient.createTransaction("create_api_key");
         await transaction.begin();
 
         const result = await transaction.queryObject<ApiKeyRecord>({
@@ -49,7 +49,7 @@ export class ApiKeysService {
     }
 
     async getAll(userEmail: string) {
-        const result = await this.databaseService.query<ApiKeyRecord>({
+        const result = await this.dbClient.queryObject<ApiKeyRecord>({
             text: "SELECT * FROM api_keys WHERE user_email = $1",
             camelCase: true,
             args: [userEmail]
@@ -58,7 +58,7 @@ export class ApiKeysService {
     }
 
     async getOne(userEmail: string, id: string) {
-        const result = await this.databaseService.query<ApiKeyRecord>({
+        const result = await this.dbClient.queryObject<ApiKeyRecord>({
             text: "SELECT * FROM api_keys WHERE id = $1 AND user_email = $2",
             args: [id, userEmail],
             camelCase: true,
@@ -68,7 +68,7 @@ export class ApiKeysService {
     }
 
     async delete(userEmail: string, keysIds: string[]) {
-        const transaction = this.databaseService.createTransaction("delete_api_key");
+        const transaction = this.dbClient.createTransaction("delete_api_key");
         await transaction.begin();
 
         const result = await transaction.queryObject<ApiKeyRecord>({
@@ -93,7 +93,7 @@ export class ApiKeysService {
     }
 
     async deactivate(userEmail: string, keysIds: string[]) {
-        const result = await this.databaseService.query({
+        const result = await this.dbClient.queryObject({
             text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1) AND user_email = $3",
             args: [keysIds, "Inactive", userEmail],
         })
@@ -102,7 +102,7 @@ export class ApiKeysService {
     }
 
     async activate(userEmail: string, keysIds: string[]) {
-        const result = await this.databaseService.query({
+        const result = await this.dbClient.queryObject({
             text: "UPDATE api_keys SET status = $2 WHERE id = ANY($1) AND user_email = $3",
             args: [keysIds, "Active", userEmail],
         })

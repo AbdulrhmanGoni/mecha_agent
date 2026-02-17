@@ -1,5 +1,5 @@
 import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { InstructionsService } from "./InstructionsService.ts";
 import performanceInSeconds from "../helpers/performanceInSeconds.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
@@ -8,7 +8,7 @@ import sentryClient from "../sentry.ts";
 export class BackgroundTasksService {
     constructor(
         private readonly kvStoreClient: Deno.Kv,
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly instructionsService: InstructionsService,
         private readonly objectStorageService: ObjectStorageService,
     ) {
@@ -45,7 +45,7 @@ export class BackgroundTasksService {
     }
 
     private async cleanExpiredAnonymousChats() {
-        await this.databaseService.query(`DELETE FROM anonymous_chats WHERE (last_interaction + INTERVAL '1 day') < NOW()`)
+        await this.dbClient.queryObject(`DELETE FROM anonymous_chats WHERE (last_interaction + INTERVAL '1 day') < NOW()`)
     }
 
     private async resetUsersInferencesRateLimits() {
@@ -56,7 +56,7 @@ export class BackgroundTasksService {
     }
 
     private async deleteAvatarsFromObjectStorage() {
-        const { rows } = await this.databaseService.query<{ id: string }>(
+        const { rows } = await this.dbClient.queryObject<{ id: string }>(
             'SELECT id FROM deleted_agents_avatars'
         )
 
@@ -64,7 +64,7 @@ export class BackgroundTasksService {
 
         const success = await this.objectStorageService.deleteAvatars(avatars)
         if (success) {
-            this.databaseService.query(
+            this.dbClient.queryObject(
                 'DELETE FROM deleted_agents_avatars WHERE id = ANY($1)', [avatars]
             )
         }

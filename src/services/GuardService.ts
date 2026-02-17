@@ -1,6 +1,6 @@
 import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
 import { sudoPermission } from "../constant/permissions.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
@@ -15,7 +15,7 @@ type GuardRouteOptions = {
 export class GuardService {
     constructor(
         private readonly jwtService: JwtService,
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly kv: Deno.Kv,
     ) {
         if (parsedEnvVariables.ENVIRONMENT === "production") {
@@ -75,7 +75,7 @@ export class GuardService {
     }
 
     async checkApiKeyStatus(apiKeyId: string) {
-        const { rows: [apiKey] } = await this.databaseService.query<Pick<ApiKeyRecord, "status"> | null>({
+        const { rows: [apiKey] } = await this.dbClient.queryObject<Pick<ApiKeyRecord, "status"> | null>({
             text: "SELECT status FROM api_keys WHERE id = $1",
             args: [apiKeyId],
         });

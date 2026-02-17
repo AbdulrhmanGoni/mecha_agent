@@ -4,7 +4,6 @@ import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import { InstructionsService } from "./InstructionsService.ts";
 import { LLMService } from "./LLMService.ts";
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import { DatabaseService } from "./DatabaseService.ts";
 import { ApiKeysService } from "./ApiKeysService.ts";
 import { JwtService } from "./JwtService.ts";
 import { AuthService } from "./AuthService.ts";
@@ -36,8 +35,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const vectorDatabaseService = new VectorDatabaseService(dependencies.vectorDatabaseClient, embeddingService);
 
-    const databaseService = new DatabaseService(dependencies.databaseClient);
-
     const objectStorageService = new ObjectStorageService(dependencies.utApi);
 
     const instructionsService = new InstructionsService(vectorDatabaseService);
@@ -52,31 +49,31 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
     const jwtService = new JwtService();
     await jwtService.init();
 
-    const usersService = new UsersService(databaseService, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
+    const usersService = new UsersService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 
-    const chatsService = new ChatsService(databaseService, vectorDatabaseService, llmService);
+    const chatsService = new ChatsService(dependencies.databaseClient, vectorDatabaseService, llmService);
 
-    const apiKeysService = new ApiKeysService(databaseService, jwtService);
+    const apiKeysService = new ApiKeysService(dependencies.databaseClient, jwtService);
 
     const mailsSenderService = new MailsSenderService();
 
     const authService = new AuthService(usersService, mailsSenderService, dependencies.kvStoreClient);
 
-    const guardService = new GuardService(jwtService, databaseService, dependencies.kvStoreClient);
+    const guardService = new GuardService(jwtService, dependencies.databaseClient, dependencies.kvStoreClient);
 
     const sseService = new SSEService();
 
-    const agentsService = new AgentsService(databaseService, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
+    const agentsService = new AgentsService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 
     const datasetsService = new DatasetsService(
-        databaseService,
+        dependencies.databaseClient,
         instructionsService,
         dependencies.kvStoreClient,
     );
 
     new BackgroundTasksService(
         dependencies.kvStoreClient,
-        databaseService,
+        dependencies.databaseClient,
         instructionsService,
         objectStorageService,
     )

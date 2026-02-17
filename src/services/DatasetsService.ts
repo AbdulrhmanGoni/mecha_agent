@@ -1,16 +1,16 @@
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { InstructionsService } from "./InstructionsService.ts";
 
 export class DatasetsService {
     constructor(
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly instructionsService: InstructionsService,
         private readonly kvClient: Deno.Kv,
     ) {
     }
 
     async create(userEmail: string, datasetInput: CreateDatasetInput) {
-        const transaction = this.databaseService.createTransaction("create_dataset");
+        const transaction = this.dbClient.createTransaction("create_dataset");
         await transaction.begin();
 
         const { rows } = await transaction.queryObject<Dataset>({
@@ -40,7 +40,7 @@ export class DatasetsService {
     }
 
     async getOne(datasetId: string, userEmail: string): Promise<Dataset & { instructionsCount: number } | null> {
-        const { rows } = await this.databaseService.query<Dataset>({
+        const { rows } = await this.dbClient.queryObject<Dataset>({
             text: "SELECT * FROM datasets WHERE id = $1 AND user_email = $2;",
             args: [datasetId, userEmail],
             camelCase: true
@@ -60,7 +60,7 @@ export class DatasetsService {
     }
 
     async getAll(userEmail: string) {
-        const { rows } = await this.databaseService.query<Dataset>({
+        const { rows } = await this.dbClient.queryObject<Dataset>({
             text: "SELECT * FROM datasets WHERE user_email = $1;",
             args: [userEmail],
             camelCase: true
@@ -84,7 +84,7 @@ export class DatasetsService {
                 ]
             }, ["", []])
 
-        const { rowCount } = await this.databaseService.query({
+        const { rowCount } = await this.dbClient.queryObject({
             text: `UPDATE datasets SET ${fields}, updated_at = NOW() WHERE id = $1 AND user_email = $2`,
             args: [datasetId, userEmail, ...values],
         })
@@ -93,7 +93,7 @@ export class DatasetsService {
     }
 
     async delete({ datasetId, userEmail }: { userEmail: string, datasetId: string }) {
-        const transaction = this.databaseService.createTransaction("delete_dataset");
+        const transaction = this.dbClient.createTransaction("delete_dataset");
         await transaction.begin();
 
         const { rowCount: datasetDeleted } = await transaction.queryObject({

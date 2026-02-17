@@ -1,5 +1,5 @@
 import { plans } from "../constant/plans.ts";
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 
@@ -16,14 +16,14 @@ const agentRowFieldsNamesMap: Record<string, string> = {
 
 export class AgentsService {
     constructor(
-        private databaseService: DatabaseService,
+        private dbClient: PostgresClient,
         private objectStorageService: ObjectStorageService,
         private kvStore: Deno.Kv,
         private readonly subscriptionsService: SubscriptionsService,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
-        const transaction = this.databaseService.createTransaction("creating_agent")
+        const transaction = this.dbClient.createTransaction("creating_agent")
         await transaction.begin();
 
         const result = await transaction.queryObject({
@@ -67,7 +67,7 @@ export class AgentsService {
     }
 
     async getOne(id: string, userEmail: string) {
-        const result = await this.databaseService.query<Agent>({
+        const result = await this.dbClient.queryObject<Agent>({
             text: 'SELECT * FROM agents WHERE id = $1 AND user_email = $2;',
             args: [id, userEmail],
             camelCase: true,
@@ -76,7 +76,7 @@ export class AgentsService {
     }
 
     async getAll(userEmail: string) {
-        const result = await this.databaseService.query<Agent>({
+        const result = await this.dbClient.queryObject<Agent>({
             text: 'SELECT * FROM agents WHERE user_email = $1;',
             camelCase: true,
             args: [userEmail]
@@ -85,7 +85,7 @@ export class AgentsService {
     }
 
     async getPublishedAgent(id: string) {
-        const result = await this.databaseService.query<Agent>({
+        const result = await this.dbClient.queryObject<Agent>({
             text: `
                 SELECT id, agent_name, description, avatar, user_email, greeting_message
                 FROM agents WHERE id = $1 AND is_published = true;
@@ -98,7 +98,7 @@ export class AgentsService {
     }
 
     async delete(agentId: string, userEmail: string) {
-        const transaction = this.databaseService.createTransaction("deleting_agent")
+        const transaction = this.dbClient.createTransaction("deleting_agent")
         await transaction.begin();
 
         const { rowCount: deleted, rows: [deletedAgent] } = await transaction.queryObject<Pick<Agent, "isPublished" | "avatar">>({
@@ -141,7 +141,7 @@ export class AgentsService {
         const { removeAvatar, ...restUpdateData } = updateData;
         let oldAvatar: string | undefined;
         if (removeAvatar || restUpdateData.avatar) {
-            const { rows: [agent] } = await this.databaseService.query<Agent>({
+            const { rows: [agent] } = await this.dbClient.queryObject<Agent>({
                 text: "SELECT avatar FROM agents WHERE id = $1 AND user_email = $2;",
                 args: [agentId, userEmail],
             })
@@ -164,7 +164,7 @@ export class AgentsService {
                 ]
             }, ["", []])
 
-        const transaction = this.databaseService.createTransaction("updating_agent")
+        const transaction = this.dbClient.createTransaction("updating_agent")
         await transaction.begin();
 
         const updateResult = await transaction.queryObject<Agent>({
@@ -185,7 +185,7 @@ export class AgentsService {
     }
 
     async setDataset(params: { agentId: string, userEmail: string, datasetId: string, action: string }) {
-        const { rowCount: agentUpdated } = await this.databaseService.query<Agent>({
+        const { rowCount: agentUpdated } = await this.dbClient.queryObject<Agent>({
             text: 'UPDATE agents SET dataset_id = $3 WHERE id = $1 AND user_email = $2',
             args: [
                 params.agentId,
@@ -198,7 +198,7 @@ export class AgentsService {
     }
 
     async updateAgentPublishingState(agentId: string, userEmail: string, isAlreadyPublished: boolean) {
-        const transaction = this.databaseService.createTransaction(isAlreadyPublished ? "unpublish_agent" : "publish_agent")
+        const transaction = this.dbClient.createTransaction(isAlreadyPublished ? "unpublish_agent" : "publish_agent")
         await transaction.begin();
 
         const { rowCount: agentUpdated } = await transaction.queryObject<Agent>({
@@ -230,7 +230,7 @@ export class AgentsService {
     async publishAgent(agentId: string, userEmail: string) {
         const userSubscription = await this.subscriptionsService.getUserSubscriptionData(userEmail)
 
-        const { rows: [user] } = await this.databaseService.query<Pick<User, "publishedAgents" | "currentPlan"> | null>({
+        const { rows: [user] } = await this.dbClient.queryObject<Pick<User, "publishedAgents" | "currentPlan"> | null>({
             text: 'SELECT published_agents FROM users WHERE email = $1',
             camelCase: true,
             args: [userEmail],

@@ -1,4 +1,4 @@
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { LLMService } from "./LLMService.ts";
 import { VectorDatabaseService } from "./VectorDatabaseService.ts";
 import contextTemplate from "../helpers/contextTemplate.ts";
@@ -6,7 +6,7 @@ import systemMessageTemplate from "../helpers/systemMessageTemplate.ts";
 
 export class ChatsService {
     constructor(
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly vectorDatabaseService: VectorDatabaseService,
         private readonly llmService: LLMService,
     ) { }
@@ -15,7 +15,7 @@ export class ChatsService {
         { agentId, prompt, userEmail, isAnonymous }:
             Pick<ChatRelatedTypes, "prompt" | "agentId" | "userEmail" | "isAnonymous">
     ) {
-        const { rows: [agentRow] } = await this.databaseService.query<Agent | null>({
+        const { rows: [agentRow] } = await this.dbClient.queryObject<Agent | null>({
             text: 'SELECT * FROM agents WHERE id = $1 AND user_email = $2 AND ($3 = false OR is_published = true)',
             args: [agentId, userEmail, !!isAnonymous],
             camelCase: true,
@@ -150,7 +150,7 @@ export class ChatsService {
         const fields = '(id, agent_id, title, user_email, messages)';
         const values = '($1, $2, $3, $4, $5)';
 
-        await this.databaseService.query<ChatHistory | undefined>({
+        await this.dbClient.queryObject<ChatHistory | undefined>({
             text: isAnonymous ?
                 `INSERT INTO anonymous_chats ${fields} VALUES ${values}` : `INSERT INTO chats ${fields} VALUES ${values}`,
             args: [chatId, agentId, firstPromptBegenning, userEmail, JSON.stringify(chatMessages)],
@@ -165,7 +165,7 @@ export class ChatsService {
             `SELECT messages FROM anonymous_chats WHERE id = $1 AND agent_id = $2 AND user_email = $3`
             : `SELECT messages FROM chats WHERE id = $1 AND agent_id = $2 AND user_email = $3`
 
-        const { rows: [chatHistory] } = await this.databaseService.query<ChatHistory | undefined>({
+        const { rows: [chatHistory] } = await this.dbClient.queryObject<ChatHistory | undefined>({
             text: query,
             args: [chatId, agentId, userEmail],
         })
@@ -174,7 +174,7 @@ export class ChatsService {
     }
 
     async getChats({ agentId, userEmail }: Pick<ChatRelatedTypes, "agentId" | "userEmail">) {
-        const { rows } = await this.databaseService.query<ChatHistory | undefined>({
+        const { rows } = await this.dbClient.queryObject<ChatHistory | undefined>({
             text: `SELECT id, agent_id, title, started_at FROM chats WHERE agent_id = $1 AND user_email = $2`,
             args: [agentId, userEmail],
             camelCase: true,
@@ -191,7 +191,7 @@ export class ChatsService {
             'UPDATE anonymous_chats SET last_interaction = NOW(), messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2'
             : 'UPDATE chats SET messages = messages || $3::JSONB WHERE id = $1 AND user_email = $2'
 
-        const { rowCount } = await this.databaseService.query({
+        const { rowCount } = await this.dbClient.queryObject({
             text: query,
             args: [chatId, userEmail, JSON.stringify(chatMessages)],
         })
@@ -207,7 +207,7 @@ export class ChatsService {
             'DELETE FROM anonymous_chats WHERE id = $1 AND agent_id = $2 AND user_email = $3'
             : 'DELETE FROM chats WHERE id = $1 AND agent_id = $2 AND user_email = $3'
 
-        const { rowCount } = await this.databaseService.query<ChatHistory | undefined>({
+        const { rowCount } = await this.dbClient.queryObject<ChatHistory | undefined>({
             text: query,
             args: [chatId, agentId, userEmail],
         })

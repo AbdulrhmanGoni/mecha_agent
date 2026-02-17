@@ -1,4 +1,4 @@
-import { DatabaseService } from "./DatabaseService.ts";
+import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { PasswordHasher } from "../helpers/passwordHasher.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { plans } from "../constant/plans.ts";
@@ -10,7 +10,7 @@ const userRowFieldsNamesMap: Record<string, string> = {
 
 export class UsersService {
     constructor(
-        private readonly databaseService: DatabaseService,
+        private readonly dbClient: PostgresClient,
         private readonly objectStorage: ObjectStorageService,
         private readonly kvStore: Deno.Kv,
         private readonly subscriptionsService: SubscriptionsService,
@@ -19,7 +19,7 @@ export class UsersService {
     async create(userInput: SignUpUserInput) {
         const hashedPassword = await PasswordHasher.hash(userInput.password);
 
-        const { rows } = await this.databaseService.query<Pick<User, "avatar" | "email"> & { name: string }>({
+        const { rows } = await this.dbClient.queryObject<Pick<User, "avatar" | "email"> & { name: string }>({
             text: `
                 INSERT INTO users(username, email, password, avatar, signing_method) 
                 VALUES($1, $2, $3, $4, $5)
@@ -42,7 +42,7 @@ export class UsersService {
     }
 
     async getByEmail(email: string) {
-        const { rows } = await this.databaseService.query<User>({
+        const { rows } = await this.dbClient.queryObject<User>({
             text: `SELECT * FROM users WHERE email = $1`,
             args: [email],
             camelCase: true,
@@ -56,7 +56,7 @@ export class UsersService {
     }
 
     async checkUserExistance(userEmail: string) {
-        const { rows } = await this.databaseService.query<User>({
+        const { rows } = await this.dbClient.queryObject<User>({
             text: `SELECT email FROM users WHERE email = $1`,
             args: [userEmail],
         });
@@ -65,7 +65,7 @@ export class UsersService {
     }
 
     async getUserData(email: string) {
-        const { rows } = await this.databaseService.query<User>({
+        const { rows } = await this.dbClient.queryObject<User>({
             text: `
                 SELECT 
                     username as name, 
@@ -108,7 +108,7 @@ export class UsersService {
         const { removeAvatar, ...updateUserData } = updateData
         let oldAvatar: string | undefined;
         if (removeAvatar || updateUserData.avatar) {
-            const { rows: [user] } = await this.databaseService.query<User>({
+            const { rows: [user] } = await this.dbClient.queryObject<User>({
                 text: "SELECT avatar FROM users WHERE email = $1",
                 args: [email],
             })
@@ -130,7 +130,7 @@ export class UsersService {
                 ]
             }, ["", []])
 
-        const transaction = this.databaseService.createTransaction("update_user_data")
+        const transaction = this.dbClient.createTransaction("update_user_data")
         await transaction.begin();
 
         const { rowCount } = await transaction.queryObject<User>({
@@ -153,7 +153,7 @@ export class UsersService {
     async changePassword(email: string, newPassword: string) {
         const hashedPassword = await PasswordHasher.hash(newPassword);
 
-        const { rowCount } = await this.databaseService.query({
+        const { rowCount } = await this.dbClient.queryObject({
             text: `UPDATE users SET password = $2 WHERE email = $1`,
             args: [email, hashedPassword],
         });
@@ -162,7 +162,7 @@ export class UsersService {
     }
 
     async delete(email: string) {
-        const { rowCount: userDeleted } = await this.databaseService.query({
+        const { rowCount: userDeleted } = await this.dbClient.queryObject({
             text: `DELETE FROM users WHERE email = $1`,
             args: [email],
         });
