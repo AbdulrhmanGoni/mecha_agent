@@ -43,6 +43,10 @@ export class AuthController {
             return c.json({ result: result.user });
         }
 
+        if (result.tooManyTries) {
+            return c.json({ error: authResponsesMessages.tooManyTries }, 429);
+        }
+
         if (result.wrongSigningMethod) {
             return c.json({ error: authResponsesMessages.userSignedUpWithAnotherMethod }, 401);
         }

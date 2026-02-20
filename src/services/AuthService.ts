@@ -9,6 +9,10 @@ function formVerifiedEmailRecord(email: string, validFor: ValidationPurpose): De
     return ["verified-emails", validFor, email]
 }
 
+function formLoginTriesRecordKey(email: string): Deno.KvKey {
+    return ["login-tries", email]
+}
+
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
@@ -16,7 +20,9 @@ export class AuthService {
         private readonly kvStore: Deno.Kv,
     ) { }
 
-    otpVerificationPeriodInMs = 1000 * 60 * 3;
+    protected otpVerificationPeriodInMs = 60000 * 3; // 3 minutes
+    protected maxLoginTries = 10;
+    protected loginTriesPeriodInMs = 60000 * 30; // 30 minutes
 
     async signUpUser(userInput: SignUpUserInput) {
         if (userInput.signingMethod === "credentials") {
@@ -51,10 +57,20 @@ export class AuthService {
     }
 
     async signInUser(userInput: SignInUserInput) {
-        const user = await this.usersService.getByEmail(userInput.email);
+        const loginTriesKey = formLoginTriesRecordKey(userInput.email);
+        const tries = await this.kvStore.get<number>(loginTriesKey);
 
+        if (tries.value && tries.value >= this.maxLoginTries) {
+            return {
+                success: false,
+                tooManyTries: true
+            }
+        }
+
+        const user = await this.usersService.getByEmail(userInput.email);
         if (user) {
             if (user.signingMethod !== userInput.signingMethod) {
+                await this.incrementLoginTries(userInput.email);
                 return {
                     success: false,
                     wrongSigningMethod: true
@@ -67,6 +83,7 @@ export class AuthService {
             );
 
             if (isMatched) {
+                await this.kvStore.delete(loginTriesKey);
                 await this.usersService.update(userInput.email, { lastSignIn: new Date() })
                     .then(() => true)
                     .catch(() => false)
@@ -82,10 +99,19 @@ export class AuthService {
             }
         }
 
+        await this.incrementLoginTries(userInput.email);
+
         return {
             success: false,
             noUser: !user
         }
+    }
+
+    private async incrementLoginTries(email: string) {
+        const loginTriesKey = formLoginTriesRecordKey(email);
+        const tries = await this.kvStore.get<number>(loginTriesKey);
+        const newValue = tries.value ? tries.value + 1 : 1;
+        await this.kvStore.set(loginTriesKey, newValue, { expireIn: this.loginTriesPeriodInMs });
     }
 
     async generateAndSendOTP(email: string) {

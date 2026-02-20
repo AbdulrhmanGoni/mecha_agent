@@ -63,5 +63,45 @@ export default function signInTests({ db }: { db: PostgresClient }) {
                 avatar: null
             });
         });
+
+        it("Should fail to sign in because of too many tries", async () => {
+            const user = {
+                email: `${crypto.randomUUID()}@example.com`,
+                password: "password123",
+                username: "limiteduser",
+                signingMethod: "credentials"
+            };
+
+            await insertUserIntoDB({ db, user });
+
+            // Try to sign in 10 times with WRONG password
+            for (let i = 0; i < 10; i++) {
+                const response = await new MechaTester(user.email).post(endpoint)
+                    .json({ ...user, password: "wrong-password" })
+                    .headers({ "Content-Type": "application/json" })
+                    .send();
+
+                const res = await response.json<{ error: string }>();
+                expect(res.error).toBe(authResponsesMessages.wrongCredentials);
+            }
+
+            // The 11th attempt should fail with "Too Many Tries" error
+            const response1 = await new MechaTester(user.email).post(endpoint)
+                .json({ ...user, password: "another-wrong-password" })
+                .headers({ "Content-Type": "application/json" })
+                .send();
+
+            const res1 = await response1.json<{ error: string }>();
+            expect(res1.error).toBe(authResponsesMessages.tooManyTries);
+
+            // Should also fail with "Too Many Tries" error even if the password is CORRECT
+            const response2 = await new MechaTester(user.email).post(endpoint)
+                .json(user)
+                .headers({ "Content-Type": "application/json" })
+                .send();
+
+            const res2 = await response2.json<{ error: string }>();
+            expect(res2.error).toBe(authResponsesMessages.tooManyTries);
+        });
     });
 };

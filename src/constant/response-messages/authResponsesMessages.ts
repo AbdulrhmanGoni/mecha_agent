@@ -14,6 +14,7 @@ const authResponsesMessages = {
 
     passwordResetSuccessfully: "Your password has been reset successfully, You can now sign in.",
     resetPasswordFailed: "We couldn't reset your password",
+    tooManyTries: "Too many login attempts. Please try again after 30 minutes.",
 }
 
 export default authResponsesMessages
