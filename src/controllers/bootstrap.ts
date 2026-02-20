@@ -6,14 +6,12 @@ import { AuthController } from "./AuthController.ts";
 import { ChatsController } from "./ChatsController.ts"
 import { InstructionsController } from "./InstructionsController.ts";
 import { DatasetsController } from "./DatasetsController.ts";
-import { SSEController } from "./SSEController.ts";
 import { AgentsService } from "../services/AgentsService.ts";
 import { ApiKeysService } from "../services/ApiKeysService.ts";
 import { AuthService } from "../services/AuthService.ts";
 import { ChatsService } from "../services/ChatsService.ts";
 import { InstructionsService } from "../services/InstructionsService.ts";
 import { ObjectStorageService } from "../services/ObjectStorageService.ts";
-import { SSEService } from "../services/SSEService.ts";
 import { DatasetsService } from "../services/DatasetsService.ts";
 import { MetricsController } from "./MetricsController.ts";
 import { SubscriptionsController } from "./SubscriptionsController.ts";
@@ -29,7 +27,6 @@ type controllersDependencies = {
         apiKeysService: ApiKeysService;
         chatsService: ChatsService;
         objectStorageService: ObjectStorageService;
-        sseService: SSEService;
         subscriptionsService: SubscriptionsService;
     };
     configs: { kvStoreClient: Deno.Kv; };
@@ -64,10 +61,6 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         dependencies.services.authService
     );
 
-    const sseController = new SSEController(
-        dependencies.services.sseService
-    );
-
     const metricsController = new MetricsController(dependencies.configs.kvStoreClient)
 
     const subscriptionsController = new SubscriptionsController(
@@ -82,7 +75,6 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         datasetsController,
         apiKeysController,
         authController,
-        sseController,
         metricsController,
         subscriptionsController,
     }

@@ -12,7 +12,6 @@ import { AgentsService } from "./AgentsService.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { ChatsService } from "./ChatsService.ts";
 import { DatasetsService } from "./DatasetsService.ts";
-import { SSEService } from "./SSEService.ts";
 import { UsersService } from "./UsersService.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
 import { BackgroundTasksService } from "./BackgroundTasksService.ts";
@@ -61,8 +60,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const guardService = new GuardService(jwtService, dependencies.databaseClient, dependencies.kvStoreClient);
 
-    const sseService = new SSEService();
-
     const agentsService = new AgentsService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 
     const datasetsService = new DatasetsService(
@@ -88,7 +85,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         authService,
         guardService,
         datasetsService,
-        sseService,
         subscriptionsService,
         mailsSenderService,
     }
