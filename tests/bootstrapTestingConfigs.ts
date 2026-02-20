@@ -1,8 +1,7 @@
 import { bootstrapConfigurations } from "../src/configurations/bootstrap.ts";
 
 export default async function bootstrapTestingConfigs() {
-    const configurations = await bootstrapConfigurations();
-
+    const { kvStoreClient: _, ...configurations } = await bootstrapConfigurations();
     return {
         configurations,
     };
