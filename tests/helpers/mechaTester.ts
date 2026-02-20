@@ -34,6 +34,7 @@ class MechaRequest {
 
     json(body: Record<string, unknown> | Array<unknown>) {
         this._body = JSON.stringify(body)
+        this._headers = { ...this._headers, "Content-Type": "application/json" }
         return this
     }
 
@@ -43,7 +44,7 @@ class MechaRequest {
     }
 
     headers(headers: Record<string, string>) {
-        this._headers = headers
+        this._headers = { ...this._headers, ...headers }
         return this
     }
 

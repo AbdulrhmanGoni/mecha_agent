@@ -24,7 +24,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(signUpInput)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -42,7 +41,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(signUpInput)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -60,7 +58,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(signUpInput)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -74,7 +71,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(testingUserCredentials)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: ReturnType<JwtService["generateJwt"]> }>()
@@ -91,7 +87,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(testingUserCredentials)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -104,7 +99,6 @@ export default function signUpTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint + "?signing-existing-user=yes")
                 .json(testingUserCredentials)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: object }>()

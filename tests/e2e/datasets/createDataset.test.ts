@@ -26,7 +26,6 @@ export default function createDatasetTests({ db }: { db: PostgresClient }) {
 
             const tester = new MechaTester(testingUserCredentials.email);
             const response = await tester.post(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json(newDataset)
                 .send();
 
@@ -57,7 +56,6 @@ export default function createDatasetTests({ db }: { db: PostgresClient }) {
             const tester = new MechaTester(testingUserCredentials.email);
             const response = await tester.post(endpoint)
                 .json(newDataset)
-                .headers({ "Content-Type": "application/json" })
                 .send();
 
             const { error } = await response.json<{ error: string }>();

@@ -18,7 +18,6 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
         it("Should fail to create the key because the user doesn't exist", async () => {
             const request = new MechaTester(fakeUserEmail);
             const response = await request.post(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json(newApiKeyInput)
                 .send()
 
@@ -32,7 +31,6 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
 
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.post(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json(newApiKeyInput)
                 .send()
 
@@ -59,7 +57,6 @@ export default function createApiKeyTests({ db }: { db: PostgresClient }) {
 
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.post(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json(newApiKeyWithNoExpiration)
                 .send()
 

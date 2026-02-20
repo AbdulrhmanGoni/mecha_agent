@@ -27,7 +27,6 @@ export default function updateAgentTests(
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", randomUUID()))
                 .json({ agentName: "any random agent name" })
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const status = response.object.status
@@ -54,7 +53,6 @@ export default function updateAgentTests(
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
                 .json({})
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const status = response.object.status
@@ -86,7 +84,6 @@ export default function updateAgentTests(
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
                 .json(updateData)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>();
@@ -122,7 +119,6 @@ export default function updateAgentTests(
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
                 .json({ avatar: avatarFileURL })
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: string }>();
@@ -155,7 +151,6 @@ export default function updateAgentTests(
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint.replace(":id", newAgentId))
                 .json({ removeAvatar: true })
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: string }>();

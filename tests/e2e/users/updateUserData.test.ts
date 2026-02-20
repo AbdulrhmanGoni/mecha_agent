@@ -25,7 +25,6 @@ export default function updateUserDataTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint)
                 .json({})
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -41,7 +40,6 @@ export default function updateUserDataTests({ db }: { db: PostgresClient }) {
             }
             const response = await request.patch(endpoint)
                 .json(updateFormData)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()
@@ -62,7 +60,6 @@ export default function updateUserDataTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint)
                 .json({ avatar: avatarFileURL })
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()
@@ -81,7 +78,6 @@ export default function updateUserDataTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.patch(endpoint)
                 .json({ removeAvatar: true })
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>()

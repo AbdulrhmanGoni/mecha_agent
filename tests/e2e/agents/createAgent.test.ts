@@ -21,7 +21,6 @@ export default function createAgentTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(fakeUserEmail);
             const response = await request.post(endpoint)
                 .json(newAgentWithNoName)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { error } = await response.json<{ error: string }>();
@@ -39,7 +38,6 @@ export default function createAgentTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.post(endpoint)
                 .json(newAgent)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const { result } = await response.json<{ result: string }>();

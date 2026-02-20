@@ -20,7 +20,6 @@ export default function deleteApiKeyTests({ db }: { db: PostgresClient }) {
         it("Should fail to delete anything because the user isn't existant", async () => {
             const request = new MechaTester(fakeUserEmail);
             const response = await request.delete(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json([randomUUID()])
                 .send()
 
@@ -32,7 +31,6 @@ export default function deleteApiKeyTests({ db }: { db: PostgresClient }) {
         it("Should return 'No API Keys ids provided' error", async () => {
             const request = new MechaTester(fakeUserEmail);
             const response = await request.delete(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json([])
                 .send()
 
@@ -55,7 +53,6 @@ export default function deleteApiKeyTests({ db }: { db: PostgresClient }) {
 
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.delete(endpoint)
-                .headers({ "Content-Type": "application/json" })
                 .json(addedKeys.map((key) => key.id))
                 .send()
 

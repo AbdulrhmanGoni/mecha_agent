@@ -32,7 +32,6 @@ export default function updateDatasetTests({ db }: { db: PostgresClient }) {
 
             const response = await tester
                 .patch(endpoint.replace(":datasetId", crypto.randomUUID()))
-                .headers({ "Content-Type": "application/json" })
                 .json(updateData)
                 .send();
 
@@ -46,7 +45,6 @@ export default function updateDatasetTests({ db }: { db: PostgresClient }) {
 
             const response = await tester
                 .patch(endpoint.replace(":datasetId", crypto.randomUUID()))
-                .headers({ "Content-Type": "application/json" })
                 .json({})
                 .send();
 
@@ -61,7 +59,6 @@ export default function updateDatasetTests({ db }: { db: PostgresClient }) {
             const tester = new MechaTester(testingUserCredentials.email)
             const response = await tester
                 .patch(endpoint.replace(":datasetId", datasetId))
-                .headers({ "Content-Type": "application/json" })
                 .json(updateData)
                 .send();
 

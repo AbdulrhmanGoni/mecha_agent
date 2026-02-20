@@ -19,7 +19,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(returnedUserCredentials)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -37,7 +36,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
 
             const response = await request.post(endpoint)
                 .json(signInInput)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ error: string }>()
@@ -52,7 +50,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
             const request = new MechaTester(testingUserCredentials.email);
             const response = await request.post(endpoint)
                 .json(testingUserCredentials)
-                .headers({ "Content-Type": "application/json" })
                 .send()
 
             const res = await response.json<{ result: object }>();
@@ -78,7 +75,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
             for (let i = 0; i < 10; i++) {
                 const response = await new MechaTester(user.email).post(endpoint)
                     .json({ ...user, password: "wrong-password" })
-                    .headers({ "Content-Type": "application/json" })
                     .send();
 
                 const res = await response.json<{ error: string }>();
@@ -88,7 +84,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
             // The 11th attempt should fail with "Too Many Tries" error
             const response1 = await new MechaTester(user.email).post(endpoint)
                 .json({ ...user, password: "another-wrong-password" })
-                .headers({ "Content-Type": "application/json" })
                 .send();
 
             const res1 = await response1.json<{ error: string }>();
@@ -97,7 +92,6 @@ export default function signInTests({ db }: { db: PostgresClient }) {
             // Should also fail with "Too Many Tries" error even if the password is CORRECT
             const response2 = await new MechaTester(user.email).post(endpoint)
                 .json(user)
-                .headers({ "Content-Type": "application/json" })
                 .send();
 
             const res2 = await response2.json<{ error: string }>();
