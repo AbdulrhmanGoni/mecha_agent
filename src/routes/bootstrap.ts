@@ -12,8 +12,6 @@ import datasetsRoutesBuilder from "./datasetsRoutes.ts";
 import { AgentsController } from "../controllers/AgentsController.ts";
 import { DatasetsController } from "../controllers/DatasetsController.ts";
 import { GuardService } from "../services/GuardService.ts";
-import sseRoutesBuilder from "./sseRoutes.ts";
-import { SSEController } from "../controllers/SSEController.ts";
 import { UsersController } from "../controllers/UsersController.ts";
 import usersRoutesBuilder from "./usersRoutes.ts";
 import globalErrorsHandler from "../helpers/globalErrorsHandler.ts";
@@ -33,7 +31,6 @@ type RoutesDependencies = {
         apiKeysController: ApiKeysController;
         chatsController: ChatsController;
         authController: AuthController;
-        sseController: SSEController;
         metricsController: MetricsController;
         subscriptionsController: SubscriptionsController;
     },
@@ -83,10 +80,6 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
         dependencies.services.guardService
     );
 
-    const sseRoutes = sseRoutesBuilder(
-        dependencies.controllers.sseController,
-    );
-
     const metricsRoutes = metricsRoutesBuilder(
         dependencies.controllers.metricsController,
         dependencies.services.guardService,
@@ -113,7 +106,6 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/chats', chatsRoutes);
     api.route('/datasets', datasetsRoutes);
     api.route('/subscriptions', subscriptionsRoutes);
-    api.route('/sse', sseRoutes);
     api.route('/metrics', metricsRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
 
