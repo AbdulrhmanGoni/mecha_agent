@@ -79,7 +79,7 @@ export class ApiKeysService {
         if (result.rowCount) {
             const updateUserResult = await transaction.queryObject<Pick<User, "email">>({
                 text: 'UPDATE users SET api_keys_count = api_keys_count - $2 WHERE email = $1',
-                args: [userEmail, keysIds.length],
+                args: [userEmail, result.rowCount],
             });
 
             if (updateUserResult.rowCount === 1) {
