@@ -4,7 +4,7 @@ import { apiKeysPermissions } from "../../constant/permissions.ts";
 import schemaParser from "../../helpers/schemaParser.ts";
 
 const createApiKeyInputSchema = z.object({
-    keyName: z.string(),
+    keyName: z.string().min(1).max(80),
     permissions: z.array(z.enum(apiKeysPermissions)).nonempty("Specify at least one permission"),
     maxAgeInDays: z.number().optional(),
 }).strict()
