@@ -2,7 +2,7 @@ type ApiKeyStatus = "Active" | "Inactive";
 
 type ApiKeyRecord = {
     id: string;
-    key: string;
+    secretHash: string;
     keyName: string;
     expirationDate: Date | null;
     permissions: Permission[];
@@ -13,4 +13,4 @@ type ApiKeyRecord = {
 
 type CreateApiKeyInput =
     Pick<ApiKeyRecord, "keyName" | "permissions" | "userEmail"> &
-    Pick<CreateJWTParams, "maxAgeInDays">
+    { maxAgeInDays?: number }

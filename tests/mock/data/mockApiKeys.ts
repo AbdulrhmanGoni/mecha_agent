@@ -3,7 +3,7 @@ import randomString from "../../../src/helpers/randomString.ts";
 
 export const mockApiKeys: ApiKeyRecord[] = [
     {
-        key: randomString(30),
+        secretHash: randomString(30),
         keyName: "API Key 1",
         id: randomUUID(),
         permissions: ["inference", "read", "write"],
@@ -13,7 +13,7 @@ export const mockApiKeys: ApiKeyRecord[] = [
         expirationDate: new Date(),
     },
     {
-        key: randomString(30),
+        secretHash: randomString(30),
         keyName: "API Key 2",
         id: randomUUID(),
         permissions: ["read", "write"],
@@ -23,7 +23,7 @@ export const mockApiKeys: ApiKeyRecord[] = [
         expirationDate: new Date(),
     },
     {
-        key: randomString(30),
+        secretHash: randomString(30),
         keyName: "API Key 3",
         id: randomUUID(),
         permissions: ["inference"],

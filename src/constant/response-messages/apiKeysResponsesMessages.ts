@@ -9,7 +9,10 @@ const apiKeysResponseMessages = {
     failedKeyActivation: "Api key failed to be activated, It may be not existant",
 
     inactiveApiKey: "The API Key is inactive",
-    unknownApiKey: "The API Key is unknown",
+    unauthenticateApiKey: "Failed to authenticate the api key",
+    insufficientPermissions: "The API Key does not have sufficient permissions",
+    expiredApiKey: "The API Key has expired",
+    invalidApiKey: "The API Key is invalid",
 }
 
 export default apiKeysResponseMessages

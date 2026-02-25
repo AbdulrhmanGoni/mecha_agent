@@ -2,10 +2,10 @@ import { bearerAuth } from "hono/bearer-auth";
 import { JwtService } from "./JwtService.ts";
 import { type Client as PostgresClient } from "deno.land/x/postgres";
 import apiKeysResponseMessages from "../constant/response-messages/apiKeysResponsesMessages.ts";
-import { sudoPermission } from "../constant/permissions.ts";
 import parsedEnvVariables from "../configurations/parseEnvironmentVariables.ts";
 import { Context } from "hono";
-import { Next } from "hono/types";
+import { MiddlewareHandler, Next } from "hono/types";
+import { ApiKeysService } from "./ApiKeysService.ts";
 
 type GuardRouteOptions = {
     permissions?: Permission[];
@@ -17,6 +17,7 @@ export class GuardService {
         private readonly jwtService: JwtService,
         private readonly dbClient: PostgresClient,
         private readonly kv: Deno.Kv,
+        private readonly apiKeysService: ApiKeysService,
     ) {
         if (parsedEnvVariables.ENVIRONMENT === "production") {
             if (!parsedEnvVariables.METRICS_SCRAPPER_TOKEN) {
@@ -25,39 +26,48 @@ export class GuardService {
         }
     }
 
-    guardRoute({ permissions, sudoOnly }: GuardRouteOptions) {
+    guardRoute({ permissions, sudoOnly }: GuardRouteOptions): MiddlewareHandler {
+        return (c, next) => {
+            const apiKey = c.req.header("Api-Key")
+            if (apiKey && !sudoOnly) {
+                return this.apiKeysGuard(c, next, apiKey, { permissions })
+            } else {
+                return this.jwtGuard(c, next)
+            }
+        }
+    }
+
+    async apiKeysGuard(c: Context, next: Next, apiKey: string, { permissions }: GuardRouteOptions) {
+        if (!permissions || permissions.length < 1) {
+            return c.json({ error: apiKeysResponseMessages.insufficientPermissions }, 401);
+        }
+
+        const apiKeyRecord = await this.apiKeysService.verifyApiKey(apiKey, permissions)
+        switch (apiKeyRecord) {
+            case this.apiKeysService.InvalidApiKey:
+                return c.json({ error: apiKeysResponseMessages.unauthenticateApiKey }, 401);
+            case this.apiKeysService.InactiveApiKey:
+                return c.json({ error: apiKeysResponseMessages.inactiveApiKey }, 401);
+            case this.apiKeysService.InvalidApiKeySecret:
+                return c.json({ error: apiKeysResponseMessages.invalidApiKey }, 401);
+            case this.apiKeysService.ExpiredApiKey:
+                return c.json({ error: apiKeysResponseMessages.expiredApiKey }, 401);
+            case this.apiKeysService.InsufficientPermissions:
+                return c.json({ error: apiKeysResponseMessages.insufficientPermissions }, 401);
+        }
+
+        c.set("userEmail", apiKeyRecord.userEmail);
+        c.set("apiKeyId", apiKeyRecord.id);
+        next()
+    }
+
+    jwtGuard(c: Context, next: Next) {
         return bearerAuth({
             verifyToken: async (token, c) => {
                 const { payload, errorMessage } = await this.jwtService.verifyJwt(token);
-
                 if (payload) {
-                    if (payload.apiKeyId) {
-                        const isActiveKey = await this.checkApiKeyStatus(payload.apiKeyId)
-                        if (!isActiveKey) {
-                            c.set(
-                                "auth-error-message",
-                                isActiveKey === false ? apiKeysResponseMessages.inactiveApiKey : apiKeysResponseMessages.unknownApiKey
-                            );
-                            return false
-                        }
-                        c.set("apiKeyId", payload.apiKeyId);
-                    }
-
-                    const isSudo = payload.permissions.includes(sudoPermission);
-
-                    if (sudoOnly) {
-                        c.set("userEmail", payload.email)
-                        return isSudo
-                    }
-
-                    const hasPermission = isSudo || !!(permissions?.every((permission) => (
-                        payload.permissions?.includes(permission)
-                    )))
-
-                    if (hasPermission && payload.email) {
-                        c.set("userEmail", payload.email)
-                        return hasPermission
-                    }
+                    c.set("userEmail", payload.email)
+                    return true
                 }
 
                 if (errorMessage) {
@@ -71,16 +81,7 @@ export class GuardService {
             invalidTokenMessage: (c) => (
                 { error: c.get("auth-error-message") || "You are unauthorized" }
             ),
-        })
-    }
-
-    async checkApiKeyStatus(apiKeyId: string) {
-        const { rows: [apiKey] } = await this.dbClient.queryObject<Pick<ApiKeyRecord, "status"> | null>({
-            text: "SELECT status FROM api_keys WHERE id = $1",
-            args: [apiKeyId],
-        });
-
-        return apiKey ? apiKey.status === "Active" : null;
+        })(c, next)
     }
 
     guardMetricsRoute() {

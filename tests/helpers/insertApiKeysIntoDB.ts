@@ -1,10 +1,10 @@
 import { Client as PostgresClient } from "deno.land/x/postgres";
-import randomString from "../../src/helpers/randomString.ts";
+import generateApiKeySecret from "../../src/helpers/generateApiKeySecret.ts";
 
 export default async function insertApiKeysIntoDB(
     { db, keys }: { db: PostgresClient, keys: (CreateApiKeyInput & { status?: ApiKeyStatus })[] }
 ) {
-    const fields = `key, key_name, expiration_date, permissions, user_email, status`;
+    const fields = `secret_hash, key_name, expiration_date, permissions, user_email, status`;
     const fieldsCount = fields.split(",")
 
     const placeholders = keys.map((_, i) => (
@@ -12,7 +12,7 @@ export default async function insertApiKeysIntoDB(
     )).join(", ")
 
     const valuse = keys.flatMap((key) => [
-        randomString(key.keyName.length + 10),
+        generateApiKeySecret(),
         key.keyName,
         null,
         key.permissions,

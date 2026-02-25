@@ -47,7 +47,6 @@ export default function getAllApiKeysTests({ db }: { db: PostgresClient }) {
             expect(res.result).toHaveLength(1);
             expect(res.result[0]).toMatchObject({
                 id: expect.stringMatching(uuidMatcher),
-                key: expect.any(String),
                 keyName: newApiKeyInput.keyName,
                 expirationDate: null,
                 permissions: expect.arrayContaining(newApiKeyInput.permissions),

@@ -52,13 +52,13 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const chatsService = new ChatsService(dependencies.databaseClient, vectorDatabaseService, llmService);
 
-    const apiKeysService = new ApiKeysService(dependencies.databaseClient, jwtService);
+    const apiKeysService = new ApiKeysService(dependencies.databaseClient);
 
     const mailsSenderService = new MailsSenderService();
 
     const authService = new AuthService(usersService, mailsSenderService, dependencies.kvStoreClient);
 
-    const guardService = new GuardService(jwtService, dependencies.databaseClient, dependencies.kvStoreClient);
+    const guardService = new GuardService(jwtService, dependencies.databaseClient, dependencies.kvStoreClient, apiKeysService);
 
     const agentsService = new AgentsService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 

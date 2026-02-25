@@ -1,10 +1,8 @@
-export const sudoPermission = "sudo"
 export const inferencePermission = "inference"
 export const readPermission = "read"
 export const writePermission = "write"
 
 const permissionsSet = [
-    sudoPermission,
     inferencePermission,
     readPermission,
     writePermission
