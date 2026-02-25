@@ -24,7 +24,7 @@ export class ChatsController {
             return c.body(chatsResponsesMessages.dontKnow);
         }
 
-        return c.body(response, 200, { chatId: chatId || "" });
+        return c.body(response!, 200, { chatId: chatId || "" });
     }
 
     startPrivateChat(c: Context<{ Variables: { userEmail: string } }>) {
@@ -59,7 +59,7 @@ export class ChatsController {
             return c.body(chatsResponsesMessages.dontKnow);
         }
 
-        return c.body(response, 200);
+        return c.body(response!, 200);
     }
 
     continuePrivateChat(c: Context<{ Variables: { userEmail: string } }>) {
