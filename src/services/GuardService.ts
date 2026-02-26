@@ -81,9 +81,11 @@ export class GuardService {
             },
             noAuthenticationHeaderMessage: { error: "Authentication header is missing" },
             invalidAuthenticationHeaderMessage: { error: "Invalid authentication header" },
-            invalidTokenMessage: (c) => (
-                { error: c.get("auth-error-message") || "You are unauthorized" }
-            ),
+            invalidToken: {
+                message: (c) => (
+                    { error: `Invalid Token: ${c.get("auth-error-message") || "You are not authenticated"}` }
+                ),
+            },
         })(c, next)
     }
 
