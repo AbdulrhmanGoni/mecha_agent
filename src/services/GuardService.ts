@@ -27,17 +27,21 @@ export class GuardService {
     }
 
     guardRoute({ permissions, sudoOnly }: GuardRouteOptions): MiddlewareHandler {
-        return (c, next) => {
+        return async (c, next) => {
             const apiKey = c.req.header("Api-Key")
             if (apiKey && !sudoOnly) {
-                return this.apiKeysGuard(c, next, apiKey, { permissions })
+                const response = await this.apiKeysGuard(c, apiKey, { permissions })
+                if (response instanceof Response) {
+                    return response
+                }
+                await next()
             } else {
                 return this.jwtGuard(c, next)
             }
         }
     }
 
-    async apiKeysGuard(c: Context, next: Next, apiKey: string, { permissions }: GuardRouteOptions) {
+    async apiKeysGuard(c: Context, apiKey: string, { permissions }: GuardRouteOptions) {
         if (!permissions || permissions.length < 1) {
             return c.json({ error: apiKeysResponseMessages.insufficientPermissions }, 401);
         }
@@ -58,7 +62,6 @@ export class GuardService {
 
         c.set("userEmail", apiKeyRecord.userEmail);
         c.set("apiKeyId", apiKeyRecord.id);
-        await next()
     }
 
     jwtGuard(c: Context, next: Next) {
