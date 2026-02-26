@@ -58,7 +58,7 @@ export class GuardService {
 
         c.set("userEmail", apiKeyRecord.userEmail);
         c.set("apiKeyId", apiKeyRecord.id);
-        next()
+        await next()
     }
 
     jwtGuard(c: Context, next: Next) {
