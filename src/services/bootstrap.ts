@@ -58,7 +58,7 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const authService = new AuthService(usersService, mailsSenderService, dependencies.kvStoreClient);
 
-    const guardService = new GuardService(jwtService, dependencies.databaseClient, dependencies.kvStoreClient, apiKeysService);
+    const guardService = new GuardService(jwtService, dependencies.kvStoreClient, apiKeysService);
 
     const agentsService = new AgentsService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
 

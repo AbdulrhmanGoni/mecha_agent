@@ -15,7 +15,6 @@ type GuardRouteOptions = {
 export class GuardService {
     constructor(
         private readonly jwtService: JwtService,
-        private readonly dbClient: PostgresClient,
         private readonly kv: Deno.Kv,
         private readonly apiKeysService: ApiKeysService,
     ) {
