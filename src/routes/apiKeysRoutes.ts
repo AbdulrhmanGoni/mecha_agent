@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { ApiKeysController } from "../controllers/ApiKeysController.ts";
+import listApiKeysParamsValidator from "../validation/apiKeys/listApiKeysParamsValidator.ts";
 import createApiKeyInputValidator from "../validation/apiKeys/createApiKeyInputValidator.ts";
 import apiKeysIdsInputValidator from "../validation/apiKeys/apiKeysIdsInputValidator.ts";
 import { GuardService } from "../services/GuardService.ts";
@@ -13,6 +14,7 @@ export default function apiKeysRoutesBuilder(
 
     apiKeysRoutes.get('/',
         guardService.guardRoute({ permissions: [readPermission] }),
+        listApiKeysParamsValidator,
         apiKeysController.getAll.bind(apiKeysController)
     );
 

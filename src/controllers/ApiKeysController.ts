@@ -25,9 +25,10 @@ export class ApiKeysController {
         throw new HTTPException(400, { message: apiKeysResponseMessages.failedKeyCreation })
     }
 
-    async getAll(c: Context<{ Variables: { userEmail: string } }>) {
+    async getAll(c: Context<{ Variables: { userEmail: string } }, never, { out: { query: ListApiKeysParams } }>) {
         const userEmail = c.get("userEmail");
-        const result = await this.apiKeysService.getAll(userEmail);
+        const query = c.req.valid("query");
+        const result = await this.apiKeysService.getAll(userEmail, query);
         return c.json({ result });
     }
 

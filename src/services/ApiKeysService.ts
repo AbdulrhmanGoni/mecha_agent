@@ -119,15 +119,17 @@ export class ApiKeysService {
         return apiKey
     }
 
-    async getAll(userEmail: string) {
+    async getAll(userEmail: string, params: ListApiKeysParams) {
         const result = await this.dbClient.queryObject<Omit<ApiKeyRecord, "secretHash">>({
             text: `
                 SELECT id, key_name, expiration_date, permissions, status, created_at, user_email
                 FROM api_keys 
                 WHERE user_email = $1
+                ORDER BY created_at DESC
+                LIMIT $2 OFFSET $3
             `,
             camelCase: true,
-            args: [userEmail]
+            args: [userEmail, params.pageSize, params.page * params.pageSize]
         })
         return result.rows
     }

@@ -14,3 +14,8 @@ type ApiKeyRecord = {
 type CreateApiKeyInput =
     Pick<ApiKeyRecord, "keyName" | "permissions" | "userEmail"> &
     { maxAgeInDays?: number }
+
+type ListApiKeysParams = {
+    page: number;
+    pageSize: number;
+}
