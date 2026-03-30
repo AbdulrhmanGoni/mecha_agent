@@ -55,5 +55,52 @@ export default function getAllApiKeysTests({ db }: { db: PostgresClient }) {
                 userEmail: testingUserCredentials.email
             });
         });
+
+        it("Should get paginated api keys with default parameters (page 0, pageSize 20)", async () => {
+            // We already have one key. Let's add 20 more to have 21 total.
+            const extraKeys = Array.from({ length: 20 }, (_, i) => ({
+                ...newApiKeyInput,
+                keyName: `Key ${i + 3}`,
+                userEmail: testingUserCredentials.email
+            }));
+            await insertApiKeysIntoDB({ db, keys: extraKeys });
+
+            const request = new MechaTester(testingUserCredentials.email);
+            const response = await request.get(endpoint).send()
+            const res = await response.json<{ result: ApiKeyRecord[] }>();
+
+            expect(res.result).toBeInstanceOf(Array);
+            expect(res.result).toHaveLength(20); // Default pageSize is 20
+        });
+
+        it("Should get paginated api keys with custom pageSize", async () => {
+            const request = new MechaTester(testingUserCredentials.email);
+            const response = await request.get(`${endpoint}?pageSize=5`).send()
+            const res = await response.json<{ result: ApiKeyRecord[] }>();
+
+            expect(res.result).toBeInstanceOf(Array);
+            expect(res.result).toHaveLength(5);
+        });
+
+        it("Should get paginated api keys with custom page", async () => {
+            const request = new MechaTester(testingUserCredentials.email);
+            const pageNumber = 2;
+            const response = await request.get(`${endpoint}?page=${pageNumber - 1}`).send()
+            const res = await response.json<{ result: ApiKeyRecord[] }>();
+
+            expect(res.result).toBeInstanceOf(Array);
+            expect(res.result).toHaveLength(1); // 21 total keys - 20 from first page, so 1 key left for the second page
+        });
+
+        it("Should return empty array for out of range page", async () => {
+            const request = new MechaTester(testingUserCredentials.email);
+            const pageNumber = 7;
+            const pageSize = 10;
+            const response = await request.get(`${endpoint}?page=${pageNumber - 1}&pageSize=${pageSize}`).send()
+            const res = await response.json<{ result: ApiKeyRecord[] }>();
+
+            expect(res.result).toBeInstanceOf(Array);
+            expect(res.result).toHaveLength(0);
+        });
     });
 };
