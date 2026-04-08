@@ -10,6 +10,9 @@ export const varsSchema = z.object({
 
 const env = parseEnvironmentVariables(varsSchema);
 
+const buildTestContainers = new Deno.Command(Deno.execPath(), { args: ["task", "build:test"], env });
+await buildTestContainers.spawn().output();
+
 const startTestingContainers = new Deno.Command("docker", {
     args: ["compose", "-f", "docker/docker-compose-test.yml", "up", "-d"],
     env,
