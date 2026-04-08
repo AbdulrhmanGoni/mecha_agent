@@ -35,6 +35,15 @@ services:
     networks:
       - development-network
 
+  dev_qstash: 
+    image: public.ecr.aws/upstash/qstash:latest
+    container_name: dev_qstash_container
+    command: qstash dev --port 6666
+    ports:
+      - 6666:6666
+    networks:
+      - development-network
+
   dev_vector_database:
     image: qdrant/qdrant:v1.13.3
     container_name: dev_vector_database_container

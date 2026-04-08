@@ -6,6 +6,7 @@ import { bootstrapEmbeddingClient } from "./bootstrapEmbeddingClient.ts";
 import { bootstrapLLMClient } from "./bootstrapLLMClient.ts";
 import { kvStoreClient } from "./denoKvStoreClient.ts";
 import { bootstrapPaymentGatewayClient } from "./bootstrapPaymentGatewayClient.ts";
+import { qStashClient } from "./qStashClient.ts";
 
 export async function bootstrapConfigurations() {
     const llmClient = await bootstrapLLMClient()
@@ -41,5 +42,6 @@ export async function bootstrapConfigurations() {
         utApi,
         kvStoreClient,
         stripePaymentGatewayClient,
+        qStashClient,
     }
 };

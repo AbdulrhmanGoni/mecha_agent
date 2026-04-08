@@ -16,6 +16,9 @@ import { DatasetsService } from "../services/DatasetsService.ts";
 import { MetricsController } from "./MetricsController.ts";
 import { SubscriptionsController } from "./SubscriptionsController.ts";
 import { SubscriptionsService } from "../services/SubscriptionsService.ts";
+import { BackgroundTasksController } from "./BackgroundTasksController.ts";
+import { BackgroundTasksService } from "../services/BackgroundTasksService.ts";
+import { QStashClient } from "../configurations/qStashClient.ts";
 
 type controllersDependencies = {
     services: {
@@ -28,8 +31,12 @@ type controllersDependencies = {
         chatsService: ChatsService;
         objectStorageService: ObjectStorageService;
         subscriptionsService: SubscriptionsService;
+        backgroundTasksService: BackgroundTasksService;
     };
-    configs: { kvStoreClient: Deno.Kv; };
+    configs: {
+        kvStoreClient: Deno.Kv;
+        qStashClient: QStashClient;
+    };
 }
 
 export default function bootstrapControllers(dependencies: controllersDependencies) {
@@ -67,6 +74,11 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         dependencies.services.subscriptionsService,
     );
 
+    const backgroundTasksController = new BackgroundTasksController(
+        dependencies.services.backgroundTasksService,
+        dependencies.configs.qStashClient,
+    );
+
     return {
         usersController,
         chatsController,
@@ -77,6 +89,7 @@ export default function bootstrapControllers(dependencies: controllersDependenci
         authController,
         metricsController,
         subscriptionsController,
+        backgroundTasksController,
     }
 };
 

@@ -41,7 +41,8 @@
     "@google/genai": "npm:@google/genai",
     "stripe": "npm:stripe",
     "uploadthing": "npm:uploadthing@^7.7.4",
-    "zod": "npm:zod"
+    "zod": "npm:zod",
+    "@upstash/qstash": "npm:@upstash/qstash@^2.7.3"
   },
   "compilerOptions": {
     "types": [
