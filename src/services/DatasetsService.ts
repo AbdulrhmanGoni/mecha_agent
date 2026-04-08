@@ -1,11 +1,13 @@
 import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { InstructionsService } from "./InstructionsService.ts";
+import { QStashClient } from "../configurations/qStashClient.ts";
 
 export class DatasetsService {
     constructor(
         private readonly dbClient: PostgresClient,
         private readonly instructionsService: InstructionsService,
         private readonly kvClient: Deno.Kv,
+        private readonly qStashClient: QStashClient,
     ) {
     }
 
@@ -109,12 +111,12 @@ export class DatasetsService {
 
             if (updateUserResult.rowCount === 1) {
                 await transaction.commit();
-                await this.kvClient.enqueue(
+                await this.qStashClient.enqueue(
+                    "background-tasks",
                     {
                         task: "delete_dataset_instructions",
                         payload: { datasetId, userEmail },
-                    },
-                    { keysIfUndelivered: [["delete_dataset_instructions", datasetId]] }
+                    }
                 )
                 return true
             }

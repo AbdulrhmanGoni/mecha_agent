@@ -18,6 +18,7 @@ import { BackgroundTasksService } from "./BackgroundTasksService.ts";
 import { MailsSenderService } from "./MailsSenderService.ts";
 import { StripePaymentGatewayClient } from "../configurations/stripePaymentGatewayClient.ts";
 import { UTApi } from "uploadthing/server";
+import { QStashClient } from "../configurations/qStashClient.ts";
 
 type ServicesDependencies = {
     vectorDatabaseClient: QdrantClient;
@@ -27,6 +28,7 @@ type ServicesDependencies = {
     utApi: UTApi;
     kvStoreClient: Deno.Kv;
     stripePaymentGatewayClient: StripePaymentGatewayClient;
+    qStashClient: QStashClient;
 }
 
 export async function bootstrapServices(dependencies: ServicesDependencies) {
@@ -60,15 +62,22 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
 
     const guardService = new GuardService(jwtService, dependencies.kvStoreClient, apiKeysService);
 
-    const agentsService = new AgentsService(dependencies.databaseClient, objectStorageService, dependencies.kvStoreClient, subscriptionsService);
+    const agentsService = new AgentsService(
+        dependencies.databaseClient,
+        objectStorageService,
+        dependencies.kvStoreClient,
+        subscriptionsService,
+        dependencies.qStashClient,
+    );
 
     const datasetsService = new DatasetsService(
         dependencies.databaseClient,
         instructionsService,
         dependencies.kvStoreClient,
+        dependencies.qStashClient,
     );
 
-    new BackgroundTasksService(
+    const backgroundTasksService = new BackgroundTasksService(
         dependencies.kvStoreClient,
         dependencies.databaseClient,
         instructionsService,
@@ -87,5 +96,6 @@ export async function bootstrapServices(dependencies: ServicesDependencies) {
         datasetsService,
         subscriptionsService,
         mailsSenderService,
+        backgroundTasksService,
     }
 };
