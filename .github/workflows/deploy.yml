@@ -11,10 +11,6 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
@@ -24,21 +20,11 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
       - name: Prepare environment variables for HTML mails bundler
         run: echo "CLIENT_URL=${{ vars.CLIENT_URL }}" >> .env
 
       - name: Bundle HTML mails templates
         run: deno task bundle-html-mails-templates:prod
 
-      - name: Install the database migration tool (dbmate)
-        run: deno add npm:dbmate
-
       - name: Upload to Deno Deploy
         run: deno deploy --app mecha-agent --token "${{ secrets.DENO_DEPLOY_TOKEN }}" --prod
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
