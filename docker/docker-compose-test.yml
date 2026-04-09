@@ -44,6 +44,16 @@ services:
       - testing-network
     restart: always
 
+  testing_qstash:
+    image: public.ecr.aws/upstash/qstash:latest
+    container_name: testing_qstash_container
+    command: qstash dev --port 6666
+    ports:
+      - 6666:6666
+    networks:
+      - testing-network
+    restart: always
+
 networks:
   testing-network:
     driver: bridge

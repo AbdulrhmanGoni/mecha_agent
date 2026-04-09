@@ -2,6 +2,7 @@ import { plans } from "../constant/plans.ts";
 import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import { SubscriptionsService } from "./SubscriptionsService.ts";
+import { QStashClient } from "../configurations/qStashClient.ts";
 
 const agentRowFieldsNamesMap: Record<string, string> = {
     agentName: "agent_name",
@@ -19,6 +20,7 @@ export class AgentsService {
         private objectStorageService: ObjectStorageService,
         private kvStore: Deno.Kv,
         private readonly subscriptionsService: SubscriptionsService,
+        private qStashClient: QStashClient,
     ) { }
 
     async create(userEmail: string, newAgent: CreateAgentFormData) {
@@ -124,11 +126,11 @@ export class AgentsService {
         await transaction.commit();
 
         if (deletedAgent.avatar) {
-            const second = 1000
-            this.kvStore.enqueue({ task: "delete_avatars_from_object_storage" }, {
-                delay: second * 7,
-                backoffSchedule: [second * 10, second * 60, second * 60 * 60],
-            });
+            this.qStashClient.enqueue(
+                "background-tasks",
+                { task: "delete_avatars_from_object_storage" },
+                { delay: 7 }
+            );
         }
 
         return true

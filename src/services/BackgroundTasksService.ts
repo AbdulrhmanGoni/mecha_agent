@@ -1,9 +1,9 @@
-import { kvStoreClient } from "../configurations/denoKvStoreClient.ts";
 import { type Client as PostgresClient } from "deno.land/x/postgres";
 import { InstructionsService } from "./InstructionsService.ts";
 import performanceInSeconds from "../helpers/performanceInSeconds.ts";
 import { ObjectStorageService } from "./ObjectStorageService.ts";
 import sentryClient from "../sentry.ts";
+import { qStashClient } from "../configurations/qStashClient.ts";
 
 export class BackgroundTasksService {
     constructor(
@@ -11,37 +11,37 @@ export class BackgroundTasksService {
         private readonly dbClient: PostgresClient,
         private readonly instructionsService: InstructionsService,
         private readonly objectStorageService: ObjectStorageService,
-    ) {
-        this.kvStoreClient.listenQueue((msg: BackgroundTaskMessage) => {
-            switch (msg.task) {
-                case "delete_expired_anonymous_chats":
-                    this.taskPerformenceLogger(msg.task, this.cleanExpiredAnonymousChats())
-                    break;
+    ) { }
 
-                case "reset_users_inferences_rate_limits":
-                    this.taskPerformenceLogger(msg.task, this.resetUsersInferencesRateLimits());
-                    break;
+    public handleTask(msg: BackgroundTaskMessage) {
+        switch (msg.task) {
+            case "delete_expired_anonymous_chats":
+                this.taskPerformenceLogger(msg.task, this.cleanExpiredAnonymousChats())
+                break;
 
-                case "delete_dataset_instructions":
-                    this.taskPerformenceLogger(
-                        msg.task,
-                        this.instructionsService.clearDatasetInstructions(msg.payload.datasetId, msg.payload.userEmail)
-                    );
-                    break;
+            case "reset_users_inferences_rate_limits":
+                this.taskPerformenceLogger(msg.task, this.resetUsersInferencesRateLimits());
+                break;
 
-                case "delete_avatars_from_object_storage":
-                    this.taskPerformenceLogger(msg.task, this.deleteAvatarsFromObjectStorage());
-                    break;
+            case "delete_dataset_instructions":
+                this.taskPerformenceLogger(
+                    msg.task,
+                    this.instructionsService.clearDatasetInstructions(msg.payload.datasetId, msg.payload.userEmail)
+                );
+                break;
 
-                case "delete_user_legacy":
-                    this.taskPerformenceLogger(msg.task, this.deleteUserLegacy(msg.payload.userEmail));
-                    break;
+            case "delete_avatars_from_object_storage":
+                this.taskPerformenceLogger(msg.task, this.deleteAvatarsFromObjectStorage());
+                break;
 
-                default:
-                    console.warn(new Date().toISOString(), `Unknown message enqueued: ${msg}`)
-                    break;
-            }
-        });
+            case "delete_user_legacy":
+                this.taskPerformenceLogger(msg.task, this.deleteUserLegacy(msg.payload.userEmail));
+                break;
+
+            default:
+                console.warn(new Date().toISOString(), `Unknown message enqueued: ${JSON.stringify(msg)}`)
+                break;
+        }
     }
 
     private async cleanExpiredAnonymousChats() {
@@ -120,9 +120,9 @@ export class BackgroundTasksService {
 }
 
 Deno.cron("Delete expired anonymous chats", "0 0 * * *", () => {
-    kvStoreClient.enqueue({ task: "delete_expired_anonymous_chats" });
+    qStashClient.enqueue("background-tasks", { task: "delete_expired_anonymous_chats" });
 });
 
 Deno.cron("Reset users inferences rate limits", "0 0 * * *", () => {
-    kvStoreClient.enqueue({ task: "reset_users_inferences_rate_limits" });
+    qStashClient.enqueue("background-tasks", { task: "reset_users_inferences_rate_limits" });
 });

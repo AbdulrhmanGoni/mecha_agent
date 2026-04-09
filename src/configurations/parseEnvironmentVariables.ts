@@ -43,6 +43,12 @@ export const envSchema = z.object({
     MAIL_SENDER_KEY: z.string().optional(),
 
     METRICS_SCRAPPER_TOKEN: z.string().optional(),
+
+    QSTASH_URL: z.string(),
+    QSTASH_TOKEN: z.string(),
+    SERVER_URL: z.string(),
+    QSTASH_NEXT_SIGNING_KEY: z.string().default(""),
+    QSTASH_CURRENT_SIGNING_KEY: z.string().default(""),
 });
 
 const parsedEnvVariables = parseEnvironmentVariables(envSchema);

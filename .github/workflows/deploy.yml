@@ -38,12 +38,7 @@ jobs:
       - name: Install the database migration tool (dbmate)
         run: deno add npm:dbmate
 
-      - name: Sync database schema with latest changes
-        run: deno -E --allow-run dbmate --url "${{ secrets.DB_URL }}" up
-
       - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "mecha-agent"
-          entrypoint: "src/server.ts"
-          exclude: docker,scripts,tests,html-mails-templates,db
+        run: deno deploy --app mecha-agent --token "${{ secrets.DENO_DEPLOY_TOKEN }}" --prod
+        env:
+          DB_URL: ${{ secrets.DB_URL }}

@@ -21,6 +21,8 @@ import { MetricsController } from "../controllers/MetricsController.ts";
 import { InferencesMiddleware } from "../middlewares/InferencesMiddleware.ts";
 import subscriptionsRoutesBuilder from "./subscriptionsRoutes.ts";
 import { SubscriptionsController } from "../controllers/SubscriptionsController.ts";
+import { BackgroundTasksController } from "../controllers/BackgroundTasksController.ts";
+import backgroundTasksRoutesBuilder from "./backgroundTasksRoutes.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -33,6 +35,7 @@ type RoutesDependencies = {
         authController: AuthController;
         metricsController: MetricsController;
         subscriptionsController: SubscriptionsController;
+        backgroundTasksController: BackgroundTasksController;
     },
     middlewares: {
         metricsMiddleware: MetricsMiddleware;
@@ -90,6 +93,10 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
         dependencies.services.guardService,
     );
 
+    const backgroundTasksRoutes = backgroundTasksRoutesBuilder(
+        dependencies.controllers.backgroundTasksController
+    );
+
     const api = new Hono();
 
     api.use(
@@ -107,6 +114,7 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/datasets', datasetsRoutes);
     api.route('/subscriptions', subscriptionsRoutes);
     api.route('/metrics', metricsRoutes);
+    api.route('/background-tasks', backgroundTasksRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
 
     const app = new Hono().route("/api", api);
