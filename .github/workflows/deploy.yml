@@ -39,6 +39,6 @@ jobs:
         run: deno add npm:dbmate
 
       - name: Upload to Deno Deploy
-        run: deno deploy --app mecha-agent --token "${{ secrets.DENO_DEPLOY_TOKEN }}"
+        run: deno deploy --app mecha-agent --token "${{ secrets.DENO_DEPLOY_TOKEN }}" --prod
         env:
           DB_URL: ${{ secrets.DB_URL }}
