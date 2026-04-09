@@ -53,4 +53,4 @@ jobs:
       id-token: write
       contents: read
     secrets:
-      DB_URL: ${{ secrets.DB_URL }}
+      DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}

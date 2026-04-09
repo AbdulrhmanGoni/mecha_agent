@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   workflow_call:
     secrets:
-      DB_URL:
+      DENO_DEPLOY_TOKEN:
         required: true
 
 jobs:
