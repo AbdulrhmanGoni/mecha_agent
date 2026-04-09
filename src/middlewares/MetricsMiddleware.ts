@@ -13,7 +13,7 @@ export class MetricsMiddleware {
         await next();
         const resTimeSec = parsedEnvVariables.ENVIRONMENT === "development" ?
             Number((Math.random() * 6).toFixed(1)) :
-            Number(((performance.now() - start) / 1000))
+            Number(((performance.now() - start) / 1000).toFixed(5))
 
         if (this.excludeRoutes.some((path) => c.req.path.startsWith(path))) {
             return
