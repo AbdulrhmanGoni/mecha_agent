@@ -21,7 +21,6 @@ import { MetricsController } from "../controllers/MetricsController.ts";
 import { InferencesMiddleware } from "../middlewares/InferencesMiddleware.ts";
 import subscriptionsRoutesBuilder from "./subscriptionsRoutes.ts";
 import { SubscriptionsController } from "../controllers/SubscriptionsController.ts";
-import tempRouteBuilder from "./tempRoute.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -109,7 +108,6 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/subscriptions', subscriptionsRoutes);
     api.route('/metrics', metricsRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
-    api.get('/temp', tempRouteBuilder);
 
     const app = new Hono().route("/api", api);
 
