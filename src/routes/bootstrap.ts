@@ -23,7 +23,8 @@ import subscriptionsRoutesBuilder from "./subscriptionsRoutes.ts";
 import { SubscriptionsController } from "../controllers/SubscriptionsController.ts";
 import { BackgroundTasksController } from "../controllers/BackgroundTasksController.ts";
 import backgroundTasksRoutesBuilder from "./backgroundTasksRoutes.ts";
-import kvMigration from "./kvMigration.ts";
+// import kvMigration from "./kvMigration.ts";
+import kvMigrationCheck from "./kvMigrationCheck.ts";
 
 type RoutesDependencies = {
     controllers: {
@@ -117,7 +118,8 @@ export default function bootstrapRoutes(dependencies: RoutesDependencies) {
     api.route('/metrics', metricsRoutes);
     api.route('/background-tasks', backgroundTasksRoutes);
     api.get('/health-check', (c) => c.body("The server is up and running", 200));
-    api.post('/kv-migration', kvMigration);
+    // api.post('/kv-migration', kvMigration);
+    api.post('/kv-migration-check', kvMigrationCheck);
 
     const app = new Hono().route("/api", api);
 
