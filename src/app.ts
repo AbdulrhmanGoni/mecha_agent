@@ -35,6 +35,7 @@ export default async function bootstrapApp() {
         services,
         configs: {
             kvStoreClient: configurations.kvStoreClient,
+            qStashClient: configurations.qStashClient,
         }
     });
     console.log(`Controllers bootstrapped in ${performanceInSeconds(controllersStart)}`);
