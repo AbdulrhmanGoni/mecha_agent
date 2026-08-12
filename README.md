@@ -7,7 +7,7 @@ publish them for the world to interact and chat with.
 ## Documentation
 
 Go to the
-[**documentation site**](https:abdulrhmangoni.github.io/mecha_agent_docs) of
+[**documentation site**](https://abdulrhmangoni.github.io/mecha_agent_docs) of
 **Mecha Agent** platform for more info
 
 ## Contribution
